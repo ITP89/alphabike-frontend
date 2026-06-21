@@ -8,6 +8,13 @@ import Galeria from './pages/Galeria'
 import Contacto from './pages/Contacto'
 import Registro from './pages/Registro'
 import Carrito from './pages/Carrito'
+import Checkout from './pages/Checkout'
+import DetallePedido from './pages/DetallePedido'
+import MisPedidos from './pages/MisPedidos'
+import AgendarCita from './pages/AgendarCita'
+import DetalleCita from './pages/DetalleCita'
+import MisCitas from './pages/MisCitas'
+import MiPerfil from './pages/MiPerfil'
 
 function App() {
   return (
@@ -21,6 +28,13 @@ function App() {
       <Route path="/contacto" element={<Contacto />} />
       <Route path="/registro" element={<Registro />} />
       <Route path="/carrito" element={<Carrito />} />
+      <Route path="/checkout" element={<Checkout />} />
+      <Route path="/pedidos/:id" element={<DetallePedido />} />
+      <Route path="/pedidos" element={<MisPedidos />} />
+      <Route path="/agendar-cita" element={<AgendarCita />} />
+      <Route path="/citas/:id" element={<DetalleCita />} />
+      <Route path="/citas" element={<MisCitas />} />
+      <Route path="/perfil" element={<MiPerfil />} />
     </Routes>
   )
 }

@@ -19,9 +19,9 @@ export function AuthProvider({ children }) {
 
   async function login(email, password) {
     const response = await api.post('/auth/login', { email, password })
-    const { token, nombre, email: userEmail, rol } = response.data.data
+    const { id, token, nombre, email: userEmail, rol } = response.data.data
 
-    const datosUsuario = { nombre, email: userEmail, rol }
+    const datosUsuario = { id, nombre, email: userEmail, rol }
 
     localStorage.setItem('token', token)
     localStorage.setItem('usuario', JSON.stringify(datosUsuario))
@@ -37,9 +37,9 @@ export function AuthProvider({ children }) {
       password,
       telefono,
     })
-    const { token, nombre: userNombre, email: userEmail, rol } = response.data.data
+    const { id, token, nombre: userNombre, email: userEmail, rol } = response.data.data
 
-    const datosUsuario = { nombre: userNombre, email: userEmail, rol }
+    const datosUsuario = { id, nombre: userNombre, email: userEmail, rol }
 
     localStorage.setItem('token', token)
     localStorage.setItem('usuario', JSON.stringify(datosUsuario))
