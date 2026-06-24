@@ -19,6 +19,12 @@ import MiPerfil from './pages/MiPerfil'
 import DashboardEncargado from './pages/encargado/Dashboard'
 import GestionCitas from './pages/encargado/GestionCitas'
 import DetalleCitaEncargado from './pages/encargado/DetalleCitaEncargado'
+import GestionProductos from './pages/encargado/GestionProductos'
+import VentaPresencial from './pages/encargado/VentaPresencial'
+import GestionPagos from './pages/encargado/GestionPagos'
+import GestionEntregas from './pages/encargado/GestionEntregas'
+import GaleriaEncargado from './pages/encargado/GaleriaEncargado'
+import DashboardAdmin from './pages/admin/Dashboard'
 
 function App() {
   return (
@@ -86,6 +92,39 @@ function App() {
       <Route path="/encargado/citas/:id" element={
         <RutaProtegida roles={['ENCARGADO', 'ADMIN']}>
           <DetalleCitaEncargado />
+        </RutaProtegida>
+      } />
+      <Route path="/encargado/productos" element={
+        <RutaProtegida roles={['ENCARGADO', 'ADMIN']}>
+          <GestionProductos />
+        </RutaProtegida>
+      } />
+      <Route path="/encargado/venta" element={
+        <RutaProtegida roles={['ENCARGADO', 'ADMIN']}>
+          <VentaPresencial />
+        </RutaProtegida>
+      } />
+      <Route path="/encargado/pagos" element={
+        <RutaProtegida roles={['ENCARGADO', 'ADMIN']}>
+          <GestionPagos />
+        </RutaProtegida>
+      } />
+      <Route path="/encargado/entregas" element={
+        <RutaProtegida roles={['ENCARGADO', 'ADMIN']}>
+          <GestionEntregas />
+        </RutaProtegida>
+      } />
+      <Route path="/encargado/galeria" element={
+        <RutaProtegida roles={['ENCARGADO', 'ADMIN']}>
+          <GaleriaEncargado />
+        </RutaProtegida>
+      } />
+
+
+      {/* Admin */}
+      <Route path="/admin/dashboard" element={
+        <RutaProtegida roles={['ADMIN']}>
+          <DashboardAdmin />
         </RutaProtegida>
       } />
     </Routes>
