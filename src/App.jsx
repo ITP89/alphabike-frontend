@@ -25,6 +25,11 @@ import GestionPagos from './pages/encargado/GestionPagos'
 import GestionEntregas from './pages/encargado/GestionEntregas'
 import GaleriaEncargado from './pages/encargado/GaleriaEncargado'
 import DashboardAdmin from './pages/admin/Dashboard'
+import GestionUsuarios from './pages/admin/GestionUsuarios'
+import HistorialCliente from './pages/admin/HistorialCliente'
+import GestionCategorias from './pages/admin/GestionCategorias'
+import GestionServicios from './pages/admin/GestionServicios'
+import Reportes from './pages/admin/Reportes'
 
 function App() {
   return (
@@ -125,6 +130,63 @@ function App() {
       <Route path="/admin/dashboard" element={
         <RutaProtegida roles={['ADMIN']}>
           <DashboardAdmin />
+        </RutaProtegida>
+      } />
+
+      <Route path="/admin/usuarios" element={
+        <RutaProtegida roles={['ADMIN']}>
+          <GestionUsuarios />
+        </RutaProtegida>
+      } />
+      
+      <Route path="/admin/usuarios/:id" element={
+        <RutaProtegida roles={['ADMIN']}>
+          <HistorialCliente />
+        </RutaProtegida>
+      } />
+
+      <Route path="/admin/categorias" element={
+        <RutaProtegida roles={['ADMIN']}>
+          <GestionCategorias />
+        </RutaProtegida>
+      } />
+
+      <Route path="/admin/servicios" element={
+        <RutaProtegida roles={['ADMIN']}>
+          <GestionServicios />
+        </RutaProtegida>
+      } />
+
+      <Route path="/admin/reportes" element={
+        <RutaProtegida roles={['ADMIN']}>
+          <Reportes />
+        </RutaProtegida>
+      } />
+
+      {/* Admin - rutas compartidas con Encargado */}
+      <Route path="/admin/citas" element={
+        <RutaProtegida roles={['ADMIN']}>
+          <GestionCitas />
+        </RutaProtegida>
+      } />
+      <Route path="/admin/citas/:id" element={
+        <RutaProtegida roles={['ADMIN']}>
+          <DetalleCitaEncargado />
+        </RutaProtegida>
+      } />
+      <Route path="/admin/productos" element={
+        <RutaProtegida roles={['ADMIN']}>
+          <GestionProductos />
+        </RutaProtegida>
+      } />
+      <Route path="/admin/pedidos" element={
+        <RutaProtegida roles={['ADMIN']}>
+          <GestionEntregas />
+        </RutaProtegida>
+      } />
+      <Route path="/admin/pagos" element={
+        <RutaProtegida roles={['ADMIN']}>
+          <GestionPagos />
         </RutaProtegida>
       } />
     </Routes>
