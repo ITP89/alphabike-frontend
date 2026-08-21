@@ -18,8 +18,15 @@ function Login() {
     setCargando(true)
 
     try {
-      await login(email, password)
-      navigate('/')
+      const datosUsuario = await login(email, password)
+
+      if (datosUsuario.rol === 'ADMIN') {
+        navigate('/admin/dashboard')
+      } else if (datosUsuario.rol === 'ENCARGADO') {
+        navigate('/encargado/dashboard')
+      } else {
+        navigate('/')
+      }
     } catch (err) {
       setError('Correo o contrasena incorrectos')
     } finally {

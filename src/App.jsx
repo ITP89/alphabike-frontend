@@ -30,6 +30,11 @@ import HistorialCliente from './pages/admin/HistorialCliente'
 import GestionCategorias from './pages/admin/GestionCategorias'
 import GestionServicios from './pages/admin/GestionServicios'
 import Reportes from './pages/admin/Reportes'
+import AdminCitas from './pages/admin/AdminCitas'
+import AdminDetalleCita from './pages/admin/AdminDetalleCita'
+import AdminProductos from './pages/admin/AdminProductos'
+import AdminPedidos from './pages/admin/AdminPedidos'
+import AdminPagos from './pages/admin/AdminPagos'
 
 function App() {
   return (
@@ -138,7 +143,7 @@ function App() {
           <GestionUsuarios />
         </RutaProtegida>
       } />
-      
+
       <Route path="/admin/usuarios/:id" element={
         <RutaProtegida roles={['ADMIN']}>
           <HistorialCliente />
@@ -166,27 +171,27 @@ function App() {
       {/* Admin - rutas compartidas con Encargado */}
       <Route path="/admin/citas" element={
         <RutaProtegida roles={['ADMIN']}>
-          <GestionCitas />
+          <AdminCitas />
         </RutaProtegida>
       } />
       <Route path="/admin/citas/:id" element={
         <RutaProtegida roles={['ADMIN']}>
-          <DetalleCitaEncargado />
+          <AdminDetalleCita />
         </RutaProtegida>
       } />
       <Route path="/admin/productos" element={
         <RutaProtegida roles={['ADMIN']}>
-          <GestionProductos />
+          <AdminProductos />
         </RutaProtegida>
       } />
       <Route path="/admin/pedidos" element={
         <RutaProtegida roles={['ADMIN']}>
-          <GestionEntregas />
+          <AdminPedidos />
         </RutaProtegida>
       } />
       <Route path="/admin/pagos" element={
         <RutaProtegida roles={['ADMIN']}>
-          <GestionPagos />
+          <AdminPagos />
         </RutaProtegida>
       } />
     </Routes>
