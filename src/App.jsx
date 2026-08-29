@@ -35,6 +35,7 @@ import AdminDetalleCita from './pages/admin/AdminDetalleCita'
 import AdminProductos from './pages/admin/AdminProductos'
 import AdminPedidos from './pages/admin/AdminPedidos'
 import AdminPagos from './pages/admin/AdminPagos'
+import NotFound from './pages/NotFound'
 
 function App() {
   return (
@@ -194,6 +195,7 @@ function App() {
           <AdminPagos />
         </RutaProtegida>
       } />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }
