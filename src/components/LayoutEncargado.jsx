@@ -1,63 +1,29 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import {
+  Bike,
+  CalendarDays,
+  Camera,
+  CreditCard,
+  LayoutDashboard,
+  Package,
+  ReceiptText,
+} from 'lucide-react'
+import PanelLayout from './PanelLayout'
 
 function LayoutEncargado({ children }) {
-  const { usuario, logout } = useAuth()
-  const navigate = useNavigate()
-  const location = useLocation()
-
-  function handleLogout() {
-    logout()
-    navigate('/')
-  }
-
   const links = [
-    { to: '/encargado/dashboard', label: 'Dashboard' },
-    { to: '/encargado/citas', label: 'Citas' },
-    { to: '/encargado/productos', label: 'Productos' },
-    { to: '/encargado/venta', label: 'Venta presencial' },
-    { to: '/encargado/entregas', label: 'Pedidos / entregas' },
-    { to: '/encargado/pagos', label: 'Pagos' },
-    { to: '/encargado/galeria', label: 'Galeria' },
+    { to: '/encargado/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/encargado/citas', label: 'Citas', icon: CalendarDays },
+    { to: '/encargado/productos', label: 'Productos', icon: Package },
+    { to: '/encargado/venta', label: 'Venta presencial', icon: Bike },
+    { to: '/encargado/entregas', label: 'Pedidos / entregas', icon: ReceiptText },
+    { to: '/encargado/pagos', label: 'Pagos', icon: CreditCard },
+    { to: '/encargado/galeria', label: 'Galeria', icon: Camera },
   ]
 
   return (
-    <div className="min-h-screen grid grid-cols-[200px_1fr]">
-
-      <div className="border-r border-gray-200 px-4 py-6 flex flex-col gap-2">
-        <div className="font-semibold text-gray-900 mb-1">ALPHA BIKE</div>
-        <div className="text-xs text-gray-500 mb-4">Panel Encargado</div>
-
-        {links.map((link) => (
-          <Link
-            key={link.to}
-            to={link.to}
-            className={`text-sm px-3 py-2 rounded-md ${
-              location.pathname === link.to
-                ? 'bg-blue-50 text-blue-600 font-medium'
-                : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            {link.label}
-          </Link>
-        ))}
-
-        <div className="mt-auto pt-4 border-t border-gray-200">
-          <div className="text-sm text-gray-700 mb-2">{usuario?.nombre}</div>
-          <button
-            onClick={handleLogout}
-            className="text-sm text-red-500 hover:text-red-700"
-          >
-            Cerrar sesion
-          </button>
-        </div>
-      </div>
-
-      <div className="p-6 bg-gray-50 min-h-screen">
-        {children}
-      </div>
-
-    </div>
+    <PanelLayout title="Encargado" subtitle="Panel Encargado" links={links}>
+      {children}
+    </PanelLayout>
   )
 }
 

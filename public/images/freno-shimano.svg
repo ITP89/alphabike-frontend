@@ -1,0 +1,35 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#cbd5e1"/>
+      <stop offset="50%" stop-color="#64748b"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="400" cy="300" r="180" fill="none" stroke="url(#metal)" stroke-width="24" opacity="0.9"/>
+  <circle cx="400" cy="300" r="140" fill="none" stroke="#475569" stroke-width="4" stroke-dasharray="12 12"/>
+  <circle cx="400" cy="300" r="90" fill="none" stroke="url(#metal)" stroke-width="12"/>
+  <circle cx="400" cy="300" r="35" fill="#1e293b" stroke="#64748b" stroke-width="6"/>
+  <g fill="#0f172a">
+    <circle cx="400" cy="130" r="8"/><circle cx="400" cy="470" r="8"/>
+    <circle cx="230" cy="300" r="8"/><circle cx="570" cy="300" r="8"/>
+    <circle cx="280" cy="180" r="8"/><circle cx="520" cy="420" r="8"/>
+    <circle cx="280" cy="420" r="8"/><circle cx="520" cy="180" r="8"/>
+  </g>
+  <path d="M 460 160 L 560 180 Q 590 220 570 270 L 490 250 Q 470 200 460 160 Z" fill="#020617" stroke="url(#metal)" stroke-width="4"/>
+  <rect x="500" y="190" width="40" height="50" rx="8" fill="url(#amber)"/>
+  <text x="520" y="220" font-family="sans-serif" font-weight="900" font-size="12" fill="#020617" text-anchor="middle">MT200</text>
+  <rect x="40" y="40" width="140" height="36" rx="10" fill="url(#amber)"/>
+  <text x="110" y="63" font-family="sans-serif" font-weight="900" font-size="16" fill="#0f172a" text-anchor="middle">SHIMANO</text>
+  <text x="40" y="540" font-family="sans-serif" font-weight="800" font-size="28" fill="#f8fafc">Freno Hidráulico MT200</text>
+  <text x="40" y="565" font-family="sans-serif" font-weight="600" font-size="16" fill="#94a3b8">Sistema de disco de 2 pistones con latiguillo purgado</text>
+</svg>

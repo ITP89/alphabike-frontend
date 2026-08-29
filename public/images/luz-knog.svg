@@ -1,0 +1,10 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <rect width="800" height="600" fill="#0f172a"/>
+  <rect x="280" y="220" width="240" height="160" rx="20" fill="#1e293b" stroke="#64748b" stroke-width="4"/>
+  <circle cx="400" cy="300" r="50" fill="#fef08a" stroke="#f59e0b" stroke-width="8"/>
+  <path d="M 470 240 L 700 160 L 700 440 L 470 360 Z" fill="#fef08a" opacity="0.15"/>
+  <rect x="40" y="40" width="120" height="36" rx="10" fill="#f59e0b"/>
+  <text x="100" y="63" font-family="sans-serif" font-weight="900" font-size="16" fill="#020617" text-anchor="middle">KNOG</text>
+  <text x="40" y="540" font-family="sans-serif" font-weight="800" font-size="28" fill="#f8fafc">Luz Delantera LED 900LM</text>
+  <text x="40" y="565" font-family="sans-serif" font-weight="600" font-size="16" fill="#94a3b8">Farola recargable USB de 900 lúmenes de potencia nocturna</text>
+</svg>

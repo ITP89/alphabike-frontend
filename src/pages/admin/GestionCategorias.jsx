@@ -1,66 +1,89 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { FolderTree, Plus, Sparkles, Edit, Trash2, X } from 'lucide-react'
 import api from '../../api/axios'
 import LayoutAdmin from '../../components/LayoutAdmin'
+import Alert from '../../components/ui/Alert'
+import { EmptyState, ErrorState, LoadingState } from '../../components/ui/AsyncState'
+import { getApiErrorMessage } from '../../utils/apiError'
+
+const FORM_INICIAL = { nombre: '', descripcion: '' }
 
 function GestionCategorias() {
   const [categorias, setCategorias] = useState([])
   const [cargando, setCargando] = useState(true)
   const [editando, setEditando] = useState(null)
-  const [mensaje, setMensaje] = useState('')
-
-  const [form, setForm] = useState({ nombre: '', descripcion: '' })
+  const [mensaje, setMensaje] = useState(null)
+  const [error, setError] = useState('')
+  const [form, setForm] = useState(FORM_INICIAL)
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
 
-  useEffect(() => {
-    async function cargarCategorias() {
-      try {
-        const response = await api.get('/categorias')
-        setCategorias(response.data.data)
-      } catch (err) {
-        console.error('Error cargando categorias', err)
-      } finally {
-        setCargando(false)
-      }
+  async function cargarCategorias() {
+    setCargando(true)
+    setError('')
+
+    try {
+      const response = await api.get('/categorias')
+      setCategorias(response.data.data || [])
+    } catch (err) {
+      setCategorias([])
+      setError(getApiErrorMessage(err, 'No se pudieron cargar las categorías'))
+    } finally {
+      setCargando(false)
     }
+  }
+
+  useEffect(() => {
     cargarCategorias()
   }, [])
 
+  function resetForm() {
+    setForm(FORM_INICIAL)
+    setEditando(null)
+    setMostrarFormulario(false)
+  }
+
   async function handleCrear(e) {
     e.preventDefault()
-    setMensaje('')
+    setMensaje(null)
+
     try {
       const response = await api.post('/categorias', form)
       setCategorias((prev) => [...prev, response.data.data])
-      setForm({ nombre: '', descripcion: '' })
-      setMostrarFormulario(false)
-      setMensaje('Categoria creada correctamente')
+      resetForm()
+      setMensaje({ type: 'success', text: 'Categoría creada correctamente en Supabase' })
     } catch (err) {
-      setMensaje('No se pudo crear la categoria')
+      setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo crear la categoría') })
     }
   }
 
   async function handleActualizar(e) {
     e.preventDefault()
-    setMensaje('')
+    setMensaje(null)
+
     try {
       const response = await api.put(`/categorias/${editando.id}`, form)
-      setCategorias((prev) => prev.map((c) => c.id === editando.id ? response.data.data : c))
-      setEditando(null)
-      setForm({ nombre: '', descripcion: '' })
-      setMensaje('Categoria actualizada correctamente')
+      setCategorias((prev) => prev.map((categoria) => (
+        categoria.id === editando.id ? response.data.data : categoria
+      )))
+      resetForm()
+      setMensaje({ type: 'success', text: 'Categoría actualizada correctamente' })
     } catch (err) {
-      setMensaje('No se pudo actualizar la categoria')
+      setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo actualizar la categoría') })
     }
   }
 
   async function handleEliminar(id) {
-    setMensaje('')
+    setMensaje(null)
+
     try {
       await api.delete(`/categorias/${id}`)
-      setCategorias((prev) => prev.filter((c) => c.id !== id))
-      setMensaje('Categoria eliminada')
+      setCategorias((prev) => prev.filter((categoria) => categoria.id !== id))
+      setMensaje({ type: 'success', text: 'Categoría eliminada correctamente' })
     } catch (err) {
-      setMensaje('No se pudo eliminar — puede tener productos asociados')
+      setMensaje({
+        type: 'error',
+        text: getApiErrorMessage(err, 'No se pudo eliminar la categoría. Puede tener productos asociados.'),
+      })
     }
   }
 
@@ -72,102 +95,126 @@ function GestionCategorias() {
 
   return (
     <LayoutAdmin>
-      <div className="flex justify-between items-baseline mb-6">
-        <h1 className="text-xl font-semibold text-gray-900">Gestion de categorias</h1>
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-4">
+        <div>
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 mb-1">
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Clasificación de Catálogo</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Gestión de Categorías</h1>
+          <p className="mt-0.5 text-xs text-slate-500">Organiza los componentes, repuestos y accesorios de la tienda.</p>
+        </div>
         <button
-          onClick={() => { setMostrarFormulario(!mostrarFormulario); setEditando(null) }}
-          className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md hover:bg-blue-700"
+          type="button"
+          onClick={() => {
+            setMostrarFormulario((open) => !open)
+            setEditando(null)
+            setForm(FORM_INICIAL)
+          }}
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-2.5 text-xs font-black text-white hover:bg-amber-500 hover:text-slate-950 transition-all shadow-sm active:scale-95"
         >
-          {mostrarFormulario ? 'Cancelar' : '+ Nueva categoria'}
+          {mostrarFormulario || editando ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4 text-amber-400" />}
+          {mostrarFormulario || editando ? 'Cancelar' : 'Nueva Categoría'}
         </button>
       </div>
 
-      {mensaje && (
-        <p className={`text-sm mb-4 ${mensaje.includes('correctamente') || mensaje.includes('eliminada') ? 'text-green-600' : 'text-red-600'}`}>
-          {mensaje}
-        </p>
-      )}
+      {mensaje && <Alert type={mensaje.type} className="mb-4 font-bold shadow-sm">{mensaje.text}</Alert>}
 
-      <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6">
-
-        <div>
-          {(mostrarFormulario || editando) && (
-            <form
-              onSubmit={editando ? handleActualizar : handleCrear}
-              className="bg-white border border-gray-200 rounded-lg p-4"
-            >
-              <h3 className="font-semibold text-gray-900 mb-3">
-                {editando ? 'Editar categoria' : 'Nueva categoria'}
-              </h3>
-              <div className="flex flex-col gap-2">
+      <div className={(mostrarFormulario || editando) ? 'grid grid-cols-1 gap-6 lg:grid-cols-[340px_1fr]' : ''}>
+        {(mostrarFormulario || editando) && (
+          <form
+            onSubmit={editando ? handleActualizar : handleCrear}
+            className="rounded-2xl border border-amber-200 bg-white p-6 shadow-lg animate-fade-in"
+          >
+            <h2 className="mb-4 text-base font-black text-slate-900 flex items-center gap-2">
+              <FolderTree className="h-5 w-5 text-amber-500" />
+              {editando ? 'Editar Categoría' : 'Nueva Categoría'}
+            </h2>
+            <div className="flex flex-col gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Nombre de categoría *</label>
                 <input
                   type="text"
-                  placeholder="Nombre"
+                  placeholder="Ej. Frenos e Hidráulicos"
                   value={form.nombre}
                   onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-                  className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
                   required
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Descripción</label>
                 <textarea
-                  placeholder="Descripcion (opcional)"
+                  placeholder="Descripción de los repuestos incluidos..."
                   value={form.descripcion}
                   onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
-                  rows="2"
-                  className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                  rows="3"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-semibold text-slate-900 focus:bg-white focus:border-amber-500"
                 />
-                <div className="flex gap-2">
-                  <button type="submit"
-                    className="flex-1 bg-blue-600 text-white text-sm py-2 rounded-md hover:bg-blue-700">
-                    {editando ? 'Actualizar' : 'Crear'}
-                  </button>
-                  {editando && (
-                    <button type="button"
-                      onClick={() => { setEditando(null); setForm({ nombre: '', descripcion: '' }) }}
-                      className="flex-1 border border-gray-300 text-sm py-2 rounded-md hover:bg-gray-50">
-                      Cancelar
-                    </button>
-                  )}
-                </div>
               </div>
-            </form>
-          )}
-        </div>
 
-        <div>
-          {cargando ? (
-            <p className="text-gray-500 text-sm">Cargando categorias...</p>
-          ) : (
-            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-              <div className="grid grid-cols-3 px-4 py-2 bg-gray-50 text-xs font-medium text-gray-500">
-                <span>Nombre</span><span>Descripcion</span><span>Acciones</span>
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="submit"
+                  className="flex-1 rounded-xl bg-amber-500 py-2.5 text-xs font-black text-slate-950 hover:bg-amber-400 transition-all shadow-md active:scale-95"
+                >
+                  {editando ? 'Actualizar' : 'Guardar Categoría'}
+                </button>
+                {editando && (
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-100"
+                  >
+                    Cancelar
+                  </button>
+                )}
               </div>
-              {categorias.length === 0 && (
-                <p className="text-gray-500 text-sm px-4 py-3">No hay categorias</p>
-              )}
+            </div>
+          </form>
+        )}
+
+        <section>
+          {cargando && <LoadingState text="Cargando categorías..." />}
+          {error && <ErrorState message={error} onRetry={cargarCategorias} />}
+
+          {!cargando && !error && categorias.length === 0 && (
+            <EmptyState title="No hay categorías" description="Crea una categoría para clasificar los productos." />
+          )}
+
+          {!cargando && !error && categorias.length > 0 && (
+            <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+              <div className="hidden grid-cols-3 bg-slate-900 px-6 py-3 text-xs font-bold text-slate-300 md:grid">
+                <span>Nombre Categoría</span>
+                <span>Descripción</span>
+                <span className="text-right">Acciones</span>
+              </div>
               {categorias.map((categoria) => (
-                <div key={categoria.id} className="grid grid-cols-3 px-4 py-3 border-t border-gray-200 text-sm items-center">
-                  <span className="text-gray-900 font-medium">{categoria.nombre}</span>
-                  <span className="text-gray-500">{categoria.descripcion || '—'}</span>
-                  <div className="flex gap-2">
+                <div key={categoria.id} className="grid grid-cols-1 gap-2 border-t border-slate-100 px-6 py-3.5 text-xs first:border-t-0 md:grid-cols-3 md:items-center md:gap-0 hover:bg-slate-50 transition-colors">
+                  <span className="font-black text-slate-900">{categoria.nombre}</span>
+                  <span className="font-medium text-slate-500">{categoria.descripcion || '-'}</span>
+                  <div className="flex items-center justify-end gap-2">
                     <button
+                      type="button"
                       onClick={() => handleEditar(categoria)}
-                      className="text-xs border border-gray-300 px-2 py-1 rounded-md hover:bg-gray-50"
+                      className="inline-flex items-center gap-1 text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1.5 rounded-xl hover:bg-amber-500 hover:text-slate-950 transition-all"
                     >
-                      Editar
+                      <Edit className="h-3.5 w-3.5" /> Editar
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleEliminar(categoria.id)}
-                      className="text-xs border border-red-300 text-red-600 px-2 py-1 rounded-md hover:bg-red-50"
+                      className="inline-flex items-center gap-1 text-xs font-bold border border-red-200 text-red-600 px-2.5 py-1.5 rounded-xl hover:bg-red-50 transition-all"
                     >
-                      Eliminar
+                      <Trash2 className="h-3.5 w-3.5" /> Eliminar
                     </button>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </div>
-
+        </section>
       </div>
     </LayoutAdmin>
   )

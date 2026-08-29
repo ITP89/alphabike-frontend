@@ -1,0 +1,5 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <rect width="800" height="600" fill="#1e293b"/>
+  <path d="M 200 300 Q 400 100 600 300 Q 400 500 200 300 Z" fill="none" stroke="#64748b" stroke-width="24"/>
+  <text x="400" y="520" font-family="sans-serif" font-weight="800" font-size="22" fill="#94a3b8" text-anchor="middle">Transmisión Desgaste y Grasa Acumulada</text>
+</svg>

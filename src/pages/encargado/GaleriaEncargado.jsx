@@ -1,167 +1,190 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { Camera, Trash2 } from 'lucide-react'
 import api from '../../api/axios'
 import LayoutEncargado from '../../components/LayoutEncargado'
+import Alert from '../../components/ui/Alert'
+import { EmptyState, ErrorState, LoadingState } from '../../components/ui/AsyncState'
+import ImageFallback from '../../components/ui/ImageFallback'
+import { getApiErrorMessage } from '../../utils/apiError'
+import { formatDate } from '../../utils/formatters'
+
+const FORM_INICIAL = {
+  titulo: '',
+  descripcion: '',
+  imagenAntesUrl: '',
+  imagenDespuesUrl: '',
+  destacado: false,
+}
 
 function GaleriaEncargado() {
   const [trabajos, setTrabajos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
-  const [mensaje, setMensaje] = useState('')
+  const [mensaje, setMensaje] = useState(null)
+  const [error, setError] = useState('')
+  const [form, setForm] = useState(FORM_INICIAL)
 
-  const [form, setForm] = useState({
-    titulo: '',
-    descripcion: '',
-    imagenAntesUrl: '',
-    imagenDespuesUrl: '',
-    destacado: false,
-  })
+  async function cargarTrabajos() {
+    setCargando(true)
+    setError('')
+
+    try {
+      const response = await api.get('/trabajos')
+      setTrabajos(response.data.data || [])
+    } catch (err) {
+      setTrabajos([])
+      setError(getApiErrorMessage(err, 'No se pudieron cargar los trabajos'))
+    } finally {
+      setCargando(false)
+    }
+  }
 
   useEffect(() => {
-    async function cargarTrabajos() {
-      try {
-        const response = await api.get('/trabajos')
-        setTrabajos(response.data.data)
-      } catch (err) {
-        console.error('Error cargando trabajos', err)
-      } finally {
-        setCargando(false)
-      }
-    }
     cargarTrabajos()
   }, [])
 
   async function handlePublicar(e) {
     e.preventDefault()
-    setMensaje('')
+    setMensaje(null)
+
     try {
-      const response = await api.post('/trabajos', form)
+      const response = await api.post('/trabajos', {
+        ...form,
+        titulo: form.titulo.trim(),
+        descripcion: form.descripcion.trim(),
+        imagenAntesUrl: form.imagenAntesUrl.trim(),
+        imagenDespuesUrl: form.imagenDespuesUrl.trim(),
+      })
       setTrabajos((prev) => [...prev, response.data.data])
       setMostrarFormulario(false)
-      setForm({ titulo: '', descripcion: '', imagenAntesUrl: '', imagenDespuesUrl: '', destacado: false })
-      setMensaje('Trabajo publicado correctamente')
+      setForm(FORM_INICIAL)
+      setMensaje({ type: 'success', text: 'Trabajo publicado correctamente' })
     } catch (err) {
-      setMensaje('No se pudo publicar el trabajo')
+      setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo publicar el trabajo') })
     }
   }
 
   async function handleEliminar(id) {
+    setMensaje(null)
+
     try {
       await api.delete(`/trabajos/${id}`)
-      setTrabajos((prev) => prev.filter((t) => t.id !== id))
+      setTrabajos((prev) => prev.filter((trabajo) => trabajo.id !== id))
+      setMensaje({ type: 'success', text: 'Trabajo eliminado correctamente' })
     } catch (err) {
-      console.error('Error eliminando trabajo', err)
+      setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo eliminar el trabajo') })
     }
   }
 
   return (
     <LayoutEncargado>
-      <div className="flex justify-between items-baseline mb-6">
-        <h1 className="text-xl font-semibold text-gray-900">Galeria de trabajos</h1>
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-950">Galeria de trabajos</h1>
+          <p className="mt-1 text-sm text-gray-500">Publica resultados antes/despues para la pagina publica.</p>
+        </div>
         <button
-          onClick={() => setMostrarFormulario(!mostrarFormulario)}
-          className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md hover:bg-blue-700"
+          type="button"
+          onClick={() => setMostrarFormulario((open) => !open)}
+          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
         >
           {mostrarFormulario ? 'Cancelar' : '+ Publicar trabajo'}
         </button>
       </div>
 
-      {mensaje && (
-        <p className={`text-sm mb-4 ${mensaje.includes('correctamente') ? 'text-green-600' : 'text-red-600'}`}>
-          {mensaje}
-        </p>
-      )}
+      {mensaje && <Alert type={mensaje.type} className="mb-4">{mensaje.text}</Alert>}
 
       {mostrarFormulario && (
-        <form onSubmit={handlePublicar} className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
-          <h3 className="font-semibold text-gray-900 mb-3">Publicar nuevo trabajo</h3>
-          <div className="flex flex-col gap-3">
+        <form onSubmit={handlePublicar} className="mb-6 rounded-md border border-gray-200 bg-white p-4 shadow-sm">
+          <h2 className="mb-3 flex items-center gap-2 font-semibold text-gray-950">
+            <Camera className="h-4 w-4 text-blue-600" aria-hidden="true" />
+            Publicar nuevo trabajo
+          </h2>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <input
               type="text"
               placeholder="Titulo del trabajo"
               value={form.titulo}
               onChange={(e) => setForm({ ...form, titulo: e.target.value })}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm"
               required
-            />
-            <textarea
-              placeholder="Descripcion breve"
-              value={form.descripcion}
-              onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
-              rows="2"
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm"
             />
             <input
               type="text"
               placeholder="URL foto antes"
               value={form.imagenAntesUrl}
               onChange={(e) => setForm({ ...form, imagenAntesUrl: e.target.value })}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm"
             />
             <input
               type="text"
               placeholder="URL foto despues"
               value={form.imagenDespuesUrl}
               onChange={(e) => setForm({ ...form, imagenDespuesUrl: e.target.value })}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm"
             />
-            <label className="flex items-center gap-2 text-sm text-gray-700">
+            <label className="flex items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700">
               <input
                 type="checkbox"
                 checked={form.destacado}
                 onChange={(e) => setForm({ ...form, destacado: e.target.checked })}
               />
-              Destacar en la pagina de inicio
+              Destacar en inicio
             </label>
-            <button
-              type="submit"
-              className="bg-blue-600 text-white text-sm py-2 rounded-md hover:bg-blue-700"
-            >
-              Publicar
-            </button>
+            <textarea
+              placeholder="Descripcion breve"
+              value={form.descripcion}
+              onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
+              rows="3"
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm md:col-span-2"
+            />
           </div>
+          <button type="submit" className="mt-3 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+            Publicar
+          </button>
         </form>
       )}
 
-      {cargando ? (
-        <p className="text-gray-500 text-sm">Cargando trabajos...</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {trabajos.length === 0 && (
-            <p className="text-gray-500 text-sm">No hay trabajos publicados aun</p>
-          )}
+      {cargando && <LoadingState text="Cargando trabajos..." />}
+      {error && <ErrorState message={error} onRetry={cargarTrabajos} />}
+
+      {!cargando && !error && trabajos.length === 0 && (
+        <EmptyState title="No hay trabajos publicados" description="Publica trabajos para alimentar la galeria publica." />
+      )}
+
+      {!cargando && !error && trabajos.length > 0 && (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {trabajos.map((trabajo) => (
-            <div key={trabajo.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-              <div className="grid grid-cols-2">
-                <div className="h-32 bg-gray-100 flex items-center justify-center border-r border-gray-200">
-                  {trabajo.imagenAntesUrl ? (
-                    <img src={trabajo.imagenAntesUrl} alt="Antes" className="h-full w-full object-cover" />
-                  ) : (
-                    <span className="text-gray-400 text-xs">Antes</span>
-                  )}
+            <article key={trabajo.id} className="overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
+              <div className="grid aspect-[16/9] grid-cols-2">
+                <div className="relative border-r border-gray-200">
+                  <ImageFallback src={trabajo.imagenAntesUrl} alt={`${trabajo.titulo} antes`} />
+                  <span className="absolute left-2 top-2 rounded bg-gray-950/80 px-2 py-1 text-xs font-medium text-white">Antes</span>
                 </div>
-                <div className="h-32 bg-gray-100 flex items-center justify-center">
-                  {trabajo.imagenDespuesUrl ? (
-                    <img src={trabajo.imagenDespuesUrl} alt="Despues" className="h-full w-full object-cover" />
-                  ) : (
-                    <span className="text-gray-400 text-xs">Despues</span>
-                  )}
+                <div className="relative">
+                  <ImageFallback src={trabajo.imagenDespuesUrl} alt={`${trabajo.titulo} despues`} />
+                  <span className="absolute left-2 top-2 rounded bg-blue-600/90 px-2 py-1 text-xs font-medium text-white">Despues</span>
                 </div>
               </div>
-              <div className="p-3 flex justify-between items-center">
-                <div>
-                  <p className="text-gray-900 text-sm font-medium">{trabajo.titulo}</p>
-                  {trabajo.destacado && (
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-md">Destacado</span>
-                  )}
+              <div className="flex items-start justify-between gap-3 p-4">
+                <div className="min-w-0">
+                  <p className="font-medium text-gray-950">{trabajo.titulo}</p>
+                  <p className="mt-1 line-clamp-2 text-sm text-gray-500">{trabajo.descripcion || 'Sin descripcion'}</p>
+                  <div className="mt-2 flex flex-wrap gap-2 text-xs text-gray-500">
+                    {trabajo.fecha && <span>{formatDate(trabajo.fecha)}</span>}
+                    {trabajo.destacado && <span className="rounded-md bg-emerald-100 px-2 py-0.5 font-medium text-emerald-700">Destacado</span>}
+                  </div>
                 </div>
                 <button
+                  type="button"
                   onClick={() => handleEliminar(trabajo.id)}
-                  className="text-red-500 text-xs hover:text-red-700"
+                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-red-600 hover:bg-red-50"
+                  aria-label="Eliminar trabajo"
                 >
-                  Eliminar
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
                 </button>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       )}

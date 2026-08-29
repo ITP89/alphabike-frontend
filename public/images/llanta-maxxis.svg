@@ -1,0 +1,10 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <rect width="800" height="600" fill="#090d16"/>
+  <circle cx="400" cy="300" r="190" fill="none" stroke="#1e293b" stroke-width="50"/>
+  <circle cx="400" cy="300" r="190" fill="none" stroke="#f59e0b" stroke-width="12" stroke-dasharray="24 16"/>
+  <circle cx="400" cy="300" r="130" fill="none" stroke="#475569" stroke-width="8"/>
+  <rect x="40" y="40" width="140" height="36" rx="10" fill="#f59e0b"/>
+  <text x="110" y="63" font-family="sans-serif" font-weight="900" font-size="16" fill="#020617" text-anchor="middle">MAXXIS</text>
+  <text x="40" y="540" font-family="sans-serif" font-weight="800" font-size="28" fill="#f8fafc">Llanta Maxxis Minion DHF 29x2.50</text>
+  <text x="40" y="565" font-family="sans-serif" font-weight="600" font-size="16" fill="#94a3b8">Neumático de montaña Tubeless Ready con compuesto 3C</text>
+</svg>

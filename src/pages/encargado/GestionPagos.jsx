@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import api from '../../api/axios'
 import LayoutEncargado from '../../components/LayoutEncargado'
+import { ErrorState, LoadingState } from '../../components/ui/AsyncState'
+import { getApiErrorMessage } from '../../utils/apiError'
+import { formatMoney } from '../../utils/formatters'
 
 const LABELS_TIPO = {
   PEDIDO: 'Pedido',
@@ -9,7 +12,8 @@ const LABELS_TIPO = {
 
 const LABELS_METODO = {
   EFECTIVO: 'Efectivo',
-  YAPE: 'Yape / Plin',
+  YAPE: 'Yape',
+  PLIN: 'Plin',
   TRANSFERENCIA: 'Transferencia',
 }
 
@@ -17,14 +21,15 @@ function GestionPagos() {
   const [pagos, setPagos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [filtro, setFiltro] = useState('todos')
+  const [error, setError] = useState('')
 
   useEffect(() => {
     async function cargarPagos() {
       try {
         const response = await api.get('/pagos')
-        setPagos(response.data.data)
+        setPagos(response.data.data || [])
       } catch (err) {
-        console.error('Error cargando pagos', err)
+        setError(getApiErrorMessage(err, 'No se pudieron cargar los pagos'))
       } finally {
         setCargando(false)
       }
@@ -48,7 +53,7 @@ function GestionPagos() {
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <p className="text-gray-500 text-sm">Total ingresos</p>
-          <p className="text-2xl font-semibold text-gray-900">S/ {totalIngresos.toFixed(2)}</p>
+          <p className="text-2xl font-semibold text-gray-900">{formatMoney(totalIngresos)}</p>
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <p className="text-gray-500 text-sm">Total pagos</p>
@@ -69,7 +74,9 @@ function GestionPagos() {
       </div>
 
       {cargando ? (
-        <p className="text-gray-500 text-sm">Cargando pagos...</p>
+        <LoadingState text="Cargando pagos..." />
+      ) : error ? (
+        <ErrorState message={error} />
       ) : (
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
           <div className="grid grid-cols-5 px-4 py-2 bg-gray-50 text-xs font-medium text-gray-500">
@@ -88,7 +95,7 @@ function GestionPagos() {
             <div key={pago.id} className="grid grid-cols-5 px-4 py-3 border-t border-gray-200 text-sm items-center">
               <span className="text-gray-900">#{pago.referenciaId.slice(0, 8)}</span>
               <span>{LABELS_TIPO[pago.referenciaTipo] || pago.referenciaTipo}</span>
-              <span className="font-medium">S/ {Number(pago.monto).toFixed(2)}</span>
+              <span className="font-medium">{formatMoney(pago.monto)}</span>
               <span>{LABELS_METODO[pago.metodoPago] || pago.metodoPago}</span>
               <span className="text-gray-500">
                 {new Date(pago.fecha).toLocaleDateString('es-PE')}

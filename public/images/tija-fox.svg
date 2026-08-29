@@ -1,0 +1,17 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <linearGradient id="kashima" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="50%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#92400e"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="#0f172a"/>
+  <rect x="380" y="100" width="40" height="380" rx="10" fill="url(#kashima)"/>
+  <rect x="360" y="100" width="80" height="40" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="4"/>
+  <path d="M 330 90 L 470 90 Q 450 60 400 60 Q 350 60 330 90 Z" fill="#020617" stroke="#94a3b8" stroke-width="3"/>
+  <rect x="40" y="40" width="120" height="36" rx="10" fill="#f59e0b"/>
+  <text x="100" y="63" font-family="sans-serif" font-weight="900" font-size="16" fill="#020617" text-anchor="middle">FOX</text>
+  <text x="40" y="540" font-family="sans-serif" font-weight="800" font-size="28" fill="#f8fafc">Tija Telescópica Transfer Factory</text>
+  <text x="40" y="565" font-family="sans-serif" font-weight="600" font-size="16" fill="#94a3b8">Recubrimiento Kashima Coat 31.6mm de accionamiento hidráulico</text>
+</svg>

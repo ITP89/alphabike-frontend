@@ -1,0 +1,5 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <rect width="800" height="600" fill="#020617"/>
+  <path d="M 200 300 Q 400 100 600 300 Q 400 500 200 300 Z" fill="none" stroke="#f59e0b" stroke-width="24"/>
+  <text x="400" y="520" font-family="sans-serif" font-weight="800" font-size="22" fill="#f59e0b" text-anchor="middle">Transmisión 12V Purgada y Calibrada</text>
+</svg>

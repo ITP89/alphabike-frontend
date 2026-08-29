@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 import api from '../../api/axios'
 import LayoutEncargado from '../../components/LayoutEncargado'
+import Alert from '../../components/ui/Alert'
+import { ErrorState, LoadingState } from '../../components/ui/AsyncState'
+import { getApiErrorMessage } from '../../utils/apiError'
+import { formatMoney } from '../../utils/formatters'
 
 function GestionProductos() {
   const [productos, setProductos] = useState([])
@@ -10,6 +14,8 @@ function GestionProductos() {
   const [nuevoStock, setNuevoStock] = useState('')
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [categorias, setCategorias] = useState([])
+  const [error, setError] = useState('')
+  const [mensaje, setMensaje] = useState(null)
 
   const [form, setForm] = useState({
     nombre: '',
@@ -27,10 +33,10 @@ function GestionProductos() {
           api.get('/productos/todos'),
           api.get('/categorias'),
         ])
-        setProductos(prodRes.data.data)
-        setCategorias(catRes.data.data)
+        setProductos(prodRes.data.data || [])
+        setCategorias(catRes.data.data || [])
       } catch (err) {
-        console.error('Error cargando productos', err)
+        setError(getApiErrorMessage(err, 'No se pudieron cargar los productos'))
       } finally {
         setCargando(false)
       }
@@ -39,23 +45,36 @@ function GestionProductos() {
   }, [])
 
   const productosFiltrados = productos.filter((p) =>
-    p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-    p.marca.toLowerCase().includes(busqueda.toLowerCase())
+    (p.nombre || '').toLowerCase().includes(busqueda.toLowerCase()) ||
+    (p.marca || '').toLowerCase().includes(busqueda.toLowerCase())
   )
 
   async function handleActualizarStock(id) {
+    if (Number(nuevoStock) < 0) {
+      setMensaje({ type: 'error', text: 'El stock no puede ser negativo' })
+      return
+    }
+
     try {
       const response = await api.patch(`/productos/${id}/stock?stock=${nuevoStock}`)
       setProductos((prev) => prev.map((p) => p.id === id ? response.data.data : p))
       setEditandoStock(null)
       setNuevoStock('')
+      setMensaje({ type: 'success', text: 'Stock actualizado correctamente' })
     } catch (err) {
-      console.error('Error actualizando stock', err)
+      setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo actualizar el stock') })
     }
   }
 
   async function handleCrearProducto(e) {
     e.preventDefault()
+    setMensaje(null)
+
+    if (Number(form.precio) <= 0 || Number(form.stock) < 0) {
+      setMensaje({ type: 'error', text: 'Revisa precio y stock antes de crear el producto' })
+      return
+    }
+
     try {
       const response = await api.post('/productos', {
         ...form,
@@ -65,8 +84,9 @@ function GestionProductos() {
       setProductos((prev) => [...prev, response.data.data])
       setMostrarFormulario(false)
       setForm({ nombre: '', descripcion: '', marca: '', precio: '', stock: '', categoriaId: '' })
+      setMensaje({ type: 'success', text: 'Producto creado correctamente' })
     } catch (err) {
-      console.error('Error creando producto', err)
+      setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo crear el producto') })
     }
   }
 
@@ -146,6 +166,8 @@ function GestionProductos() {
         </form>
       )}
 
+      {mensaje && <Alert type={mensaje.type} className="mb-4">{mensaje.text}</Alert>}
+
       <div className="mb-4">
         <input
           type="text"
@@ -157,7 +179,9 @@ function GestionProductos() {
       </div>
 
       {cargando ? (
-        <p className="text-gray-500 text-sm">Cargando productos...</p>
+        <LoadingState text="Cargando productos..." />
+      ) : error ? (
+        <ErrorState message={error} />
       ) : (
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
           <div className="grid grid-cols-6 px-4 py-2 bg-gray-50 text-xs font-medium text-gray-500">
@@ -175,7 +199,7 @@ function GestionProductos() {
                 <p className="text-gray-500 text-xs">{producto.marca}</p>
               </div>
               <span>{producto.categoriaNombre}</span>
-              <span>S/ {Number(producto.precio).toFixed(2)}</span>
+              <span>{formatMoney(producto.precio)}</span>
               <div>
                 {editandoStock === producto.id ? (
                   <div className="flex gap-1 items-center">

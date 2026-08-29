@@ -1,0 +1,10 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <rect width="800" height="600" fill="#0f172a"/>
+  <rect x="330" y="140" width="30" height="300" rx="8" fill="#cbd5e1"/>
+  <rect x="440" y="140" width="30" height="300" rx="8" fill="#cbd5e1"/>
+  <rect x="310" y="260" width="180" height="180" rx="16" fill="#1e293b" stroke="#ef4444" stroke-width="6"/>
+  <rect x="40" y="40" width="160" height="36" rx="10" fill="#ef4444"/>
+  <text x="120" y="63" font-family="sans-serif" font-weight="900" font-size="16" fill="#ffffff" text-anchor="middle">ROCKSHOX</text>
+  <text x="40" y="540" font-family="sans-serif" font-weight="800" font-size="28" fill="#f8fafc">Horquilla Pike Ultimate 150mm</text>
+  <text x="40" y="565" font-family="sans-serif" font-weight="600" font-size="16" fill="#94a3b8">Suspensión delantera con cartucho Charger 3 RC2 para MTB 29</text>
+</svg>

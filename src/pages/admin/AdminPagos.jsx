@@ -1,30 +1,36 @@
 import { useState, useEffect } from 'react'
+import { CreditCard, Sparkles, Receipt, CheckCircle2 } from 'lucide-react'
 import api from '../../api/axios'
 import LayoutAdmin from '../../components/LayoutAdmin'
+import { ErrorState, LoadingState } from '../../components/ui/AsyncState'
+import { getApiErrorMessage } from '../../utils/apiError'
+import { formatMoney } from '../../utils/formatters'
 
 const LABELS_TIPO = {
-  PEDIDO: 'Pedido',
-  COTIZACION: 'Cotizacion',
+  PEDIDO: 'Pedido de Tienda',
+  COTIZACION: 'Servicio de Taller',
 }
 
 const LABELS_METODO = {
   EFECTIVO: 'Efectivo',
   YAPE: 'Yape / Plin',
-  TRANSFERENCIA: 'Transferencia',
+  PLIN: 'Plin',
+  TRANSFERENCIA: 'Transferencia BCP/BBVA',
 }
 
 function AdminPagos() {
   const [pagos, setPagos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [filtro, setFiltro] = useState('todos')
+  const [error, setError] = useState('')
 
   useEffect(() => {
     async function cargarPagos() {
       try {
         const response = await api.get('/pagos')
-        setPagos(response.data.data)
+        setPagos(response.data.data || [])
       } catch (err) {
-        console.error('Error cargando pagos', err)
+        setError(getApiErrorMessage(err, 'No se pudieron cargar los pagos'))
       } finally {
         setCargando(false)
       }
@@ -42,45 +48,85 @@ function AdminPagos() {
 
   return (
     <LayoutAdmin>
-      <h1 className="text-xl font-semibold text-gray-900 mb-6">Gestion de pagos</h1>
-
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <p className="text-gray-500 text-sm">Total ingresos</p>
-          <p className="text-2xl font-semibold text-gray-900">S/ {totalIngresos.toFixed(2)}</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <p className="text-gray-500 text-sm">Total pagos</p>
-          <p className="text-2xl font-semibold text-gray-900">{pagos.length}</p>
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-4">
+        <div>
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 mb-1">
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Caja & Finanzas Taller</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Gestión de Pagos</h1>
+          <p className="mt-0.5 text-xs text-slate-500">Historial completo de cobros por Yape, Plin, Transferencia y Efectivo.</p>
         </div>
       </div>
 
-      <div className="flex gap-3 mb-4">
-        <select value={filtro} onChange={(e) => setFiltro(e.target.value)}
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm bg-white">
-          <option value="todos">Tipo: todos</option>
-          <option value="PEDIDO">Pedidos</option>
-          <option value="COTIZACION">Cotizaciones</option>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
+        <div className="rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-2.5 text-emerald-600">
+              <CreditCard className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Ingresos Totales Confirmados</p>
+              <p className="text-3xl font-black text-slate-900">{formatMoney(totalIngresos)}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="rounded-xl bg-amber-50 border border-amber-200 p-2.5 text-amber-600">
+              <Receipt className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Transacciones Registradas</p>
+              <p className="text-3xl font-black text-slate-900">{pagos.length} operaciones</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-6 max-w-xs">
+        <select
+          value={filtro}
+          onChange={(e) => setFiltro(e.target.value)}
+          className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 shadow-sm focus:border-amber-500"
+        >
+          <option value="todos">Todos los Tipos de Cobro</option>
+          <option value="PEDIDO">Pedidos de Tienda</option>
+          <option value="COTIZACION">Servicios de Taller</option>
         </select>
       </div>
 
       {cargando ? (
-        <p className="text-gray-500 text-sm">Cargando pagos...</p>
+        <LoadingState text="Cargando historial de pagos..." />
+      ) : error ? (
+        <ErrorState message={error} />
       ) : (
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <div className="grid grid-cols-5 px-4 py-2 bg-gray-50 text-xs font-medium text-gray-500">
-            <span>Referencia</span><span>Tipo</span><span>Monto</span><span>Metodo</span><span>Fecha</span>
+        <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+          <div className="hidden grid-cols-5 bg-slate-900 px-6 py-3 text-xs font-bold text-slate-300 lg:grid">
+            <span>Referencia Operación</span>
+            <span>Tipo de Cobro</span>
+            <span>Monto Recaudado</span>
+            <span>Método de Pago</span>
+            <span>Fecha de Registro</span>
           </div>
+
           {pagosFiltrados.length === 0 && (
-            <p className="text-gray-500 text-sm px-4 py-3">No hay pagos registrados</p>
+            <p className="text-slate-500 text-xs font-semibold px-6 py-6 text-center">No hay transacciones de pago registradas aún.</p>
           )}
+
           {pagosFiltrados.map((pago) => (
-            <div key={pago.id} className="grid grid-cols-5 px-4 py-3 border-t border-gray-200 text-sm items-center">
-              <span>#{pago.referenciaId.slice(0, 8)}</span>
-              <span>{LABELS_TIPO[pago.referenciaTipo] || pago.referenciaTipo}</span>
-              <span className="font-medium">S/ {Number(pago.monto).toFixed(2)}</span>
-              <span>{LABELS_METODO[pago.metodoPago] || pago.metodoPago}</span>
-              <span className="text-gray-500">{new Date(pago.fecha).toLocaleDateString('es-PE')}</span>
+            <div key={pago.id} className="grid grid-cols-1 gap-2 border-t border-slate-100 px-6 py-3.5 text-xs first:border-t-0 lg:grid-cols-5 lg:items-center lg:gap-0 hover:bg-slate-50 transition-colors">
+              <span className="font-black text-slate-900">#{pago.referenciaId.slice(0, 8)}</span>
+              <span className="font-bold text-amber-700">{LABELS_TIPO[pago.referenciaTipo] || pago.referenciaTipo}</span>
+              <span className="font-black text-slate-950 text-sm">{formatMoney(pago.monto)}</span>
+              <div>
+                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-black text-emerald-800">
+                  <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+                  {LABELS_METODO[pago.metodoPago] || pago.metodoPago}
+                </span>
+              </div>
+              <span className="font-semibold text-slate-500">{new Date(pago.fecha).toLocaleDateString('es-PE')}</span>
             </div>
           ))}
         </div>

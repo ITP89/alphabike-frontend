@@ -1,0 +1,20 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="gold3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg3)"/>
+  <path d="M 180 300 C 180 200, 620 200, 620 300 C 620 400, 180 400, 180 300 Z" fill="none" stroke="url(#gold3)" stroke-width="28" stroke-dasharray="35 15"/>
+  <circle cx="280" cy="300" r="14" fill="#020617"/><circle cx="360" cy="300" r="14" fill="#020617"/>
+  <circle cx="440" cy="300" r="14" fill="#020617"/><circle cx="520" cy="300" r="14" fill="#020617"/>
+  <rect x="40" y="40" width="120" height="36" rx="10" fill="url(#gold3)"/>
+  <text x="100" y="63" font-family="sans-serif" font-weight="900" font-size="16" fill="#020617" text-anchor="middle">KMC</text>
+  <text x="40" y="540" font-family="sans-serif" font-weight="800" font-size="28" fill="#f8fafc">Cadena KMC X11 11V</text>
+  <text x="40" y="565" font-family="sans-serif" font-weight="600" font-size="16" fill="#94a3b8">Cadena reforzada de alta resistencia para 11 y 12 velocidades</text>
+</svg>
