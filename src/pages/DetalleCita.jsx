@@ -1,7 +1,12 @@
-import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useCallback, useEffect, useState } from 'react'
+import { ArrowLeft, CalendarCheck, ClipboardCheck } from 'lucide-react'
+import { Link, useParams } from 'react-router-dom'
 import api from '../api/axios'
 import Navbar from '../components/Navbar'
+import Alert from '../components/ui/Alert'
+import { ErrorState, LoadingState } from '../components/ui/AsyncState'
+import { getApiErrorMessage } from '../utils/apiError'
+import { formatMoney } from '../utils/formatters'
 
 const LABELS_ESTADO_CITA = {
   PENDIENTE: { texto: 'Pendiente', color: 'bg-yellow-100 text-yellow-700' },
@@ -22,37 +27,45 @@ function DetalleCita() {
   const [cotizacion, setCotizacion] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
+  const [mensaje, setMensaje] = useState('')
   const [procesando, setProcesando] = useState(false)
 
-  useEffect(() => {
-    async function cargarDatos() {
+  const cargarDatos = useCallback(async () => {
+    setCargando(true)
+    setError('')
+
+    try {
+      const citaResponse = await api.get(`/citas/${id}`)
+      setCita(citaResponse.data.data)
+
       try {
-        const citaResponse = await api.get(`/citas/${id}`)
-        setCita(citaResponse.data.data)
-
-        try {
-          const cotizacionResponse = await api.get(`/cotizaciones/cita/${id}`)
-          setCotizacion(cotizacionResponse.data.data)
-        } catch {
-          setCotizacion(null)
-        }
-      } catch (err) {
-        setError('No se pudo cargar la cita')
-      } finally {
-        setCargando(false)
+        const cotizacionResponse = await api.get(`/cotizaciones/cita/${id}`)
+        setCotizacion(cotizacionResponse.data.data)
+      } catch {
+        setCotizacion(null)
       }
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'No se pudo cargar la cita'))
+    } finally {
+      setCargando(false)
     }
-
-    cargarDatos()
   }, [id])
+
+  useEffect(() => {
+    cargarDatos()
+  }, [cargarDatos])
 
   async function responderCotizacion(estado) {
     setProcesando(true)
+    setMensaje('')
+    setError('')
+
     try {
       const response = await api.patch(`/cotizaciones/${cotizacion.id}/estado?estado=${estado}`)
       setCotizacion(response.data.data)
+      setMensaje(estado === 'ACEPTADA' ? 'Cotizacion aceptada correctamente' : 'Cotizacion rechazada')
     } catch (err) {
-      setError('No se pudo procesar tu respuesta')
+      setError(getApiErrorMessage(err, 'No se pudo procesar tu respuesta'))
     } finally {
       setProcesando(false)
     }
@@ -60,75 +73,89 @@ function DetalleCita() {
 
   if (cargando) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-white">
         <Navbar />
-        <p className="text-center text-gray-500 py-10">Cargando cita...</p>
+        <main className="mx-auto max-w-6xl px-6 py-10">
+          <LoadingState text="Cargando cita..." />
+        </main>
       </div>
     )
   }
 
   if (error || !cita) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-white">
         <Navbar />
-        <p className="text-center text-red-600 py-10">{error || 'Cita no encontrada'}</p>
+        <main className="mx-auto max-w-6xl px-6 py-10">
+          <ErrorState message={error || 'Cita no encontrada'} onRetry={cargarDatos} />
+        </main>
       </div>
     )
   }
 
-  const estadoCita = LABELS_ESTADO_CITA[cita.estado] || { texto: cita.estado, color: 'bg-gray-100' }
+  const estadoCita = LABELS_ESTADO_CITA[cita.estado] || { texto: cita.estado, color: 'bg-gray-100 text-gray-700' }
+  const estadoCotizacion = cotizacion ? LABELS_ESTADO_COTIZACION[cotizacion.estado] : null
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <Link to="/citas" className="text-sm text-blue-600 hover:underline">
-          ← Mis citas
+      <main className="mx-auto max-w-6xl px-6 py-8">
+        <Link to="/citas" className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-blue-700 hover:text-blue-800">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Mis citas
         </Link>
 
-        <h1 className="text-xl font-semibold text-gray-900 mt-2 mb-6">
-          {cita.servicioNombre}
-        </h1>
+        {mensaje && <Alert type="success" className="mb-4">{mensaje}</Alert>}
+        {error && <Alert type="error" className="mb-4">{error}</Alert>}
 
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-gray-950">{cita.servicioNombre}</h1>
+          <p className="mt-1 text-sm text-gray-500">Detalle de la cita y cotizacion asociada.</p>
+        </div>
 
-          <div className="flex flex-col gap-4">
-
-            <div className="border border-gray-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Informacion de la cita</h3>
-              <p className="text-sm text-gray-600">Servicio: {cita.servicioNombre}</p>
-              <p className="text-sm text-gray-600">Bicicleta: {cita.biciDescripcion || '—'}</p>
-              <p className="text-sm text-gray-600">
-                Fecha y hora: {cita.fecha} {cita.hora}
-              </p>
-              <p className="text-sm text-gray-600">Observaciones: {cita.observaciones || '—'}</p>
-              <p className="text-sm text-gray-600">
-                Atendido por: {cita.encargadoNombre || 'Sin asignar'}
-              </p>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_300px]">
+          <section className="space-y-4">
+            <div className="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
+              <h2 className="mb-3 flex items-center gap-2 text-base font-semibold text-gray-950">
+                <CalendarCheck className="h-5 w-5 text-blue-600" aria-hidden="true" />
+                Informacion de la cita
+              </h2>
+              <div className="space-y-2 text-sm text-gray-600">
+                <p>Servicio: {cita.servicioNombre}</p>
+                <p>Bicicleta: {cita.biciDescripcion || 'Sin descripcion'}</p>
+                <p>Fecha y hora: {cita.fecha} {cita.hora}</p>
+                <p>Observaciones: {cita.observaciones || 'Sin observaciones'}</p>
+                <p>Atendido por: {cita.encargadoNombre || 'Sin asignar'}</p>
+              </div>
             </div>
 
             {cotizacion && (
-              <div className="border border-gray-200 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Cotizacion</h3>
-                <p className="text-sm text-gray-600 mb-2">{cotizacion.descripcion}</p>
-                <p className="text-lg font-semibold text-gray-900 mb-3">
-                  Monto: S/ {cotizacion.monto.toFixed(2)}
+              <div className="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
+                <h2 className="mb-3 flex items-center gap-2 text-base font-semibold text-gray-950">
+                  <ClipboardCheck className="h-5 w-5 text-blue-600" aria-hidden="true" />
+                  Cotizacion
+                </h2>
+                <p className="mb-3 text-sm leading-6 text-gray-600">{cotizacion.descripcion}</p>
+                <p className="mb-4 text-lg font-semibold text-gray-950">
+                  Monto: {formatMoney(cotizacion.monto)}
                 </p>
 
                 {cotizacion.estado === 'PENDIENTE' && (
-                  <div className="flex gap-3">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <button
+                      type="button"
                       onClick={() => responderCotizacion('ACEPTADA')}
                       disabled={procesando}
-                      className="flex-1 bg-blue-600 text-white text-sm py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                      className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Aceptar cotizacion
                     </button>
                     <button
+                      type="button"
                       onClick={() => responderCotizacion('RECHAZADA')}
                       disabled={procesando}
-                      className="flex-1 border border-gray-300 text-sm py-2 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                      className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Rechazar
                     </button>
@@ -136,35 +163,29 @@ function DetalleCita() {
                 )}
               </div>
             )}
+          </section>
 
-          </div>
-
-          <div>
-            <div className="border border-gray-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Estado</h3>
-              <p className="text-sm mb-2">
-                Cita:{' '}
-                <span className={`text-xs px-2 py-1 rounded-md ${estadoCita.color}`}>
-                  {estadoCita.texto}
-                </span>
-              </p>
-              <p className="text-sm">
-                Cotizacion:{' '}
-                {cotizacion ? (
-                  <span className={`text-xs px-2 py-1 rounded-md ${LABELS_ESTADO_COTIZACION[cotizacion.estado].color}`}>
-                    {LABELS_ESTADO_COTIZACION[cotizacion.estado].texto}
-                  </span>
-                ) : (
-                  <span className="text-xs px-2 py-1 rounded-md bg-gray-100 text-gray-700">
-                    Sin cotizacion
-                  </span>
-                )}
-              </p>
+          <aside className="lg:sticky lg:top-24 lg:self-start">
+            <div className="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
+              <h2 className="mb-3 text-base font-semibold text-gray-950">Estado</h2>
+              <div className="space-y-3 text-sm">
+                <p className="flex items-center justify-between gap-3">
+                  <span className="text-gray-500">Cita</span>
+                  <span className={`rounded-md px-2 py-1 text-xs font-semibold ${estadoCita.color}`}>{estadoCita.texto}</span>
+                </p>
+                <p className="flex items-center justify-between gap-3">
+                  <span className="text-gray-500">Cotizacion</span>
+                  {estadoCotizacion ? (
+                    <span className={`rounded-md px-2 py-1 text-xs font-semibold ${estadoCotizacion.color}`}>{estadoCotizacion.texto}</span>
+                  ) : (
+                    <span className="rounded-md bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">Sin cotizacion</span>
+                  )}
+                </p>
+              </div>
             </div>
-          </div>
-
+          </aside>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
