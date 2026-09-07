@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import api from '../api/axios'
 import { getApiErrorMessage } from '../utils/apiError'
 
@@ -6,30 +6,39 @@ function unwrapApiData(response) {
   return response.data?.data ?? response.data
 }
 
-export function useApiGet(path, fallbackData = [], fallbackError = 'No se pudo cargar la informacion') {
-  const fallbackRef = useRef(fallbackData)
-  const [data, setData] = useState(fallbackData)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+export function useApiGet(path, fallbackData = [], fallbackError = 'No se pudo cargar la información') {
+  const queryClient = useQueryClient()
 
-  const refetch = useCallback(async () => {
-    setLoading(true)
-    setError('')
-
-    try {
+  const {
+    data: queryData,
+    isLoading,
+    isFetching,
+    error: queryError,
+    refetch,
+  } = useQuery({
+    queryKey: ['api-get', path],
+    queryFn: async () => {
       const response = await api.get(path)
-      setData(unwrapApiData(response) ?? fallbackRef.current)
-    } catch (err) {
-      setError(getApiErrorMessage(err, fallbackError))
-      setData(fallbackRef.current)
-    } finally {
-      setLoading(false)
-    }
-  }, [fallbackError, path])
+      return unwrapApiData(response)
+    },
+    enabled: Boolean(path),
+  })
 
-  useEffect(() => {
-    refetch()
-  }, [refetch])
+  const data = queryData ?? fallbackData
+  const loading = isLoading
+  const error = queryError ? getApiErrorMessage(queryError, fallbackError) : ''
 
-  return { data, setData, loading, error, refetch }
+  const setData = (newData) => {
+    queryClient.setQueryData(['api-get', path], newData)
+  }
+
+  return {
+    data,
+    setData,
+    loading,
+    isFetching,
+    error,
+    refetch,
+  }
 }
+

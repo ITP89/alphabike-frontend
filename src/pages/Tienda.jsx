@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
-import { CheckCircle2, Filter, Package, Search, ShoppingCart } from 'lucide-react'
+import { Filter, Package, Search, ShoppingCart } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { toast } from 'sonner'
 import Navbar from '../components/Navbar'
-import Alert from '../components/ui/Alert'
-import { EmptyState, ErrorState, LoadingState } from '../components/ui/AsyncState'
+import { EmptyState, ErrorState } from '../components/ui/AsyncState'
+import { CardSkeleton } from '../components/ui/Skeleton'
 import ImageFallback from '../components/ui/ImageFallback'
 import { useCarrito } from '../context/CarritoContext'
 import { useApiGet } from '../hooks/useApiGet'
@@ -27,7 +28,6 @@ function Tienda() {
   const [busqueda, setBusqueda] = useState('')
   const [categoriaId, setCategoriaId] = useState('')
   const [orden, setOrden] = useState('relevancia')
-  const [mensaje, setMensaje] = useState('')
 
   const cargando = cargandoProductos || cargandoCategorias
   const error = errorProductos || errorCategorias
@@ -55,8 +55,7 @@ function Tienda() {
 
   function handleAgregar(producto) {
     agregarProducto(producto)
-    setMensaje(`¡${producto.nombre} añadido al carrito!`)
-    window.setTimeout(() => setMensaje(''), 2500)
+    toast.success(`¡${producto.nombre} añadido al carrito!`)
   }
 
   function limpiarFiltros() {
@@ -199,16 +198,7 @@ function Tienda() {
 
           {/* Product Grid Area */}
           <section>
-            {mensaje && (
-              <div className="mb-4 animate-fade-in">
-                <Alert type="success" className="flex items-center gap-2 font-bold shadow-sm">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                  {mensaje}
-                </Alert>
-              </div>
-            )}
-
-            {cargando && <LoadingState text="Cargando productos del almacén..." />}
+            {cargando && <CardSkeleton count={6} />}
             {error && <ErrorState message={error} onRetry={recargarTodo} />}
 
             {!cargando && !error && (

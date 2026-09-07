@@ -4,7 +4,7 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { classNames } from '../utils/formatters'
 
-function PanelLayout({ children, title, subtitle, links }) {
+function PanelLayout({ children, title, subtitle, links = [] }) {
   const { usuario, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -16,7 +16,7 @@ function PanelLayout({ children, title, subtitle, links }) {
   }
 
   function renderLinks(compact = false) {
-    return links.map((link) => {
+    return (links || []).map((link) => {
       const Icon = link.icon
       const isActive = location.pathname === link.to || location.pathname.startsWith(`${link.to}/`)
 

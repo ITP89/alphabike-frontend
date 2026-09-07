@@ -1,7 +1,8 @@
 import { ArrowRight, CalendarCheck, Clock3, ShieldCheck, Wrench } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
-import { EmptyState, ErrorState, LoadingState } from '../components/ui/AsyncState'
+import { EmptyState, ErrorState } from '../components/ui/AsyncState'
+import { CardSkeleton } from '../components/ui/Skeleton'
 import { useApiGet } from '../hooks/useApiGet'
 import { formatMoney } from '../utils/formatters'
 
@@ -61,7 +62,7 @@ function Servicios() {
       </section>
 
       <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        {loading && <LoadingState text="Cargando catálogo de servicios..." />}
+        {loading && <CardSkeleton count={3} />}
         {error && <ErrorState message={error} onRetry={refetch} />}
 
         {!loading && !error && servicios.length > 0 && (

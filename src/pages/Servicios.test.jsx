@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import Servicios from './Servicios'
 import api from '../api/axios'
@@ -15,8 +16,17 @@ vi.mock('../components/Navbar', () => ({
 }))
 
 describe('Servicios', () => {
+  let queryClient
+
   beforeEach(() => {
     vi.clearAllMocks()
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    })
   })
 
   it('muestra servicios reales desde la API', async () => {
@@ -35,9 +45,11 @@ describe('Servicios', () => {
     })
 
     render(
-      <MemoryRouter>
-        <Servicios />
-      </MemoryRouter>,
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <Servicios />
+        </MemoryRouter>
+      </QueryClientProvider>,
     )
 
     expect(await screen.findByText('Mantenimiento general')).toBeInTheDocument()

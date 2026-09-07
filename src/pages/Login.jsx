@@ -1,6 +1,7 @@
 import { LogIn, Mail, Lock, Sparkles, ShieldCheck, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import Navbar from '../components/Navbar'
 import Alert from '../components/ui/Alert'
 import { useAuth } from '../context/AuthContext'
@@ -38,6 +39,7 @@ function Login() {
 
     try {
       const datosUsuario = await login(email.trim(), password)
+      toast.success(`¡Bienvenido de nuevo, ${datosUsuario.nombre || 'Usuario'}!`)
 
       if (datosUsuario.rol === 'ADMIN') {
         navigate('/admin/dashboard')
@@ -47,11 +49,12 @@ function Login() {
         navigate('/')
       }
     } catch (err) {
-      if (!err.response) {
-        setError('No se pudo conectar con el backend. Verifica la conexión con el servidor.')
-      } else {
-        setError(getApiErrorMessage(err, 'Correo o contraseña incorrectos'))
-      }
+      const mensajeError = !err.response
+        ? 'No se pudo conectar con el backend. Verifica la conexión con el servidor.'
+        : getApiErrorMessage(err, 'Correo o contraseña incorrectos')
+
+      setError(mensajeError)
+      toast.error(mensajeError)
     } finally {
       setCargando(false)
     }
