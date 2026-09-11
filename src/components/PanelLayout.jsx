@@ -29,11 +29,11 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
             'flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-extrabold transition-all duration-200',
             compact && 'min-w-max',
             isActive
-              ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+              ? 'bg-red-600 text-white shadow-md shadow-red-500/20'
               : 'text-slate-400 hover:bg-slate-900 hover:text-white',
           )}
         >
-          {Icon && <Icon className={classNames('h-4 w-4 shrink-0', isActive ? 'text-slate-950' : 'text-amber-400')} aria-hidden="true" />}
+          {Icon && <Icon className={classNames('h-4 w-4 shrink-0', isActive ? 'text-slate-950' : 'text-red-400')} aria-hidden="true" />}
           <span>{link.label}</span>
         </NavLink>
       )
@@ -41,15 +41,15 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-amber-400 selection:text-slate-950">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-red-600 selection:text-white">
       {/* Mobile Top Header */}
       <header className="sticky top-0 z-30 border-b border-slate-800 bg-slate-950 text-white lg:hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <Link to="/" className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500 text-slate-950 font-black shadow-md">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-600 text-white font-black shadow-md">
               <Bike className="h-5 w-5" aria-hidden="true" />
             </span>
-            <span className="font-black text-white text-base tracking-tight">AlphaBike <span className="text-amber-400 text-xs font-bold">PRO</span></span>
+            <span className="font-black text-white text-base tracking-tight">AlphaBike <span className="text-red-400 text-xs font-bold">PRO</span></span>
           </Link>
           <button
             type="button"
@@ -80,14 +80,14 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
         {/* Sidebar Desktop Pro */}
         <aside className="hidden border-r border-slate-800 bg-slate-950 px-4 py-6 text-white lg:flex lg:flex-col shadow-2xl">
           <Link to="/" className="mb-8 flex items-center gap-3 group px-2">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/25 group-hover:scale-105 transition-transform">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-600 text-white font-black shadow-lg shadow-red-500/25 group-hover:scale-105 transition-transform">
               <Bike className="h-5 w-5" aria-hidden="true" />
             </span>
             <div>
               <p className="text-base font-black tracking-tight text-white flex items-center gap-1.5">
-                AlphaBike <Sparkles className="h-3 w-3 text-amber-400" />
+                AlphaBike <Sparkles className="h-3 w-3 text-red-400" />
               </p>
-              <p className="text-[10px] font-bold text-amber-400 uppercase tracking-widest">{subtitle}</p>
+              <p className="text-[10px] font-bold text-red-400 uppercase tracking-widest">{subtitle}</p>
             </div>
           </Link>
 
@@ -100,12 +100,12 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
           {/* User Profile Card Footer */}
           <div className="mt-auto border-t border-slate-800/80 pt-4 px-2">
             <div className="flex items-center gap-2.5 mb-3 bg-slate-900/90 border border-slate-800 p-2.5 rounded-xl">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-400 shrink-0 font-bold text-xs">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600/20 border border-red-500/40 text-red-400 shrink-0 font-bold text-xs">
                 <Shield className="h-4 w-4" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-bold text-white">{usuario?.nombre || title}</p>
-                <p className="truncate text-[10px] font-semibold text-amber-400">{usuario?.rol || subtitle}</p>
+                <p className="truncate text-[10px] font-semibold text-red-400">{usuario?.rol || subtitle}</p>
               </div>
             </div>
             
@@ -130,3 +130,5 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
 }
 
 export default PanelLayout
+
+

@@ -8,7 +8,7 @@
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 antialiased selection:bg-amber-400 selection:text-slate-900;
+    @apply bg-zinc-50 text-zinc-950 antialiased selection:bg-red-600 selection:text-white;
   }
 
   /* Custom Scrollbar */
@@ -18,16 +18,16 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    background: #f4f4f5;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 9999px;
+    background: #a1a1aa;
+    border-radius: 8px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: #71717a;
   }
 
   button,
@@ -42,20 +42,54 @@
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible {
-    @apply outline-none ring-2 ring-amber-500 ring-offset-2;
+    @apply outline-none ring-2 ring-red-500 ring-offset-2;
   }
 }
 
 @layer utilities {
   .glass-card {
-    @apply bg-white/80 backdrop-blur-md border border-slate-100 shadow-sm transition-all duration-300;
+    @apply bg-white/90 backdrop-blur-md border border-zinc-200 shadow-sm transition-all duration-300;
   }
 
   .glass-card-hover {
-    @apply hover:shadow-md hover:-translate-y-1 hover:border-amber-200/60;
+    @apply hover:-translate-y-0.5 hover:border-red-500/40 hover:shadow-lg hover:shadow-zinc-950/10;
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-amber-600 via-amber-500 to-amber-700 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-red-600 via-red-500 to-red-700 bg-clip-text text-transparent;
+  }
+
+  .brand-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    background-size: 42px 42px;
+  }
+
+  .brand-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+
+  .brand-card::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: linear-gradient(180deg, #dc2626, #991b1b);
+    opacity: 0;
+    transition: opacity 180ms ease;
+  }
+
+  .brand-card:hover::before {
+    opacity: 1;
+  }
+
+  .chain-ring {
+    border: 18px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+    box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.18), 0 0 0 1px rgba(239, 68, 68, 0.08);
   }
 }
+

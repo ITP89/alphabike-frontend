@@ -5,6 +5,7 @@ import api from '../api/axios'
 import Navbar from '../components/Navbar'
 import { EmptyState, ErrorState, LoadingState } from '../components/ui/AsyncState'
 import ImageFallback from '../components/ui/ImageFallback'
+import alphaLogo from '../assets/alphabike-logo.png'
 import heroImage from '../assets/hero-workshop.png'
 import { formatDate, formatMoney } from '../utils/formatters'
 import { getApiErrorMessage } from '../utils/apiError'
@@ -15,7 +16,7 @@ const beneficios = [
     description: 'Catálogo completo con componentes originales, repuestos y accesorios de alto rendimiento.',
     to: '/tienda',
     icon: PackageSearch,
-    color: 'from-amber-500 to-amber-600',
+    color: 'from-red-500 to-red-600',
     badge: 'Stock en vivo'
   },
   {
@@ -31,7 +32,7 @@ const beneficios = [
     description: 'Monitorea el avance de tu bicicleta en taller y el estado de tus envíos en tiempo real.',
     to: '/perfil',
     icon: CalendarCheck,
-    color: 'from-amber-600 to-amber-700',
+    color: 'from-red-600 to-red-700',
     badge: '100% Transparente'
   },
 ]
@@ -80,67 +81,91 @@ function Home() {
   }, [cargarProductos, cargarTrabajos])
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-amber-400 selection:text-slate-950">
+    <div className="min-h-screen bg-zinc-50 font-sans text-zinc-950 selection:bg-red-600 selection:text-white">
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative min-h-[580px] overflow-hidden bg-slate-950 text-white">
+      <section className="brand-grid relative min-h-[640px] overflow-hidden bg-zinc-950 text-white">
         <img
           src={heroImage}
           alt="Taller AlphaBike profesional"
-          className="absolute inset-0 h-full w-full object-cover opacity-85 transition-transform duration-1000 hover:scale-105"
+          className="absolute inset-0 h-full w-full object-cover opacity-55 grayscale transition-transform duration-1000 hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-slate-950/20" />
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-50 via-slate-50/50 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_18%,rgba(220,38,38,0.28),transparent_28%),linear-gradient(110deg,#09090b_0%,rgba(9,9,11,0.96)_36%,rgba(9,9,11,0.78)_67%,rgba(9,9,11,0.42)_100%)]" />
+        <div className="chain-ring absolute -right-24 top-16 hidden h-80 w-80 opacity-70 lg:block" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-zinc-50 via-zinc-50/60 to-transparent" />
 
-        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <div className="max-w-2xl">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-28">
+          <div className="max-w-3xl">
             {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/20 px-4 py-1.5 text-xs font-bold text-amber-400 backdrop-blur-md">
-              <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+            <div className="inline-flex items-center gap-2 rounded-lg border border-red-500/40 bg-red-600/15 px-4 py-2 text-xs font-black uppercase text-red-200 backdrop-blur-md">
+              <Sparkles className="h-3.5 w-3.5 text-red-400" />
               <span>TALLER Y TIENDA ESPECIALIZADA EN CICLISMO</span>
             </div>
 
             {/* Hero Heading */}
-            <h1 className="mt-4 text-4xl font-black tracking-tight text-white sm:text-6xl lg:leading-tight drop-shadow-md">
-              Potencia tu ruta con <span className="text-amber-500">AlphaBike</span>
+            <h1 className="mt-6 text-5xl font-black tracking-tight text-white sm:text-7xl lg:leading-[0.92] drop-shadow-md">
+              AlphaBike <span className="text-red-500">Workshop</span>
             </h1>
 
-            <p className="mt-4 text-base text-slate-200 sm:text-lg sm:leading-relaxed drop-shadow">
-              Mantenimiento experto, repuestos originales y seguimiento transparente para ciclistas exigentes.
+            <p className="mt-5 max-w-2xl text-base font-medium text-zinc-200 sm:text-lg sm:leading-relaxed drop-shadow">
+              Mantenimiento experto, repuestos originales y seguimiento transparente con una experiencia pensada para ciclistas exigentes.
             </p>
 
             {/* CTAs */}
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 to="/tienda"
-                className="group inline-flex items-center gap-2.5 rounded-xl bg-amber-500 px-6 py-3.5 text-sm font-extrabold text-slate-950 shadow-lg shadow-amber-500/25 transition-all duration-200 hover:bg-amber-400 hover:shadow-amber-500/40 active:scale-95"
+                className="group inline-flex items-center gap-2.5 rounded-lg bg-red-600 px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-red-600/25 transition-all duration-200 hover:bg-red-500 hover:shadow-red-500/40 active:scale-95"
               >
                 Explorar Tienda
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
                 to="/mantenimiento"
-                className="group inline-flex items-center gap-2.5 rounded-xl border border-white/20 bg-slate-900/90 px-6 py-3.5 text-sm font-bold text-white shadow-md backdrop-blur-md transition-all duration-200 hover:bg-slate-800 active:scale-95"
+                className="group inline-flex items-center gap-2.5 rounded-lg border border-white/15 bg-white/10 px-6 py-3.5 text-sm font-bold text-white shadow-md backdrop-blur-md transition-all duration-200 hover:bg-white/15 active:scale-95"
               >
                 Agendar Cita en Taller
-                <CalendarCheck className="h-4 w-4 text-amber-400 transition-transform group-hover:scale-110" />
+                <CalendarCheck className="h-4 w-4 text-red-400 transition-transform group-hover:scale-110" />
               </Link>
             </div>
 
             {/* Feature Badges */}
-            <div className="mt-10 grid grid-cols-3 gap-3 border-t border-white/10 pt-6">
-              <div className="flex items-center gap-2.5">
-                <CheckCircle2 className="h-5 w-5 text-amber-400 shrink-0" />
-                <span className="text-xs font-semibold text-slate-200">Técnicos Certificados</span>
+            <div className="mt-10 grid grid-cols-1 gap-3 border-t border-white/10 pt-6 sm:grid-cols-3">
+              <div className="flex items-center gap-2.5 rounded-lg border border-white/10 bg-white/5 px-3 py-3">
+                <CheckCircle2 className="h-5 w-5 text-red-400 shrink-0" />
+                <span className="text-xs font-semibold text-zinc-200">Técnicos Certificados</span>
               </div>
-              <div className="flex items-center gap-2.5">
-                <ShieldCheck className="h-5 w-5 text-amber-400 shrink-0" />
-                <span className="text-xs font-semibold text-slate-200">Garantía en Servicio</span>
+              <div className="flex items-center gap-2.5 rounded-lg border border-white/10 bg-white/5 px-3 py-3">
+                <ShieldCheck className="h-5 w-5 text-red-400 shrink-0" />
+                <span className="text-xs font-semibold text-zinc-200">Garantía en Servicio</span>
               </div>
-              <div className="flex items-center gap-2.5">
-                <Clock className="h-5 w-5 text-amber-400 shrink-0" />
-                <span className="text-xs font-semibold text-slate-200">Entregas a Tiempo</span>
+              <div className="flex items-center gap-2.5 rounded-lg border border-white/10 bg-white/5 px-3 py-3">
+                <Clock className="h-5 w-5 text-red-400 shrink-0" />
+                <span className="text-xs font-semibold text-zinc-200">Entregas a Tiempo</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="hidden justify-end lg:flex">
+            <div className="relative w-full max-w-md">
+              <div className="absolute -inset-6 bg-red-600/20 blur-3xl" />
+              <div className="relative rounded-lg border border-white/10 bg-white/[0.06] p-8 shadow-2xl shadow-black/50 backdrop-blur-xl">
+                <img src={alphaLogo} alt="Logo AlphaBike Workshop" className="mx-auto max-h-72 w-full object-contain drop-shadow-2xl" />
+                <div className="mt-8 grid grid-cols-3 gap-3 border-t border-white/10 pt-5">
+                  <div>
+                    <p className="text-2xl font-black text-white">30</p>
+                    <p className="mt-1 text-[10px] font-bold uppercase text-zinc-400">Días garantía</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-black text-white">24h</p>
+                    <p className="mt-1 text-[10px] font-bold uppercase text-zinc-400">Respuesta</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-black text-red-400">Pro</p>
+                    <p className="mt-1 text-[10px] font-bold uppercase text-zinc-400">Setup taller</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -156,23 +181,23 @@ function Home() {
               <Link
                 key={item.title}
                 to={item.to}
-                className="group glass-card glass-card-hover rounded-2xl p-6 relative overflow-hidden"
+                className="group brand-card glass-card glass-card-hover p-6"
               >
                 <div className="flex items-center justify-between">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${item.color} text-white shadow-md transition-transform group-hover:scale-110`}>
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br ${item.color} text-white shadow-md transition-transform group-hover:scale-105`}>
                     <Icon className="h-6 w-6" />
                   </div>
-                  <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold text-slate-600">
+                  <span className="rounded-md bg-zinc-100 px-3 py-1 text-[11px] font-bold uppercase text-zinc-600">
                     {item.badge}
                   </span>
                 </div>
-                <h3 className="mt-5 text-lg font-extrabold text-slate-950 group-hover:text-amber-600 transition-colors">
+                <h3 className="mt-5 text-lg font-extrabold text-slate-950 group-hover:text-red-600 transition-colors">
                   {item.title}
                 </h3>
                 <p className="mt-2 text-sm text-slate-600 leading-relaxed">
                   {item.description}
                 </p>
-                <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-amber-600 group-hover:gap-2.5 transition-all">
+                <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-red-600 group-hover:gap-2.5 transition-all">
                   <span>Saber más</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </div>
@@ -187,7 +212,7 @@ function Home() {
         <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between border-b border-slate-200 pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+              <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
               <span className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Catálogo Pro</span>
             </div>
             <h2 className="mt-1 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
@@ -196,7 +221,7 @@ function Home() {
           </div>
           <Link
             to="/tienda"
-            className="group inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 transition-all hover:bg-amber-500 hover:text-slate-950"
+            className="group inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 transition-all hover:bg-red-600 hover:text-white"
           >
             <span>Ver Catálogo Completo</span>
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
@@ -212,19 +237,19 @@ function Home() {
               <Link
                 key={prod.id}
                 to={`/producto/${prod.id}`}
-                className="group glass-card glass-card-hover flex flex-col rounded-2xl overflow-hidden p-4"
+                className="group brand-card glass-card glass-card-hover flex flex-col p-4"
               >
-                <div className="relative mb-3 aspect-square overflow-hidden rounded-xl bg-slate-100">
+                <div className="relative mb-3 aspect-square overflow-hidden rounded-lg bg-zinc-100">
                   <ImageFallback
                     src={prod.imagenUrl}
                     alt={prod.nombre}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <span className="absolute top-2.5 left-2.5 rounded-full bg-slate-950/80 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-bold text-amber-400">
+                  <span className="absolute top-2.5 left-2.5 rounded-md bg-zinc-950/85 px-2.5 py-0.5 text-[10px] font-bold uppercase text-red-300 backdrop-blur-md">
                     {prod.marca || 'AlphaBike'}
                   </span>
                 </div>
-                <h3 className="line-clamp-2 text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors">
+                <h3 className="line-clamp-2 text-sm font-bold text-slate-900 group-hover:text-red-600 transition-colors">
                   {prod.nombre}
                 </h3>
                 <p className="mt-1 text-xs text-slate-500">
@@ -234,7 +259,7 @@ function Home() {
                   <span className="text-base font-black text-slate-950">
                     {formatMoney(prod.precio)}
                   </span>
-                  <span className="rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">
+                  <span className="rounded-md bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700 transition-colors group-hover:bg-red-600 group-hover:text-white">
                     Ver Detalle
                   </span>
                 </div>
@@ -254,8 +279,8 @@ function Home() {
           <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between border-b border-slate-800 pb-4">
             <div>
               <div className="flex items-center gap-2">
-                <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                <span className="text-xs font-extrabold uppercase tracking-widest text-amber-400">Resultados del Taller</span>
+                <Star className="h-4 w-4 fill-red-400 text-red-400" />
+                <span className="text-xs font-extrabold uppercase tracking-widest text-red-400">Resultados del Taller</span>
               </div>
               <h2 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">
                 Trabajos Destacados (Antes / Después)
@@ -263,7 +288,7 @@ function Home() {
             </div>
             <Link
               to="/galeria"
-              className="group inline-flex items-center gap-1.5 rounded-full bg-slate-800 px-4 py-2 text-xs font-bold text-slate-200 transition-all hover:bg-amber-500 hover:text-slate-950"
+              className="group inline-flex items-center gap-1.5 rounded-full bg-slate-800 px-4 py-2 text-xs font-bold text-slate-200 transition-all hover:bg-red-600 hover:text-white"
             >
               <span>Ver Galería Completa</span>
               <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
@@ -279,7 +304,7 @@ function Home() {
                 <Link
                   key={trabajo.id}
                   to="/galeria"
-                  className="group overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/60 transition-all duration-300 hover:border-amber-500/50 hover:shadow-xl hover:shadow-amber-500/10"
+                  className="group overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950/70 transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500/50 hover:shadow-xl hover:shadow-red-500/10"
                 >
                   <div className="relative grid aspect-[16/9] grid-cols-2 gap-0.5 overflow-hidden bg-slate-800">
                     <div className="relative">
@@ -290,13 +315,13 @@ function Home() {
                     </div>
                     <div className="relative">
                       <ImageFallback src={trabajo.imagenDespuesUrl} alt={`${trabajo.titulo} después`} className="h-full w-full object-cover" />
-                      <span className="absolute bottom-2 right-2 rounded bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-slate-950">
+                      <span className="absolute bottom-2 right-2 rounded bg-red-600 px-2 py-0.5 text-[10px] font-bold text-slate-950">
                         DESPUÉS
                       </span>
                     </div>
                   </div>
                   <div className="p-4">
-                    <h3 className="font-bold text-white group-hover:text-amber-400 transition-colors">
+                    <h3 className="font-bold text-white group-hover:text-red-400 transition-colors">
                       {trabajo.titulo}
                     </h3>
                     <p className="mt-1 text-xs text-slate-400">
@@ -318,9 +343,7 @@ function Home() {
       <footer className="border-t border-slate-200 bg-white py-10 text-slate-600">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-lg bg-slate-950 text-amber-400 flex items-center justify-center font-black text-xs">
-              AB
-            </div>
+            <img src={alphaLogo} alt="AlphaBike Workshop" className="h-10 w-10 rounded-lg border border-zinc-200 bg-white object-contain p-1" />
             <span className="font-bold text-slate-900 text-sm">AlphaBike Taller & Tienda Pro</span>
           </div>
           <p className="text-xs text-slate-500 text-center md:text-right">
@@ -333,3 +356,5 @@ function Home() {
 }
 
 export default Home
+
+

@@ -51,8 +51,8 @@ export function PageLoader() {
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 p-8">
       <div className="relative flex h-14 w-14 items-center justify-center">
-        <div className="absolute inset-0 rounded-full border-4 border-amber-500/20" />
-        <div className="absolute inset-0 rounded-full border-4 border-amber-500 border-t-transparent animate-spin" />
+        <div className="absolute inset-0 rounded-full border-4 border-red-500/20" />
+        <div className="absolute inset-0 rounded-full border-4 border-red-500 border-t-transparent animate-spin" />
       </div>
       <p className="text-xs font-extrabold uppercase tracking-widest text-slate-400 animate-pulse">
         Cargando AlphaBike...
@@ -60,3 +60,4 @@ export function PageLoader() {
     </div>
   )
 }
+

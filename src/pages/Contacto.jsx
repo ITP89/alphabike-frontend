@@ -57,14 +57,14 @@ function Contacto() {
 
       {/* Signature Hero Header (Dark Navy AlphaBike Theme) */}
       <section className="relative overflow-hidden border-b border-slate-800 bg-slate-950 px-6 py-14 text-white">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 via-transparent to-transparent pointer-events-none" />
         <div className="mx-auto max-w-6xl relative z-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-1.5 text-xs font-bold text-amber-400 backdrop-blur-md mb-3">
-            <Mail className="h-4 w-4 text-amber-400" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-1.5 text-xs font-bold text-red-400 backdrop-blur-md mb-3">
+            <Mail className="h-4 w-4 text-red-400" />
             <span>ATENCIÓN DIRECTA & COTIZACIONES</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
-            Conversemos sobre <span className="text-amber-500">Tu Bicicleta</span>
+            Conversemos sobre <span className="text-red-500">Tu Bicicleta</span>
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-400">
             Escríbenos para consultar repuestos en stock, cotizar servicios de taller especializado o dar seguimiento a tus reparaciones.
@@ -108,7 +108,7 @@ function Contacto() {
                 placeholder="Ej. Carlos Mendoza"
                 value={form.nombre}
                 onChange={(event) => updateField('nombre', event.target.value)}
-                className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all"
+                className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 transition-all"
               />
             </FormField>
 
@@ -118,7 +118,7 @@ function Contacto() {
                 placeholder="carlos@ejemplo.com"
                 value={form.email}
                 onChange={(event) => updateField('email', event.target.value)}
-                className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all"
+                className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 transition-all"
               />
             </FormField>
 
@@ -128,7 +128,7 @@ function Contacto() {
                 placeholder="+51 902 280 036"
                 value={form.telefono}
                 onChange={(event) => updateField('telefono', event.target.value)}
-                className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all"
+                className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 transition-all"
               />
             </FormField>
 
@@ -136,7 +136,7 @@ function Contacto() {
               <select
                 value={form.asunto}
                 onChange={(event) => updateField('asunto', event.target.value)}
-                className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all"
+                className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 transition-all"
               >
                 <option value="MANTENIMIENTO">Mantenimiento de Taller</option>
                 <option value="TIENDA">Consulta de Productos y Repuestos</option>
@@ -152,7 +152,7 @@ function Contacto() {
                   onChange={(event) => updateField('mensaje', event.target.value)}
                   rows="4"
                   placeholder="Detalla el modelo de tu bicicleta o el servicio específico que requieres..."
-                  className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all"
+                  className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 transition-all"
                 />
               </FormField>
             </div>
@@ -160,7 +160,7 @@ function Contacto() {
             <div className="sm:col-span-2 flex flex-col sm:flex-row gap-3 pt-2">
               <button
                 type="submit"
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 px-6 py-3 text-xs font-bold text-slate-950 hover:bg-amber-400 transition-all shadow-md shadow-amber-500/20 active:scale-95"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-6 py-3 text-xs font-bold text-slate-950 hover:bg-red-400 transition-all shadow-md shadow-red-500/20 active:scale-95"
               >
                 <span>Enviar Mensaje</span>
                 <Send className="h-4 w-4" />
@@ -182,13 +182,13 @@ function Contacto() {
         <aside className="space-y-6">
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
             <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-amber-500" />
+              <Sparkles className="h-4 w-4 text-red-500" />
               <span>Información de Contacto</span>
             </h2>
 
             <div className="space-y-4 text-xs font-medium text-slate-600">
               <div className="flex items-start gap-3">
-                <div className="rounded-xl bg-amber-50 border border-amber-200 p-2 text-amber-700 shrink-0">
+                <div className="rounded-xl bg-red-50 border border-red-200 p-2 text-red-700 shrink-0">
                   <MapPin className="h-4 w-4" />
                 </div>
                 <div>
@@ -238,10 +238,10 @@ function Contacto() {
           <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
             <div className="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs font-bold text-slate-700">
               <span className="flex items-center gap-1.5">
-                <MapPin className="h-3.5 w-3.5 text-amber-600" />
+                <MapPin className="h-3.5 w-3.5 text-red-600" />
                 Ubicación en Tiempo Real
               </span>
-              <span className="text-[10px] text-amber-700 font-extrabold uppercase">San Borja, Lima</span>
+              <span className="text-[10px] text-red-700 font-extrabold uppercase">San Borja, Lima</span>
             </div>
 
             <iframe
@@ -262,3 +262,5 @@ function Contacto() {
 }
 
 export default Contacto
+
+

@@ -40,14 +40,14 @@ function Galeria() {
 
       {/* Signature Hero Header (Dark Navy AlphaBike Theme) */}
       <section className="relative overflow-hidden border-b border-slate-800 bg-slate-950 px-6 py-14 text-white">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 via-transparent to-transparent pointer-events-none" />
         <div className="mx-auto max-w-6xl relative z-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-1.5 text-xs font-bold text-amber-400 backdrop-blur-md mb-3">
-            <Camera className="h-4 w-4 text-amber-400" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-1.5 text-xs font-bold text-red-400 backdrop-blur-md mb-3">
+            <Camera className="h-4 w-4 text-red-400" />
             <span>SHOWCASE DE RESULTADOS REALIZADOS</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
-            Galería <span className="text-amber-500">Antes & Después</span>
+            Galería <span className="text-red-500">Antes & Después</span>
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-400">
             Explora las transformaciones, restauraciones y mantenimientos ejecutados por nuestros mecánicos certificados en el taller AlphaBike.
@@ -66,7 +66,7 @@ function Galeria() {
               placeholder="Buscar trabajo por título o descripción..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              className="w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-xs font-semibold text-slate-900 placeholder-slate-400 shadow-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all"
+              className="w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-xs font-semibold text-slate-900 placeholder-slate-400 shadow-sm focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 transition-all"
             />
           </div>
 
@@ -77,7 +77,7 @@ function Galeria() {
               className={classNames(
                 'rounded-xl px-3.5 py-2 text-xs font-bold transition-all shadow-sm',
                 filtro === 'todos'
-                  ? 'bg-amber-500 text-slate-950 shadow-amber-500/20 font-black'
+                  ? 'bg-red-600 text-white shadow-red-500/20 font-black'
                   : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100',
               )}
             >
@@ -91,7 +91,7 @@ function Galeria() {
                 className={classNames(
                   'rounded-xl px-3.5 py-2 text-xs font-bold transition-all shadow-sm',
                   filtro === cat
-                    ? 'bg-amber-500 text-slate-950 shadow-amber-500/20 font-black'
+                    ? 'bg-red-600 text-white shadow-red-500/20 font-black'
                     : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100',
                 )}
               >
@@ -111,7 +111,7 @@ function Galeria() {
               <article
                 key={trabajo.id}
                 onClick={() => setTrabajoSeleccionado(trabajo)}
-                className="group cursor-pointer rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm hover:shadow-md hover:border-amber-500/50 transition-all duration-300 transform hover:-translate-y-0.5"
+                className="group cursor-pointer rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm hover:shadow-md hover:border-red-500/50 transition-all duration-300 transform hover:-translate-y-0.5"
               >
                 {/* Comparación Visual Antes / Después */}
                 <div className="relative grid aspect-[16/9] grid-cols-2 overflow-hidden bg-slate-100">
@@ -131,7 +131,7 @@ function Galeria() {
                       alt={`${trabajo.titulo} después`}
                       className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <span className="absolute left-2.5 top-2.5 rounded-md bg-amber-500 px-2 py-0.5 text-[10px] font-black uppercase text-slate-950 shadow-sm">
+                    <span className="absolute left-2.5 top-2.5 rounded-md bg-red-600 px-2 py-0.5 text-[10px] font-black uppercase text-slate-950 shadow-sm">
                       Después
                     </span>
                   </div>
@@ -140,15 +140,15 @@ function Galeria() {
                 {/* Info Body */}
                 <div className="p-5">
                   <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase text-amber-700 tracking-wider">
-                      <Tag className="h-3 w-3 text-amber-600" /> {obtenerCategoria(trabajo)}
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase text-red-700 tracking-wider">
+                      <Tag className="h-3 w-3 text-red-600" /> {obtenerCategoria(trabajo)}
                     </span>
                     <span className="text-[10px] font-semibold text-slate-500 flex items-center gap-1">
                       <Calendar className="h-3 w-3" /> {formatDate(trabajo.fecha)}
                     </span>
                   </div>
 
-                  <h2 className="text-base font-bold text-slate-900 group-hover:text-amber-600 transition-colors line-clamp-1">
+                  <h2 className="text-base font-bold text-slate-900 group-hover:text-red-600 transition-colors line-clamp-1">
                     {trabajo.titulo}
                   </h2>
 
@@ -156,7 +156,7 @@ function Galeria() {
                     {trabajo.descripcion || 'Trabajo realizado con precisión técnica en el taller AlphaBike.'}
                   </p>
 
-                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs font-bold text-amber-600 group-hover:translate-x-1 transition-transform">
+                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs font-bold text-red-600 group-hover:translate-x-1 transition-transform">
                     <span>Ver Detalles Completos</span>
                     <ChevronRight className="h-4 w-4" />
                   </div>
@@ -183,7 +183,7 @@ function Galeria() {
             </button>
 
             <div className="flex items-center gap-2 mb-2">
-              <span className="rounded-md bg-amber-100 text-amber-800 px-3 py-1 text-xs font-bold uppercase">
+              <span className="rounded-md bg-red-100 text-red-800 px-3 py-1 text-xs font-bold uppercase">
                 {obtenerCategoria(trabajoSeleccionado)}
               </span>
               <span className="text-xs text-slate-500 font-semibold">
@@ -205,13 +205,13 @@ function Galeria() {
                   Estado Anterior
                 </span>
               </div>
-              <div className="relative rounded-2xl overflow-hidden border border-amber-300 bg-slate-100 h-64 sm:h-72 shadow-inner">
+              <div className="relative rounded-2xl overflow-hidden border border-red-300 bg-slate-100 h-64 sm:h-72 shadow-inner">
                 <ImageFallback
                   src={trabajoSeleccionado.imagenDespuesUrl}
                   alt="Después"
                   className="h-full w-full object-cover"
                 />
-                <span className="absolute left-3 top-3 rounded-lg bg-amber-500 px-3 py-1 text-xs font-black uppercase text-slate-950 shadow-md">
+                <span className="absolute left-3 top-3 rounded-lg bg-red-600 px-3 py-1 text-xs font-black uppercase text-slate-950 shadow-md">
                   Resultado Final
                 </span>
               </div>
@@ -223,12 +223,12 @@ function Galeria() {
 
             <div className="flex items-center justify-between border-t border-slate-200 pt-4">
               <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
-                <Wrench className="h-4 w-4 text-amber-600" />
+                <Wrench className="h-4 w-4 text-red-600" />
                 <span>Ejecutado por Mecánicos Especializados AlphaBike</span>
               </div>
               <Link
                 to="/servicios"
-                className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-xs font-black text-slate-950 hover:bg-amber-400 transition-all shadow-md active:scale-95"
+                className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-xs font-black text-slate-950 hover:bg-red-400 transition-all shadow-md active:scale-95"
               >
                 <Sparkles className="h-4 w-4" /> Agendar Servicio Similar
               </Link>
@@ -241,3 +241,5 @@ function Galeria() {
 }
 
 export default Galeria
+
+
