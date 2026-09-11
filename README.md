@@ -67,7 +67,7 @@ Usar commits semanticos como:
 
 ## Docker
 
-El Dockerfile sirve la build con Nginx. Desde el directorio padre que contiene ambos repositorios:
+El Dockerfile sirve la build con Nginx. Con `alphabike-backend` y `alphabike-frontend` clonados como carpetas hermanas, ejecuta desde `alphabike-backend`:
 
 ```bash
 docker compose up --build
