@@ -171,10 +171,6 @@ function Home() {
                   </div>
                 </div>
               </div>
-              <div className="absolute -bottom-8 -left-10 rounded-lg border border-red-500/30 bg-white px-5 py-4 shadow-xl shadow-black/20">
-                <p className="text-xs font-black uppercase text-red-600">Diagnóstico rápido</p>
-                <p className="mt-1 text-sm font-bold text-zinc-900">Agenda y recibe atención personalizada</p>
-              </div>
             </div>
           </div>
         </div>
@@ -216,9 +212,9 @@ function Home() {
       </section>
 
       {/* Featured Products */}
-      <section className="bg-zinc-100 px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-[linear-gradient(180deg,#f4f4f5_0%,#e7e5e4_100%)] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex flex-col gap-3 border-b border-zinc-300 pb-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mb-8 rounded-xl border border-zinc-300 bg-white/75 p-5 shadow-sm backdrop-blur-sm sm:flex sm:items-end sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-red-600" />
@@ -230,7 +226,7 @@ function Home() {
           </div>
           <Link
             to="/tienda"
-            className="group inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 px-4 py-2 text-xs font-bold text-white transition-all hover:bg-red-600"
+            className="group mt-4 inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 px-4 py-2 text-xs font-bold text-white transition-all hover:bg-red-600 sm:mt-0"
           >
             <span>Ver Catálogo Completo</span>
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
@@ -246,9 +242,9 @@ function Home() {
               <Link
                 key={prod.id}
                 to={`/producto/${prod.id}`}
-                className="group brand-card flex flex-col border border-zinc-200 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-red-500/50 hover:shadow-xl hover:shadow-zinc-950/10"
+                className="group brand-card flex flex-col border border-zinc-300 bg-white p-4 shadow-md shadow-zinc-950/5 transition-all duration-300 hover:-translate-y-1 hover:border-red-500/50 hover:shadow-xl hover:shadow-zinc-950/15"
               >
-                <div className="relative mb-3 aspect-square overflow-hidden rounded-lg bg-zinc-100">
+                <div className="relative mb-3 aspect-square overflow-hidden rounded-lg bg-zinc-100 ring-1 ring-zinc-200">
                   <ImageFallback
                     src={prod.imagenUrl}
                     alt={prod.nombre}
@@ -264,11 +260,11 @@ function Home() {
                 <p className="mt-1 text-xs text-slate-500">
                   {prod.categoriaNombre || 'Repuesto Original'}
                 </p>
-                <div className="mt-auto pt-3 flex items-center justify-between border-t border-slate-100">
+                <div className="mt-auto flex items-center justify-between border-t border-zinc-100 pt-3">
                   <span className="text-base font-black text-slate-950">
                     {formatMoney(prod.precio)}
                   </span>
-                  <span className="rounded-md bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700 transition-colors group-hover:bg-red-600 group-hover:text-white">
+                  <span className="rounded-md bg-zinc-950 px-2.5 py-1 text-xs font-bold text-white transition-colors group-hover:bg-red-600">
                     Ver Detalle
                   </span>
                 </div>
@@ -284,7 +280,7 @@ function Home() {
       </section>
 
       {/* Workshop Gallery / Trabajos Realizados */}
-      <section className="brand-grid border-y border-zinc-900 bg-[linear-gradient(135deg,#18181b_0%,#2b0d0d_62%,#111113_100%)] py-16 text-white">
+      <section className="brand-grid border-y border-zinc-900 bg-zinc-950 py-16 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8 flex flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -314,7 +310,7 @@ function Home() {
                 <Link
                   key={trabajo.id}
                   to="/galeria"
-                  className="group overflow-hidden rounded-lg border border-white/10 bg-white shadow-xl shadow-black/20 transition-all duration-300 hover:-translate-y-1 hover:border-red-500/60"
+                  className="group overflow-hidden rounded-lg border border-white/10 bg-white shadow-2xl shadow-black/35 transition-all duration-300 hover:-translate-y-1 hover:border-red-500/70"
                 >
                   <div className="relative grid aspect-[16/9] grid-cols-2 gap-0.5 overflow-hidden bg-zinc-100">
                     <div className="relative">
