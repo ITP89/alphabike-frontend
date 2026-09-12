@@ -85,31 +85,32 @@ function Home() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="brand-grid-light relative min-h-[640px] overflow-hidden bg-[linear-gradient(135deg,#ffffff_0%,#f8fafc_48%,#fef2f2_100%)] text-zinc-950">
+      <section className="relative min-h-[660px] overflow-hidden bg-zinc-100 text-zinc-950">
         <img
           src={heroImage}
           alt="Taller AlphaBike profesional"
-          className="absolute inset-y-0 right-0 hidden h-full w-[58%] object-cover opacity-35 grayscale transition-transform duration-1000 hover:scale-105 lg:block"
+          className="absolute inset-y-0 right-0 hidden h-full w-[62%] object-cover opacity-75 saturate-75 transition-transform duration-1000 hover:scale-105 lg:block"
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_22%,rgba(220,38,38,0.18),transparent_30%),linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.96)_46%,rgba(255,255,255,0.70)_72%,rgba(255,255,255,0.88)_100%)]" />
-        <div className="absolute right-0 top-0 hidden h-full w-32 bg-red-600 lg:block" />
-        <div className="chain-ring-light absolute -right-24 top-20 hidden h-80 w-80 opacity-80 lg:block" />
-        <div className="absolute -left-20 bottom-[-120px] h-80 w-80 rounded-full bg-red-600/10 blur-3xl" />
+        <div className="absolute inset-y-0 left-0 w-full bg-[linear-gradient(110deg,#09090b_0%,#111113_48%,rgba(17,17,19,0.88)_58%,rgba(17,17,19,0.12)_100%)] lg:w-[72%]" />
+        <div className="absolute inset-y-0 right-0 hidden w-[30%] bg-[linear-gradient(90deg,rgba(220,38,38,0),rgba(220,38,38,0.86))] lg:block" />
+        <div className="brand-grid absolute inset-0 opacity-70" />
+        <div className="chain-ring absolute -right-20 top-20 hidden h-80 w-80 opacity-90 lg:block" />
+        <div className="absolute -left-20 bottom-[-120px] h-80 w-80 rounded-full bg-red-600/20 blur-3xl" />
 
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-28">
           <div className="max-w-3xl">
             {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-xs font-black uppercase text-red-700 shadow-sm">
-              <Sparkles className="h-3.5 w-3.5 text-red-600" />
+            <div className="inline-flex items-center gap-2 rounded-lg border border-red-500/40 bg-red-600/15 px-4 py-2 text-xs font-black uppercase text-red-200 shadow-sm backdrop-blur-md">
+              <Sparkles className="h-3.5 w-3.5 text-red-300" />
               <span>TALLER Y TIENDA ESPECIALIZADA EN CICLISMO</span>
             </div>
 
             {/* Hero Heading */}
-            <h1 className="mt-6 max-w-4xl text-5xl font-black tracking-tight text-zinc-950 sm:text-7xl lg:leading-[0.92]">
-              Tu bicicleta lista para <span className="text-red-600">rodar mejor</span>
+            <h1 className="mt-6 max-w-4xl text-5xl font-black tracking-tight text-white sm:text-7xl lg:leading-[0.92]">
+              Taller experto para una bici que <span className="text-red-500">se siente nueva</span>
             </h1>
 
-            <p className="mt-5 max-w-2xl text-base font-semibold text-zinc-700 sm:text-lg sm:leading-relaxed">
+            <p className="mt-5 max-w-2xl text-base font-semibold text-zinc-200 sm:text-lg sm:leading-relaxed">
               Servicio mecánico especializado, repuestos originales y una atención rápida para que vuelvas a la ruta con confianza.
             </p>
 
@@ -124,51 +125,53 @@ function Home() {
               </Link>
               <Link
                 to="/mantenimiento"
-                className="group inline-flex items-center gap-2.5 rounded-lg border border-zinc-200 bg-white px-6 py-3.5 text-sm font-bold text-zinc-950 shadow-md shadow-zinc-200/70 transition-all duration-200 hover:border-red-300 hover:bg-red-50 active:scale-95"
+                className="group inline-flex items-center gap-2.5 rounded-lg border border-white/15 bg-white/10 px-6 py-3.5 text-sm font-bold text-white shadow-md backdrop-blur-md transition-all duration-200 hover:bg-white/15 active:scale-95"
               >
                 Agendar Cita en Taller
-                <CalendarCheck className="h-4 w-4 text-red-600 transition-transform group-hover:scale-110" />
+                <CalendarCheck className="h-4 w-4 text-red-300 transition-transform group-hover:scale-110" />
               </Link>
             </div>
 
             {/* Feature Badges */}
-            <div className="mt-10 grid grid-cols-1 gap-3 border-t border-zinc-200 pt-6 sm:grid-cols-3">
-              <div className="flex items-center gap-2.5 rounded-lg border border-zinc-200 bg-white px-3 py-3 shadow-sm">
-                <CheckCircle2 className="h-5 w-5 shrink-0 text-red-600" />
-                <span className="text-xs font-bold text-zinc-700">Técnicos Certificados</span>
+            <div className="mt-10 grid grid-cols-1 gap-3 border-t border-white/10 pt-6 sm:grid-cols-3">
+              <div className="flex items-center gap-2.5 rounded-lg border border-white/10 bg-white/5 px-3 py-3 shadow-sm backdrop-blur-md">
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-red-300" />
+                <span className="text-xs font-bold text-zinc-100">Técnicos Certificados</span>
               </div>
-              <div className="flex items-center gap-2.5 rounded-lg border border-zinc-200 bg-white px-3 py-3 shadow-sm">
-                <ShieldCheck className="h-5 w-5 shrink-0 text-red-600" />
-                <span className="text-xs font-bold text-zinc-700">Garantía en Servicio</span>
+              <div className="flex items-center gap-2.5 rounded-lg border border-white/10 bg-white/5 px-3 py-3 shadow-sm backdrop-blur-md">
+                <ShieldCheck className="h-5 w-5 shrink-0 text-red-300" />
+                <span className="text-xs font-bold text-zinc-100">Garantía en Servicio</span>
               </div>
-              <div className="flex items-center gap-2.5 rounded-lg border border-zinc-200 bg-white px-3 py-3 shadow-sm">
-                <Clock className="h-5 w-5 shrink-0 text-red-600" />
-                <span className="text-xs font-bold text-zinc-700">Entregas a Tiempo</span>
+              <div className="flex items-center gap-2.5 rounded-lg border border-white/10 bg-white/5 px-3 py-3 shadow-sm backdrop-blur-md">
+                <Clock className="h-5 w-5 shrink-0 text-red-300" />
+                <span className="text-xs font-bold text-zinc-100">Entregas a Tiempo</span>
               </div>
             </div>
           </div>
 
           <div className="hidden justify-end lg:flex">
             <div className="relative w-full max-w-md">
-              <div className="absolute -inset-6 bg-red-600/15 blur-3xl" />
-              <div className="relative rounded-xl border border-zinc-200 bg-white/90 p-7 shadow-2xl shadow-zinc-950/12 backdrop-blur-xl">
-                <img src={alphaLogo} alt="Logo AlphaBike Workshop" className="mx-auto max-h-56 w-full object-contain drop-shadow-sm" />
-                <div className="mt-7 grid grid-cols-3 gap-3 border-t border-zinc-200 pt-5">
+              <div className="absolute -inset-6 bg-red-600/25 blur-3xl" />
+              <div className="relative rounded-xl border border-white/15 bg-zinc-950/80 p-7 shadow-2xl shadow-black/45 backdrop-blur-xl">
+                <div className="rounded-lg bg-white p-6 shadow-inner shadow-zinc-950/10">
+                  <img src={alphaLogo} alt="Logo AlphaBike Workshop" className="mx-auto max-h-52 w-full object-contain" />
+                </div>
+                <div className="mt-7 grid grid-cols-3 gap-3 border-t border-white/10 pt-5">
                   <div>
-                    <p className="text-2xl font-black text-zinc-950">30</p>
-                    <p className="mt-1 text-[10px] font-bold uppercase text-zinc-500">Días garantía</p>
+                    <p className="text-2xl font-black text-white">30</p>
+                    <p className="mt-1 text-[10px] font-bold uppercase text-zinc-400">Días garantía</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-black text-zinc-950">24h</p>
-                    <p className="mt-1 text-[10px] font-bold uppercase text-zinc-500">Respuesta</p>
+                    <p className="text-2xl font-black text-white">24h</p>
+                    <p className="mt-1 text-[10px] font-bold uppercase text-zinc-400">Respuesta</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-black text-red-600">Pro</p>
-                    <p className="mt-1 text-[10px] font-bold uppercase text-zinc-500">Setup taller</p>
+                    <p className="text-2xl font-black text-red-400">Pro</p>
+                    <p className="mt-1 text-[10px] font-bold uppercase text-zinc-400">Setup taller</p>
                   </div>
                 </div>
               </div>
-              <div className="absolute -bottom-8 -left-10 rounded-lg border border-red-100 bg-white px-5 py-4 shadow-xl shadow-zinc-950/10">
+              <div className="absolute -bottom-8 -left-10 rounded-lg border border-red-500/30 bg-white px-5 py-4 shadow-xl shadow-black/20">
                 <p className="text-xs font-black uppercase text-red-600">Diagnóstico rápido</p>
                 <p className="mt-1 text-sm font-bold text-zinc-900">Agenda y recibe atención personalizada</p>
               </div>
@@ -178,7 +181,7 @@ function Home() {
       </section>
 
       {/* Services Showcase Cards */}
-      <section className="relative z-10 mx-auto -mt-8 max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="relative z-10 mx-auto -mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {beneficios.map((item) => {
             const Icon = item.icon
@@ -186,23 +189,23 @@ function Home() {
               <Link
                 key={item.title}
                 to={item.to}
-                className="group brand-card glass-card glass-card-hover p-6"
+                className="group brand-card border border-zinc-800 bg-zinc-950 p-6 text-white shadow-xl shadow-zinc-950/15 transition-all duration-300 hover:-translate-y-1 hover:border-red-500/60"
               >
                 <div className="flex items-center justify-between">
                   <div className={`flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br ${item.color} text-white shadow-md transition-transform group-hover:scale-105`}>
                     <Icon className="h-6 w-6" />
                   </div>
-                  <span className="rounded-md bg-zinc-100 px-3 py-1 text-[11px] font-bold uppercase text-zinc-600">
+                  <span className="rounded-md bg-white/10 px-3 py-1 text-[11px] font-bold uppercase text-zinc-300">
                     {item.badge}
                   </span>
                 </div>
-                <h3 className="mt-5 text-lg font-extrabold text-slate-950 group-hover:text-red-600 transition-colors">
+                <h3 className="mt-5 text-lg font-extrabold text-white transition-colors group-hover:text-red-300">
                   {item.title}
                 </h3>
-                <p className="mt-2 text-sm text-slate-600 leading-relaxed">
+                <p className="mt-2 text-sm leading-relaxed text-zinc-300">
                   {item.description}
                 </p>
-                <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-red-600 group-hover:gap-2.5 transition-all">
+                <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-red-300 transition-all group-hover:gap-2.5">
                   <span>Saber más</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </div>
@@ -213,20 +216,21 @@ function Home() {
       </section>
 
       {/* Featured Products */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between border-b border-slate-200 pb-4">
+      <section className="bg-zinc-100 px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+        <div className="mb-8 flex flex-col gap-3 border-b border-zinc-300 pb-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
-              <span className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Catálogo Pro</span>
+              <span className="h-2.5 w-2.5 rounded-full bg-red-600" />
+              <span className="text-xs font-extrabold uppercase tracking-widest text-zinc-600">Catálogo Pro</span>
             </div>
-            <h2 className="mt-1 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
+            <h2 className="mt-1 text-2xl font-black tracking-tight text-zinc-950 sm:text-3xl">
               Productos Destacados
             </h2>
           </div>
           <Link
             to="/tienda"
-            className="group inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 transition-all hover:bg-red-600 hover:text-white"
+            className="group inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 px-4 py-2 text-xs font-bold text-white transition-all hover:bg-red-600"
           >
             <span>Ver Catálogo Completo</span>
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
@@ -242,7 +246,7 @@ function Home() {
               <Link
                 key={prod.id}
                 to={`/producto/${prod.id}`}
-                className="group brand-card glass-card glass-card-hover flex flex-col p-4"
+                className="group brand-card flex flex-col border border-zinc-200 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-red-500/50 hover:shadow-xl hover:shadow-zinc-950/10"
               >
                 <div className="relative mb-3 aspect-square overflow-hidden rounded-lg bg-zinc-100">
                   <ImageFallback
@@ -276,24 +280,25 @@ function Home() {
         {!cargandoProductos && !errorProductos && productos.length === 0 && (
           <EmptyState title="No hay productos activos" description="No se registraron productos en el catálogo." />
         )}
+        </div>
       </section>
 
       {/* Workshop Gallery / Trabajos Realizados */}
-      <section className="border-y border-zinc-200 bg-white py-16 text-zinc-950">
+      <section className="brand-grid border-y border-zinc-900 bg-[linear-gradient(135deg,#18181b_0%,#2b0d0d_62%,#111113_100%)] py-16 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-8 flex flex-col gap-3 border-b border-zinc-200 pb-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="mb-8 flex flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <Star className="h-4 w-4 fill-red-600 text-red-600" />
-                <span className="text-xs font-extrabold uppercase tracking-widest text-red-600">Resultados del Taller</span>
+                <Star className="h-4 w-4 fill-red-400 text-red-400" />
+                <span className="text-xs font-extrabold uppercase tracking-widest text-red-300">Resultados del Taller</span>
               </div>
-              <h2 className="mt-1 text-2xl font-black tracking-tight text-zinc-950 sm:text-3xl">
+              <h2 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">
                 Trabajos Destacados (Antes / Después)
               </h2>
             </div>
             <Link
               to="/galeria"
-              className="group inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-xs font-bold text-zinc-700 transition-all hover:bg-red-600 hover:text-white"
+              className="group inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/10 px-4 py-2 text-xs font-bold text-white transition-all hover:bg-red-600"
             >
               <span>Ver Galería Completa</span>
               <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
@@ -309,7 +314,7 @@ function Home() {
                 <Link
                   key={trabajo.id}
                   to="/galeria"
-                  className="group overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500/50 hover:shadow-xl hover:shadow-zinc-950/10"
+                  className="group overflow-hidden rounded-lg border border-white/10 bg-white shadow-xl shadow-black/20 transition-all duration-300 hover:-translate-y-1 hover:border-red-500/60"
                 >
                   <div className="relative grid aspect-[16/9] grid-cols-2 gap-0.5 overflow-hidden bg-zinc-100">
                     <div className="relative">
