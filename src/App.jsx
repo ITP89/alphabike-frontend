@@ -41,6 +41,7 @@ const GestionUsuarios = lazy(() => import('./pages/admin/GestionUsuarios'))
 const HistorialCliente = lazy(() => import('./pages/admin/HistorialCliente'))
 const GestionCategorias = lazy(() => import('./pages/admin/GestionCategorias'))
 const GestionServicios = lazy(() => import('./pages/admin/GestionServicios'))
+const GestionProveedores = lazy(() => import('./pages/admin/GestionProveedores'))
 const Reportes = lazy(() => import('./pages/admin/Reportes'))
 const AdminCitas = lazy(() => import('./pages/admin/AdminCitas'))
 const AdminDetalleCita = lazy(() => import('./pages/admin/AdminDetalleCita'))
@@ -173,6 +174,12 @@ function App() {
           <Route path="/admin/servicios" element={
             <RutaProtegida roles={['ADMIN']}>
               <GestionServicios />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proveedores" element={
+            <RutaProtegida roles={['ADMIN']}>
+              <GestionProveedores />
             </RutaProtegida>
           } />
 

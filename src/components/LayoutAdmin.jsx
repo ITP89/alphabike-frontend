@@ -3,6 +3,7 @@ import {
   CalendarDays,
   CreditCard,
   FolderTree,
+  Handshake,
   LayoutDashboard,
   Package,
   ReceiptText,
@@ -21,6 +22,7 @@ function LayoutAdmin({ children }) {
     { to: '/admin/pagos', label: 'Pagos', icon: CreditCard },
     { to: '/admin/categorias', label: 'Categorias', icon: FolderTree },
     { to: '/admin/servicios', label: 'Servicios', icon: Settings },
+    { to: '/admin/proveedores', label: 'Proveedores', icon: Handshake },
     { to: '/admin/reportes', label: 'Reportes', icon: BarChart3 },
   ]
 

@@ -17,6 +17,7 @@ function AdminProductos() {
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [modoEdicion, setModoEdicion] = useState(null) // ID del producto siendo editado o null
   const [categorias, setCategorias] = useState([])
+  const [proveedores, setProveedores] = useState([])
   const [form, setForm] = useState({
     nombre: '',
     descripcion: '',
@@ -25,6 +26,7 @@ function AdminProductos() {
     precioMinimoVenta: '',
     stock: '',
     categoriaId: '',
+    proveedorId: '',
     imagenUrl: ''
   })
   const [error, setError] = useState('')
@@ -33,12 +35,14 @@ function AdminProductos() {
   useEffect(() => {
     async function cargarDatos() {
       try {
-        const [prodRes, catRes] = await Promise.all([
+        const [prodRes, catRes, provRes] = await Promise.all([
           api.get('/productos/todos'),
           api.get('/categorias'),
+          api.get('/proveedores'),
         ])
         setProductos(prodRes.data.data || [])
         setCategorias(catRes.data.data || [])
+        setProveedores((provRes.data.data || []).filter((proveedor) => proveedor.estado === 'ACTIVO'))
       } catch (err) {
         setError(getApiErrorMessage(err, 'No se pudieron cargar los productos'))
       } finally {
@@ -74,7 +78,7 @@ function AdminProductos() {
 
   function handleNuevoProducto() {
     setModoEdicion(null)
-    setForm({ nombre: '', descripcion: '', marca: '', precio: '', precioMinimoVenta: '', stock: '', categoriaId: '', imagenUrl: '' })
+    setForm({ nombre: '', descripcion: '', marca: '', precio: '', precioMinimoVenta: '', stock: '', categoriaId: '', proveedorId: '', imagenUrl: '' })
     setMostrarFormulario(true)
   }
 
@@ -88,6 +92,7 @@ function AdminProductos() {
       precioMinimoVenta: producto.precioMinimoVenta ? String(producto.precioMinimoVenta) : '',
       stock: producto.stock !== undefined ? String(producto.stock) : '',
       categoriaId: producto.categoriaId || '',
+      proveedorId: producto.proveedorId || '',
       imagenUrl: producto.imagenUrl || ''
     })
     setMostrarFormulario(true)
@@ -127,7 +132,7 @@ function AdminProductos() {
 
       setMostrarFormulario(false)
       setModoEdicion(null)
-      setForm({ nombre: '', descripcion: '', marca: '', precio: '', precioMinimoVenta: '', stock: '', categoriaId: '', imagenUrl: '' })
+      setForm({ nombre: '', descripcion: '', marca: '', precio: '', precioMinimoVenta: '', stock: '', categoriaId: '', proveedorId: '', imagenUrl: '' })
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo guardar el producto') })
     }
@@ -269,6 +274,19 @@ function AdminProductos() {
                     ))}
                   </select>
                 </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Proveedor</label>
+                  <select
+                    value={form.proveedorId}
+                    onChange={(e) => setForm({ ...form, proveedorId: e.target.value })}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
+                  >
+                    <option value="">Sin proveedor asignado</option>
+                    {proveedores.map((proveedor) => (
+                      <option key={proveedor.id} value={proveedor.id}>{proveedor.nombre}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div>
@@ -369,8 +387,9 @@ function AdminProductos() {
           <div className="grid grid-cols-12 px-6 py-3 bg-slate-900 text-xs font-bold text-slate-300">
             <span className="col-span-1">Imagen</span>
             <span className="col-span-3">Producto</span>
-            <span className="col-span-2">Categoría</span>
-            <span className="col-span-2">Precio</span>
+            <span className="col-span-1">Categoría</span>
+            <span className="col-span-2">Proveedor</span>
+            <span className="col-span-1">Precio</span>
             <span className="col-span-1">Mínimo</span>
             <span className="col-span-1">Stock</span>
             <span className="col-span-2 text-right">Acciones</span>
@@ -395,12 +414,16 @@ function AdminProductos() {
               </div>
 
               {/* Categoría */}
-              <div className="col-span-2 font-bold text-slate-700">
+              <div className="col-span-1 font-bold text-slate-700">
                 {producto.categoriaNombre || 'Sin Categoría'}
               </div>
 
+              <div className="col-span-2 font-bold text-slate-600">
+                {producto.proveedorNombre || 'Sin proveedor'}
+              </div>
+
               {/* Precio */}
-              <div className="col-span-2 font-black text-slate-950 text-sm">
+              <div className="col-span-1 font-black text-slate-950 text-sm">
                 {formatMoney(producto.precio)}
               </div>
 
