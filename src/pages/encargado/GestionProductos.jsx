@@ -22,6 +22,7 @@ function GestionProductos() {
     descripcion: '',
     marca: '',
     precio: '',
+    precioMinimoVenta: '',
     stock: '',
     categoriaId: '',
   })
@@ -70,8 +71,11 @@ function GestionProductos() {
     e.preventDefault()
     setMensaje(null)
 
-    if (Number(form.precio) <= 0 || Number(form.stock) < 0) {
-      setMensaje({ type: 'error', text: 'Revisa precio y stock antes de crear el producto' })
+    const precio = Number(form.precio)
+    const precioMinimo = form.precioMinimoVenta === '' ? precio : Number(form.precioMinimoVenta)
+
+    if (precio <= 0 || Number(form.stock) < 0 || precioMinimo <= 0 || precioMinimo > precio) {
+      setMensaje({ type: 'error', text: 'Revisa precio, mínimo de regateo y stock antes de crear el producto' })
       return
     }
 
@@ -79,11 +83,12 @@ function GestionProductos() {
       const response = await api.post('/productos', {
         ...form,
         precio: parseFloat(form.precio),
+        precioMinimoVenta: precioMinimo,
         stock: parseInt(form.stock),
       })
       setProductos((prev) => [...prev, response.data.data])
       setMostrarFormulario(false)
-      setForm({ nombre: '', descripcion: '', marca: '', precio: '', stock: '', categoriaId: '' })
+      setForm({ nombre: '', descripcion: '', marca: '', precio: '', precioMinimoVenta: '', stock: '', categoriaId: '' })
       setMensaje({ type: 'success', text: 'Producto creado correctamente' })
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo crear el producto') })
@@ -129,6 +134,14 @@ function GestionProductos() {
               onChange={(e) => setForm({ ...form, precio: e.target.value })}
               className="border border-gray-300 rounded-md px-3 py-2 text-sm"
               required
+            />
+            <input
+              type="number"
+              step="0.01"
+              placeholder="Mínimo regateo S/"
+              value={form.precioMinimoVenta}
+              onChange={(e) => setForm({ ...form, precioMinimoVenta: e.target.value })}
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm"
             />
             <input
               type="number"
@@ -184,22 +197,24 @@ function GestionProductos() {
         <ErrorState message={error} />
       ) : (
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <div className="grid grid-cols-6 px-4 py-2 bg-gray-50 text-xs font-medium text-gray-500">
+          <div className="grid grid-cols-7 px-4 py-2 bg-gray-50 text-xs font-medium text-gray-500">
             <span className="col-span-2">Producto</span>
             <span>Categoria</span>
             <span>Precio</span>
+            <span>Mínimo</span>
             <span>Stock</span>
             <span>Estado</span>
           </div>
 
           {productosFiltrados.map((producto) => (
-            <div key={producto.id} className="grid grid-cols-6 px-4 py-3 border-t border-gray-200 text-sm items-center">
+            <div key={producto.id} className="grid grid-cols-7 px-4 py-3 border-t border-gray-200 text-sm items-center">
               <div className="col-span-2">
                 <p className="text-gray-900">{producto.nombre}</p>
                 <p className="text-gray-500 text-xs">{producto.marca}</p>
               </div>
               <span>{producto.categoriaNombre}</span>
               <span>{formatMoney(producto.precio)}</span>
+              <span className="text-xs font-semibold text-amber-700">{formatMoney(producto.precioMinimoVenta || producto.precio)}</span>
               <div>
                 {editandoStock === producto.id ? (
                   <div className="flex gap-1 items-center">

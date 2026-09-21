@@ -15,44 +15,44 @@ function Servicios() {
   } = useApiGet('/servicios', [], 'No se pudieron cargar los servicios')
 
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans text-zinc-950 selection:bg-red-600 selection:text-white">
+    <div className="min-h-screen bg-[#f0f1f3] font-sans text-zinc-950 selection:bg-red-600 selection:text-white">
       <Navbar />
 
       {/* Header Banner */}
-      <section className="brand-grid border-b border-zinc-800 bg-zinc-950 px-4 py-12 text-white sm:px-6 lg:px-8">
+      <section className="border-b border-zinc-200 bg-[linear-gradient(135deg,#fafafa_0%,#f2f3f5_52%,#ffe4e4_80%,#e1262f_148%)] px-4 py-14 text-zinc-950 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
-          <div className="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-1.5 text-xs font-bold text-red-300 backdrop-blur-md">
+          <div className="inline-flex items-center gap-2 rounded-md border border-red-200 bg-white px-4 py-1.5 text-xs font-black text-red-700 shadow-sm">
             <Wrench className="h-3.5 w-3.5" />
             <span>TALLER DE MANTENIMIENTO ESPECIALIZADO</span>
           </div>
-          <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-5xl">
+          <h1 className="mt-4 text-3xl font-black tracking-normal sm:text-5xl">
             Servicios Mecánicos Pro
           </h1>
-          <p className="mt-2 max-w-2xl text-sm text-zinc-400">
+          <p className="mt-3 max-w-2xl text-sm font-semibold leading-6 text-zinc-600">
             Puesta a punto, calibración de frenos, suspensión y transmisiones ejecutados por técnicos certificados.
           </p>
         </div>
       </section>
 
       {/* Process Timeline */}
-      <section className="mx-auto max-w-7xl border-b border-zinc-200 px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-          <div className="brand-card glass-card p-5">
-            <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-red-600 text-sm font-black text-white">
+      <section className="mx-auto -mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-6 text-center md:grid-cols-3">
+          <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white p-5 shadow-xl shadow-zinc-950/8">
+            <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-md bg-red-600 text-sm font-black text-white shadow-lg shadow-red-600/25">
               1
             </div>
             <h3 className="text-sm font-bold text-zinc-900">Reserva en Línea</h3>
             <p className="mt-1 text-xs text-zinc-500">Selecciona el servicio, fecha y horario de preferencia.</p>
           </div>
-          <div className="brand-card glass-card p-5">
-            <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-red-600 text-sm font-black text-white">
+          <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white p-5 shadow-xl shadow-zinc-950/8">
+            <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-md bg-zinc-950 text-sm font-black text-white shadow-lg shadow-zinc-950/20">
               2
             </div>
             <h3 className="text-sm font-bold text-zinc-900">Diagnóstico y Mantenimiento</h3>
             <p className="mt-1 text-xs text-zinc-500">Nuestros mecánicos revisan y afinan cada componente.</p>
           </div>
-          <div className="brand-card glass-card p-5">
-            <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-red-600 text-sm font-black text-white">
+          <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white p-5 shadow-xl shadow-zinc-950/8">
+            <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-md bg-red-600 text-sm font-black text-white shadow-lg shadow-red-600/25">
               3
             </div>
             <h3 className="text-sm font-bold text-zinc-900">Entrega con Garantía</h3>
@@ -70,7 +70,7 @@ function Servicios() {
             {servicios.map((serv) => (
               <article
                 key={serv.id}
-                className="group brand-card glass-card glass-card-hover flex flex-col p-6"
+                className="group flex flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white p-6 shadow-lg shadow-zinc-950/5 transition-all duration-300 hover:-translate-y-1 hover:border-red-300 hover:shadow-xl hover:shadow-zinc-950/10"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-zinc-950 text-red-300 shadow-md transition-colors group-hover:bg-red-600 group-hover:text-white">
@@ -114,7 +114,7 @@ function Servicios() {
         )}
       </main>
 
-      <section className="brand-grid bg-zinc-950 py-10 text-white">
+      <section className="border-y border-zinc-900 bg-[linear-gradient(135deg,#111113_0%,#1a1516_72%,#e1262f_180%)] py-10 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <ShieldCheck className="h-6 w-6 text-red-400 shrink-0" />

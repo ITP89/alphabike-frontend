@@ -22,6 +22,7 @@ function AdminProductos() {
     descripcion: '',
     marca: '',
     precio: '',
+    precioMinimoVenta: '',
     stock: '',
     categoriaId: '',
     imagenUrl: ''
@@ -73,7 +74,7 @@ function AdminProductos() {
 
   function handleNuevoProducto() {
     setModoEdicion(null)
-    setForm({ nombre: '', descripcion: '', marca: '', precio: '', stock: '', categoriaId: '', imagenUrl: '' })
+    setForm({ nombre: '', descripcion: '', marca: '', precio: '', precioMinimoVenta: '', stock: '', categoriaId: '', imagenUrl: '' })
     setMostrarFormulario(true)
   }
 
@@ -84,6 +85,7 @@ function AdminProductos() {
       descripcion: producto.descripcion || '',
       marca: producto.marca || '',
       precio: producto.precio ? String(producto.precio) : '',
+      precioMinimoVenta: producto.precioMinimoVenta ? String(producto.precioMinimoVenta) : '',
       stock: producto.stock !== undefined ? String(producto.stock) : '',
       categoriaId: producto.categoriaId || '',
       imagenUrl: producto.imagenUrl || ''
@@ -95,7 +97,10 @@ function AdminProductos() {
     e.preventDefault()
     setMensaje(null)
 
-    if (Number(form.precio) <= 0 || Number(form.stock) < 0) {
+    const precio = Number(form.precio)
+    const precioMinimo = form.precioMinimoVenta === '' ? precio : Number(form.precioMinimoVenta)
+
+    if (precio <= 0 || Number(form.stock) < 0 || precioMinimo <= 0 || precioMinimo > precio) {
       setMensaje({ type: 'error', text: 'Revisa precio y stock antes de guardar' })
       return
     }
@@ -104,6 +109,7 @@ function AdminProductos() {
       const payload = {
         ...form,
         precio: parseFloat(form.precio),
+        precioMinimoVenta: precioMinimo,
         stock: parseInt(form.stock),
       }
 
@@ -121,7 +127,7 @@ function AdminProductos() {
 
       setMostrarFormulario(false)
       setModoEdicion(null)
-      setForm({ nombre: '', descripcion: '', marca: '', precio: '', stock: '', categoriaId: '', imagenUrl: '' })
+      setForm({ nombre: '', descripcion: '', marca: '', precio: '', precioMinimoVenta: '', stock: '', categoriaId: '', imagenUrl: '' })
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo guardar el producto') })
     }
@@ -225,6 +231,18 @@ function AdminProductos() {
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
                     required
                   />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Mínimo regateo (S/)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    placeholder="Ej. 45.00"
+                    value={form.precioMinimoVenta}
+                    onChange={(e) => setForm({ ...form, precioMinimoVenta: e.target.value })}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
+                  />
+                  <p className="mt-1 text-[10px] font-semibold text-slate-400">Si lo dejas vacío, no tendrá rebaja autorizada.</p>
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">Stock Inicial *</label>
@@ -350,9 +368,10 @@ function AdminProductos() {
         <div className="glass-card rounded-2xl overflow-hidden shadow-sm border border-slate-200">
           <div className="grid grid-cols-12 px-6 py-3 bg-slate-900 text-xs font-bold text-slate-300">
             <span className="col-span-1">Imagen</span>
-            <span className="col-span-4">Producto</span>
+            <span className="col-span-3">Producto</span>
             <span className="col-span-2">Categoría</span>
             <span className="col-span-2">Precio</span>
+            <span className="col-span-1">Mínimo</span>
             <span className="col-span-1">Stock</span>
             <span className="col-span-2 text-right">Acciones</span>
           </div>
@@ -370,7 +389,7 @@ function AdminProductos() {
               </div>
 
               {/* Nombre y Marca */}
-              <div className="col-span-4">
+              <div className="col-span-3">
                 <p className="font-extrabold text-slate-900">{producto.nombre}</p>
                 <p className="text-slate-400 text-[11px] font-semibold">{producto.marca || 'Sin Marca'}</p>
               </div>
@@ -383,6 +402,10 @@ function AdminProductos() {
               {/* Precio */}
               <div className="col-span-2 font-black text-slate-950 text-sm">
                 {formatMoney(producto.precio)}
+              </div>
+
+              <div className="col-span-1 text-xs font-black text-amber-700">
+                {formatMoney(producto.precioMinimoVenta || producto.precio)}
               </div>
 
               {/* Stock */}

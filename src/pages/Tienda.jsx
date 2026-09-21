@@ -70,20 +70,20 @@ function Tienda() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans text-zinc-950 selection:bg-red-600 selection:text-white">
+    <div className="min-h-screen bg-[#f0f1f3] font-sans text-zinc-950 selection:bg-red-600 selection:text-white">
       <Navbar />
 
       {/* Header Banner */}
-      <section className="brand-grid border-b border-zinc-800 bg-zinc-950 px-4 py-12 text-white sm:px-6 lg:px-8">
+      <section className="border-b border-zinc-200 bg-[linear-gradient(135deg,#fafafa_0%,#f2f3f5_50%,#ffe4e4_78%,#e1262f_145%)] px-4 py-14 text-zinc-950 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
-          <div className="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-1.5 text-xs font-bold text-red-300 backdrop-blur-md">
+          <div className="inline-flex items-center gap-2 rounded-md border border-red-200 bg-white px-4 py-1.5 text-xs font-black text-red-700 shadow-sm">
             <Package className="h-3.5 w-3.5" />
             <span>TIENDA PRO Y REPUESTOS ORIGINALES</span>
           </div>
-          <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-5xl">
+          <h1 className="mt-4 max-w-5xl text-3xl font-black tracking-normal sm:text-5xl">
             Catálogo de Componentes & Accesorios
           </h1>
-          <p className="mt-2 max-w-2xl text-sm text-zinc-400">
+          <p className="mt-3 max-w-2xl text-sm font-semibold leading-6 text-zinc-600">
             Encuentra repuestos de las mejores marcas con garantía y disponibilidad inmediata en nuestro almacén.
           </p>
         </div>
@@ -92,7 +92,8 @@ function Tienda() {
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Category Pills Header */}
         {categorias.length > 0 && (
-          <div className="mb-6 flex flex-wrap items-center gap-2 pb-2">
+          <div className="-mt-12 mb-8 rounded-lg border border-zinc-200 bg-white p-4 shadow-xl shadow-zinc-950/10">
+            <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => setCategoriaId('')}
@@ -123,13 +124,16 @@ function Tienda() {
                 </button>
               )
             })}
+            </div>
           </div>
         )}
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[260px_1fr]">
           {/* Sidebar Controls */}
           <aside className="lg:sticky lg:top-24 lg:self-start space-y-5">
-            <div className="brand-card glass-card space-y-4 p-5">
+            <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-lg shadow-zinc-950/5">
+              <div className="h-1.5 bg-[linear-gradient(90deg,#e1262f_0%,#e1262f_45%,#101012_45%,#101012_100%)]" />
+              <div className="space-y-4 p-5">
               <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
                 <span className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-zinc-900">
                   <Filter className="h-4 w-4 text-red-500" />
@@ -193,6 +197,7 @@ function Tienda() {
                   <option value="stock">Mayor Stock Disponible</option>
                 </select>
               </div>
+              </div>
             </div>
           </aside>
 
@@ -217,10 +222,10 @@ function Tienda() {
                       return (
                         <article
                           key={prod.id}
-                          className="group brand-card glass-card glass-card-hover flex flex-col p-4"
+                          className="group flex flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white p-4 shadow-lg shadow-zinc-950/5 transition-all duration-300 hover:-translate-y-1 hover:border-red-300 hover:shadow-xl hover:shadow-zinc-950/10"
                         >
                           <Link to={`/producto/${prod.id}`} className="block relative">
-                            <div className="relative mb-3 aspect-square overflow-hidden rounded-lg bg-zinc-100">
+                            <div className="relative mb-3 aspect-square overflow-hidden rounded-md border border-zinc-100 bg-[linear-gradient(145deg,#ffffff_0%,#f4f4f5_100%)]">
                               <ImageFallback
                                 src={prod.imagenUrl}
                                 alt={prod.nombre}

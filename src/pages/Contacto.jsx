@@ -52,40 +52,41 @@ function Contacto() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
+    <div className="min-h-screen bg-[#f0f1f3] text-zinc-950 font-sans selection:bg-red-600 selection:text-white">
       <Navbar />
 
       {/* Signature Hero Header (Dark Navy AlphaBike Theme) */}
-      <section className="relative overflow-hidden border-b border-slate-800 bg-slate-950 px-6 py-14 text-white">
-        <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 via-transparent to-transparent pointer-events-none" />
+      <section className="relative overflow-hidden border-b border-zinc-200 bg-[linear-gradient(135deg,#fafafa_0%,#f2f3f5_52%,#ffe4e4_80%,#e1262f_148%)] px-6 py-14 text-zinc-950">
         <div className="mx-auto max-w-6xl relative z-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-1.5 text-xs font-bold text-red-400 backdrop-blur-md mb-3">
-            <Mail className="h-4 w-4 text-red-400" />
+          <div className="mb-3 inline-flex items-center gap-2 rounded-md border border-red-200 bg-white px-4 py-1.5 text-xs font-black text-red-700 shadow-sm">
+            <Mail className="h-4 w-4 text-red-600" />
             <span>ATENCIÓN DIRECTA & COTIZACIONES</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
+          <h1 className="text-3xl sm:text-4xl font-black tracking-normal text-zinc-950">
             Conversemos sobre <span className="text-red-500">Tu Bicicleta</span>
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-400">
+          <p className="mt-3 max-w-2xl text-sm font-semibold leading-relaxed text-zinc-600">
             Escríbenos para consultar repuestos en stock, cotizar servicios de taller especializado o dar seguimiento a tus reparaciones.
           </p>
         </div>
       </section>
 
       {/* Main Grid Content */}
-      <main className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-6 py-10 lg:grid-cols-[1fr_380px]">
+      <main className="mx-auto grid max-w-6xl grid-cols-1 items-start gap-8 px-6 py-12 lg:grid-cols-[1fr_380px]">
         
         {/* Formulario de Contacto en Blanco Brillante */}
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
+        <section className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-xl shadow-zinc-950/10">
+          <div className="h-2 bg-[linear-gradient(90deg,#e1262f_0%,#e1262f_40%,#101012_40%,#101012_100%)]" />
+          <div className="p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-zinc-100 pb-4">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Envíanos un mensaje</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Completa tus datos y te responderemos en menos de 2 horas.</p>
+              <h2 className="text-xl font-black text-zinc-950">Envíanos un mensaje</h2>
+              <p className="text-xs text-zinc-500 mt-0.5">Completa tus datos y te responderemos en menos de 2 horas.</p>
             </div>
             <button
               type="button"
               onClick={handleWhatsAppDirect}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-3.5 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-100 transition-all shadow-sm"
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-emerald-50 border border-emerald-200 px-3.5 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-100 transition-all shadow-sm"
             >
               <MessageCircle className="h-4 w-4 text-emerald-600" />
               <span>WhatsApp Directo</span>
@@ -108,7 +109,7 @@ function Contacto() {
                 placeholder="Ej. Carlos Mendoza"
                 value={form.nombre}
                 onChange={(event) => updateField('nombre', event.target.value)}
-                className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 transition-all"
+                className="w-full rounded-md border border-zinc-300 bg-zinc-50 px-3.5 py-2.5 text-xs font-semibold text-zinc-900 placeholder-zinc-400 transition-all focus:border-red-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20"
               />
             </FormField>
 
@@ -118,7 +119,7 @@ function Contacto() {
                 placeholder="carlos@ejemplo.com"
                 value={form.email}
                 onChange={(event) => updateField('email', event.target.value)}
-                className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 transition-all"
+                className="w-full rounded-md border border-zinc-300 bg-zinc-50 px-3.5 py-2.5 text-xs font-semibold text-zinc-900 placeholder-zinc-400 transition-all focus:border-red-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20"
               />
             </FormField>
 
@@ -128,7 +129,7 @@ function Contacto() {
                 placeholder="+51 902 280 036"
                 value={form.telefono}
                 onChange={(event) => updateField('telefono', event.target.value)}
-                className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 transition-all"
+                className="w-full rounded-md border border-zinc-300 bg-zinc-50 px-3.5 py-2.5 text-xs font-semibold text-zinc-900 placeholder-zinc-400 transition-all focus:border-red-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20"
               />
             </FormField>
 
@@ -136,7 +137,7 @@ function Contacto() {
               <select
                 value={form.asunto}
                 onChange={(event) => updateField('asunto', event.target.value)}
-                className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 transition-all"
+                className="w-full rounded-md border border-zinc-300 bg-zinc-50 px-3.5 py-2.5 text-xs font-semibold text-zinc-900 transition-all focus:border-red-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20"
               >
                 <option value="MANTENIMIENTO">Mantenimiento de Taller</option>
                 <option value="TIENDA">Consulta de Productos y Repuestos</option>
@@ -152,7 +153,7 @@ function Contacto() {
                   onChange={(event) => updateField('mensaje', event.target.value)}
                   rows="4"
                   placeholder="Detalla el modelo de tu bicicleta o el servicio específico que requieres..."
-                  className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 transition-all"
+                  className="w-full rounded-md border border-zinc-300 bg-zinc-50 px-3.5 py-2.5 text-xs font-semibold text-zinc-900 placeholder-zinc-400 transition-all focus:border-red-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20"
                 />
               </FormField>
             </div>
@@ -160,7 +161,7 @@ function Contacto() {
             <div className="sm:col-span-2 flex flex-col sm:flex-row gap-3 pt-2">
               <button
                 type="submit"
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-6 py-3 text-xs font-bold text-slate-950 hover:bg-red-400 transition-all shadow-md shadow-red-500/20 active:scale-95"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-md bg-red-600 px-6 py-3 text-xs font-black text-white transition-all hover:bg-red-700 shadow-md shadow-red-500/20 active:scale-95"
               >
                 <span>Enviar Mensaje</span>
                 <Send className="h-4 w-4" />
@@ -169,31 +170,34 @@ function Contacto() {
               <button
                 type="button"
                 onClick={handleWhatsAppDirect}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-xs font-bold text-white hover:bg-emerald-500 transition-all shadow-md active:scale-95"
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-emerald-600 px-6 py-3 text-xs font-black text-white hover:bg-emerald-500 transition-all shadow-md active:scale-95"
               >
                 <MessageCircle className="h-4 w-4" />
                 <span>Contactar por WhatsApp</span>
               </button>
             </div>
           </form>
+          </div>
         </section>
 
         {/* Sidebar Info & Mapa */}
         <aside className="space-y-6">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
-            <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+          <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-xl shadow-zinc-950/10">
+            <div className="h-2 bg-[linear-gradient(90deg,#101012_0%,#101012_45%,#e1262f_45%,#e1262f_100%)]" />
+            <div className="space-y-5 p-6">
+            <h2 className="text-base font-black text-zinc-950 border-b border-zinc-100 pb-3 flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-red-500" />
               <span>Información de Contacto</span>
             </h2>
 
-            <div className="space-y-4 text-xs font-medium text-slate-600">
+            <div className="space-y-4 text-xs font-medium text-zinc-600">
               <div className="flex items-start gap-3">
                 <div className="rounded-xl bg-red-50 border border-red-200 p-2 text-red-700 shrink-0">
                   <MapPin className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="font-bold text-slate-900 mb-0.5">Dirección de Taller & Tienda</p>
-                  <p className="text-slate-600 leading-relaxed">Av. Javier Prado Este 2450, San Borja, Lima - Perú</p>
+                  <p className="font-bold text-zinc-950 mb-0.5">Dirección de Taller & Tienda</p>
+                  <p className="text-zinc-600 leading-relaxed">Av. Javier Prado Este 2450, San Borja, Lima - Perú</p>
                 </div>
               </div>
 
@@ -202,7 +206,7 @@ function Contacto() {
                   <Phone className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="font-bold text-slate-900 mb-0.5">Teléfono / WhatsApp</p>
+                  <p className="font-bold text-zinc-950 mb-0.5">Teléfono / WhatsApp</p>
                   <a href="https://wa.me/51902280036" target="_blank" rel="noreferrer" className="text-emerald-700 font-bold hover:underline">
                     +51 902 280 036
                   </a>
@@ -214,7 +218,7 @@ function Contacto() {
                   <Mail className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="font-bold text-slate-900 mb-0.5">Correo Electrónico</p>
+                  <p className="font-bold text-zinc-950 mb-0.5">Correo Electrónico</p>
                   <a href="mailto:contacto@alphabike.pe" className="text-blue-600 font-semibold hover:underline">
                     contacto@alphabike.pe
                   </a>
@@ -222,21 +226,22 @@ function Contacto() {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="rounded-xl bg-slate-100 border border-slate-200 p-2 text-slate-700 shrink-0">
+                <div className="rounded-xl bg-zinc-100 border border-zinc-200 p-2 text-zinc-700 shrink-0">
                   <Clock3 className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="font-bold text-slate-900 mb-0.5">Horario de Atención</p>
-                  <p className="text-slate-600">Lun - Sáb: 8:00 am - 8:00 pm</p>
-                  <p className="text-slate-600">Domingos: 9:00 am - 2:00 pm</p>
+                  <p className="font-bold text-zinc-950 mb-0.5">Horario de Atención</p>
+                  <p className="text-zinc-600">Lun - Sáb: 8:00 am - 8:00 pm</p>
+                  <p className="text-zinc-600">Domingos: 9:00 am - 2:00 pm</p>
                 </div>
               </div>
+            </div>
             </div>
           </div>
 
           {/* Mapa Interactivo */}
-          <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
-            <div className="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs font-bold text-slate-700">
+          <div className="rounded-lg border border-zinc-200 bg-white overflow-hidden shadow-xl shadow-zinc-950/10">
+            <div className="p-3 bg-zinc-50 border-b border-zinc-200 flex items-center justify-between text-xs font-bold text-zinc-700">
               <span className="flex items-center gap-1.5">
                 <MapPin className="h-3.5 w-3.5 text-red-600" />
                 Ubicación en Tiempo Real

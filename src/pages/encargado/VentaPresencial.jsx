@@ -8,6 +8,10 @@ import ImageFallback from '../../components/ui/ImageFallback'
 import { getApiErrorMessage } from '../../utils/apiError'
 import { formatMoney } from '../../utils/formatters'
 
+function getPrecioMinimo(producto) {
+  return Number(producto.precioMinimoVenta ?? producto.precio ?? 0)
+}
+
 function VentaPresencial() {
   const [productos, setProductos] = useState([])
   const [busqueda, setBusqueda] = useState('')
@@ -70,7 +74,12 @@ function VentaPresencial() {
             : item
         )
       }
-      return [...prev, { ...producto, cantidad: 1, precioAcordado: Number(producto.precio || 0) }]
+      return [...prev, {
+        ...producto,
+        cantidad: 1,
+        precioAcordado: Number(producto.precio || 0),
+        precioMinimoVenta: getPrecioMinimo(producto),
+      }]
     })
     setMensaje(null)
   }
@@ -95,6 +104,15 @@ function VentaPresencial() {
 
     if (carrito.some((item) => !item.precioAcordado || item.precioAcordado <= 0)) {
       setMensaje({ type: 'error', text: 'Todos los precios deben ser mayores a cero' })
+      return
+    }
+
+    const itemDebajoDelLimite = carrito.find((item) => Number(item.precioAcordado) < getPrecioMinimo(item))
+    if (itemDebajoDelLimite) {
+      setMensaje({
+        type: 'error',
+        text: `${itemDebajoDelLimite.nombre} no puede venderse por debajo de ${formatMoney(getPrecioMinimo(itemDebajoDelLimite))}`,
+      })
       return
     }
 
@@ -170,6 +188,9 @@ function VentaPresencial() {
                     <h2 className="mt-1 line-clamp-2 text-sm font-semibold text-gray-950">{producto.nombre}</h2>
                     <p className="mt-1 text-xs text-gray-500">{producto.marca || 'Marca no especificada'}</p>
                     <p className="mt-3 text-base font-semibold text-gray-950">{formatMoney(producto.precio)}</p>
+                    <p className="mt-1 text-xs font-medium text-amber-700">
+                      Min. regateo: {formatMoney(getPrecioMinimo(producto))}
+                    </p>
                     <p className={sinStock ? 'mt-1 text-xs font-medium text-red-600' : 'mt-1 text-xs font-medium text-emerald-700'}>
                       {sinStock ? 'Sin stock' : `Stock: ${producto.stock}`}
                     </p>
@@ -209,12 +230,17 @@ function VentaPresencial() {
             ) : (
               <>
                 <div className="mb-4 max-h-[360px] space-y-3 overflow-auto pr-1">
-                  {carrito.map((item) => (
-                    <div key={item.id} className="rounded-md border border-gray-200 p-3">
+                  {carrito.map((item) => {
+                    const precioMinimo = getPrecioMinimo(item)
+                    const precioInvalido = Number(item.precioAcordado) < precioMinimo
+
+                    return (
+                    <div key={item.id} className={precioInvalido ? 'rounded-md border border-red-200 bg-red-50/60 p-3' : 'rounded-md border border-gray-200 p-3'}>
                       <div className="mb-2 flex items-start justify-between gap-3">
                         <div>
                           <p className="text-sm font-medium text-gray-950">{item.nombre}</p>
                           <p className="text-xs text-gray-500">Cantidad: {item.cantidad}</p>
+                          <p className="text-xs font-semibold text-amber-700">Mínimo autorizado: {formatMoney(precioMinimo)}</p>
                         </div>
                         <button
                           type="button"
@@ -229,15 +255,21 @@ function VentaPresencial() {
                         Precio acordado
                         <input
                           type="number"
-                          min="0"
+                          min={precioMinimo}
                           step="0.01"
                           value={item.precioAcordado}
                           onChange={(e) => actualizarPrecio(item.id, e.target.value)}
-                          className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm"
+                          className={precioInvalido ? 'mt-1 w-full rounded-md border border-red-400 px-2 py-1.5 text-sm outline-none ring-2 ring-red-100' : 'mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm'}
                         />
                       </label>
+                      {precioInvalido && (
+                        <p className="mt-2 text-xs font-semibold text-red-700">
+                          Este precio supera el límite de regateo permitido.
+                        </p>
+                      )}
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
 
                 <div className="mb-4 flex justify-between border-t border-gray-200 pt-4 text-base font-semibold text-gray-950">
