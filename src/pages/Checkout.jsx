@@ -1,12 +1,15 @@
 import { useState } from 'react'
-import { ArrowRight, CreditCard, MapPin, PackageCheck, UserCircle } from 'lucide-react'
+import { ArrowRight, Lock, MapPin, PackageCheck, UserCircle } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import api from '../api/axios'
 import Navbar from '../components/Navbar'
+import ComprobanteModal from '../components/checkout/ComprobanteModal'
+import PasarelaPago from '../components/checkout/PasarelaPago'
 import Alert from '../components/ui/Alert'
 import FormField from '../components/ui/FormField'
 import { useAuth } from '../context/AuthContext'
 import { useCarrito } from '../context/CarritoContext'
+import { procesarPago, validarDatosTarjeta } from '../services/paymentGateway'
 import { getApiErrorMessage } from '../utils/apiError'
 import { formatMoney } from '../utils/formatters'
 
@@ -17,9 +20,9 @@ const COSTOS_ENVIO = {
 }
 
 const LABELS_ENTREGA = {
-  RECOJO_TIENDA: 'Recojo en tienda',
-  DELIVERY_LIMA: 'Delivery Lima',
-  ENVIO_PROVINCIA: 'Envio a provincia',
+  RECOJO_TIENDA: 'Recojo en tienda (AlphaBike Taller)',
+  DELIVERY_LIMA: 'Delivery Express Lima Metropolitana',
+  ENVIO_PROVINCIA: 'Envío a provincia (Agencia Shalom / Olva)',
 }
 
 function Checkout() {
@@ -39,15 +42,60 @@ function Checkout() {
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState({})
 
+  // Estado para la pasarela de pago modular
+  const [metodoPago, setMetodoPago] = useState('TARJETA')
+  const [datosPago, setDatosPago] = useState({
+    tarjeta: {
+      numero: '',
+      titular: usuario?.nombre || '',
+      expiracion: '',
+      cvv: '',
+      documentoTipo: 'DNI',
+      documentoNumero: '',
+    },
+    yape: {
+      telefono: usuario?.telefono || '',
+      codigoOperacion: '',
+    },
+    transferencia: {
+      banco: 'BCP',
+      numeroOperacion: '',
+    },
+  })
+
+  // Modal de comprobante tras pago exitoso
+  const [comprobanteExitoso, setComprobanteExitoso] = useState(null)
+  const [pedidoExitoso, setPedidoExitoso] = useState(null)
+
+  function handleDatosPagoChange(seccion, valor) {
+    setDatosPago((prev) => ({
+      ...prev,
+      [seccion]: valor,
+    }))
+    // Limpiar errores asociados a la sección
+    setFieldErrors((prev) => {
+      const actualizados = { ...prev }
+      if (seccion === 'tarjeta') {
+        delete actualizados.numero
+        delete actualizados.titular
+        delete actualizados.expiracion
+        delete actualizados.cvv
+      }
+      if (seccion === 'yape') delete actualizados.yapeTelefono
+      if (seccion === 'transferencia') delete actualizados.transferOperacion
+      return actualizados
+    })
+  }
+
   if (!usuario) {
     return (
       <div className="min-h-screen bg-white">
         <Navbar />
         <div className="mx-auto flex max-w-xl flex-col items-center px-6 py-20 text-center">
           <UserCircle className="mb-4 h-10 w-10 text-gray-400" aria-hidden="true" />
-          <p className="mb-4 text-sm text-gray-500">Debes iniciar sesion para continuar con la compra.</p>
+          <p className="mb-4 text-sm text-gray-500">Debes iniciar sesión para continuar con la compra.</p>
           <Link to="/login" className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-            Iniciar sesion
+            Iniciar sesión
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
@@ -55,13 +103,13 @@ function Checkout() {
     )
   }
 
-  if (items.length === 0) {
+  if (items.length === 0 && !comprobanteExitoso) {
     return (
       <div className="min-h-screen bg-white">
         <Navbar />
         <div className="mx-auto flex max-w-xl flex-col items-center px-6 py-20 text-center">
           <PackageCheck className="mb-4 h-10 w-10 text-gray-400" aria-hidden="true" />
-          <p className="mb-4 text-sm text-gray-500">Tu carrito esta vacio.</p>
+          <p className="mb-4 text-sm text-gray-500">Tu carrito está vacío.</p>
           <Link to="/tienda" className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
             Ir a la tienda
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -75,21 +123,56 @@ function Checkout() {
     const errors = {}
 
     if (requiereDireccion && direccion.trim().length < 6) {
-      errors.direccion = 'Ingresa una direccion valida'
+      errors.direccion = 'Ingresa una dirección válida con calle/avenida y número'
     }
 
     if (requiereDireccion && distrito.trim().length < 3) {
-      errors.distrito = 'Ingresa el distrito'
+      errors.distrito = 'Ingresa el distrito de entrega'
     }
 
-    setFieldErrors(errors)
+    setFieldErrors((prev) => ({ ...prev, ...errors }))
     return Object.keys(errors).length === 0
+  }
+
+  function validarPago() {
+    const errors = {}
+
+    if (metodoPago === 'TARJETA') {
+      const resTarjeta = validarDatosTarjeta(datosPago.tarjeta)
+      if (!resTarjeta.valido) {
+        setFieldErrors((prev) => ({ ...prev, ...resTarjeta.errors }))
+        return false
+      }
+    } else if (metodoPago === 'YAPE' || metodoPago === 'PLIN') {
+      const tel = (datosPago.yape?.telefono || '').trim()
+      if (!tel || tel.length < 9) {
+        errors.yapeTelefono = 'Ingresa el número de 9 dígitos asociado a tu Yape/Plin'
+      }
+    } else if (metodoPago === 'TRANSFERENCIA') {
+      const op = (datosPago.transferencia?.numeroOperacion || '').trim()
+      if (!op || op.length < 4) {
+        errors.transferOperacion = 'Ingresa el número de operación bancaria emitido por tu banco'
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors((prev) => ({ ...prev, ...errors }))
+      return false
+    }
+
+    return true
   }
 
   async function handleConfirmar() {
     setError('')
 
-    if (!validarEntrega()) return
+    const entregaOk = validarEntrega()
+    const pagoOk = validarPago()
+
+    if (!entregaOk || !pagoOk) {
+      setError('Por favor revisa los campos requeridos en el formulario antes de continuar.')
+      return
+    }
 
     setCargando(true)
 
@@ -103,118 +186,171 @@ function Checkout() {
         ? `${direccion.trim()}, ${distrito.trim()}`
         : null
 
+      // 1. Crear el pedido en el backend
       const response = await api.post('/pedidos', {
         tipoEntrega,
         direccionEntrega: direccionCompleta,
         detalles,
       })
 
+      const nuevoPedido = response.data?.data || response.data
+
+      // 2. Procesar el pago mediante la pasarela modular (Sandbox o Real)
+      const comprobante = await procesarPago({
+        metodo: metodoPago,
+        monto: total,
+        pedidoId: nuevoPedido.id,
+        datosTarjeta: datosPago.tarjeta,
+        datosYape: datosPago.yape,
+        datosTransferencia: datosPago.transferencia,
+        cliente: usuario,
+      })
+
+      // 3. Vaciar carrito y mostrar comprobante digital
       vaciarCarrito()
-      navigate(`/pedidos/${response.data.data.id}`)
+      setPedidoExitoso(nuevoPedido)
+      setComprobanteExitoso(comprobante)
     } catch (err) {
-      setError(getApiErrorMessage(err, 'No se pudo confirmar el pedido. Intenta nuevamente.'))
+      setError(getApiErrorMessage(err, 'No se pudo procesar la transacción. Intenta nuevamente.'))
     } finally {
       setCargando(false)
     }
   }
 
+  function handleContinuarTrasPago() {
+    if (pedidoExitoso?.id) {
+      navigate(`/pedidos/${pedidoExitoso.id}`)
+    } else {
+      navigate('/mis-pedidos')
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-slate-50">
       <Navbar />
 
-      <main className="mx-auto max-w-6xl px-6 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-950">Finalizar compra</h1>
-          <p className="mt-1 text-sm text-gray-500">Carrito / Entrega / Confirmacion del pedido</p>
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        <div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-4">
+          <div>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight sm:text-3xl">Finalizar Compra</h1>
+            <p className="mt-1 text-xs text-slate-500 font-medium">AlphaBike Store • Checkout Seguro y Verificado</p>
+          </div>
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800">
+            <Lock className="h-3.5 w-3.5 text-emerald-600" />
+            <span>Pasarela de Pago Protegida</span>
+          </div>
         </div>
 
-        {error && <Alert type="error" className="mb-4">{error}</Alert>}
+        {error && <Alert type="error" className="mb-5 shadow-sm font-semibold">{error}</Alert>}
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
-          <section className="space-y-4">
-            <div className="rounded-md border border-gray-200 bg-white p-4">
-              <h2 className="mb-3 flex items-center gap-2 text-base font-semibold text-gray-950">
-                <UserCircle className="h-5 w-5 text-blue-600" aria-hidden="true" />
-                Datos del cliente
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
+          {/* Columna Izquierda: Datos, Entrega y Pasarela */}
+          <section className="space-y-5">
+            {/* Datos del Cliente */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="mb-3 flex items-center gap-2 text-sm font-black uppercase tracking-wider text-slate-800">
+                <UserCircle className="h-5 w-5 text-red-600" aria-hidden="true" />
+                1. Datos del Cliente
               </h2>
-              <p className="text-sm text-gray-700">{usuario.nombre}</p>
-              <p className="text-sm text-gray-500">{usuario.email}</p>
-              {usuario.telefono && <p className="text-sm text-gray-500">{usuario.telefono}</p>}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 rounded-xl bg-slate-50 p-3.5 text-xs">
+                <div>
+                  <span className="text-slate-400 block font-bold">Nombre Completo</span>
+                  <p className="font-extrabold text-slate-900">{usuario.nombre}</p>
+                </div>
+                <div>
+                  <span className="text-slate-400 block font-bold">Correo Electrónico</span>
+                  <p className="font-extrabold text-slate-900">{usuario.email}</p>
+                </div>
+                <div>
+                  <span className="text-slate-400 block font-bold">Teléfono de Contacto</span>
+                  <p className="font-extrabold text-slate-900">{usuario.telefono || 'No registrado'}</p>
+                </div>
+              </div>
             </div>
 
-            <div className="rounded-md border border-gray-200 bg-white p-4">
-              <h2 className="mb-3 flex items-center gap-2 text-base font-semibold text-gray-950">
-                <MapPin className="h-5 w-5 text-blue-600" aria-hidden="true" />
-                Entrega
+            {/* Método de Entrega */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="mb-3 flex items-center gap-2 text-sm font-black uppercase tracking-wider text-slate-800">
+                <MapPin className="h-5 w-5 text-red-600" aria-hidden="true" />
+                2. Método de Entrega
               </h2>
-              <div className="mb-4 rounded-md bg-gray-50 p-3 text-sm font-medium text-gray-700">
+              <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-3.5 text-xs font-bold text-slate-800">
                 {LABELS_ENTREGA[tipoEntrega]}
               </div>
 
               {requiereDireccion ? (
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <FormField label="Direccion de entrega" error={fieldErrors.direccion}>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <FormField label="Dirección exacta de entrega" error={fieldErrors.direccion}>
                     <input
                       type="text"
                       value={direccion}
                       onChange={(e) => setDireccion(e.target.value)}
-                      placeholder="Av. Principal 123"
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                      placeholder="Ej. Av. Larco 743, Dpto 402"
+                      className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs font-bold text-slate-800 shadow-sm focus:border-red-500 focus:ring-1 focus:ring-red-500"
                     />
                   </FormField>
-                  <FormField label="Distrito" error={fieldErrors.distrito}>
+                  <FormField label="Distrito / Ciudad" error={fieldErrors.distrito}>
                     <input
                       type="text"
                       value={distrito}
                       onChange={(e) => setDistrito(e.target.value)}
-                      placeholder="Miraflores"
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                      placeholder="Ej. Miraflores / Lima"
+                      className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs font-bold text-slate-800 shadow-sm focus:border-red-500 focus:ring-1 focus:ring-red-500"
                     />
                   </FormField>
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">Te avisaremos cuando el pedido este listo para recoger en tienda.</p>
+                <p className="text-xs font-semibold text-slate-500 bg-slate-50 rounded-xl p-3 border border-dashed border-slate-200">
+                  📍 Tu pedido será preparado y guardado en nuestro local principal. Te notificaremos cuando esté listo para su recojo inmediato.
+                </p>
               )}
             </div>
 
-            <div className="rounded-md border border-blue-200 bg-blue-50 p-4">
-              <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-blue-950">
-                <CreditCard className="h-5 w-5 text-blue-700" aria-hidden="true" />
-                Pago
-              </h2>
-              <p className="text-sm leading-6 text-blue-800">
-                Al confirmar se crea el pedido como pendiente. El encargado o administrador registrara el pago cuando verifique el monto y el metodo usado.
-              </p>
+            {/* 3. Pasarela de Pago Completa */}
+            <div>
+              <PasarelaPago
+                total={total}
+                tipoEntrega={tipoEntrega}
+                metodoSeleccionado={metodoPago}
+                onMetodoChange={setMetodoPago}
+                datosPago={datosPago}
+                onDatosPagoChange={handleDatosPagoChange}
+                fieldErrors={fieldErrors}
+              />
             </div>
           </section>
 
-          <aside className="lg:sticky lg:top-24 lg:self-start">
-            <div className="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
-              <h2 className="mb-4 text-base font-semibold text-gray-950">Resumen del pedido</h2>
+          {/* Columna Derecha: Resumen y CTA */}
+          <aside className="lg:sticky lg:top-24 lg:self-start space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="mb-4 text-base font-black text-slate-900 border-b border-slate-100 pb-3">
+                Resumen de Compra
+              </h2>
+              
               <div className="mb-4 max-h-56 space-y-3 overflow-auto pr-1">
                 {items.map((item) => (
-                  <div key={item.id} className="flex justify-between gap-3 text-sm">
+                  <div key={item.id} className="flex justify-between gap-3 text-xs border-b border-slate-50 pb-2.5 last:border-b-0">
                     <div>
-                      <p className="font-medium text-gray-800">{item.nombre}</p>
-                      <p className="text-xs text-gray-500">Cantidad: {item.cantidad}</p>
+                      <p className="font-extrabold text-slate-900 line-clamp-1">{item.nombre}</p>
+                      <p className="text-[11px] font-semibold text-slate-400">Cantidad: {item.cantidad}</p>
                     </div>
-                    <span className="font-medium text-gray-900">{formatMoney(item.precio * item.cantidad)}</span>
+                    <span className="font-black text-slate-900">{formatMoney(item.precio * item.cantidad)}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="space-y-2 border-t border-gray-200 pt-4 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Subtotal</span>
-                  <span className="font-medium text-gray-900">{formatMoney(subtotal)}</span>
+              <div className="space-y-2 border-t border-slate-200 pt-4 text-xs font-bold">
+                <div className="flex justify-between text-slate-500">
+                  <span>Subtotal productos</span>
+                  <span className="text-slate-900">{formatMoney(subtotal)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Envio</span>
-                  <span className="font-medium text-gray-900">{formatMoney(costoEnvio)}</span>
+                <div className="flex justify-between text-slate-500">
+                  <span>Costo de envío</span>
+                  <span className="text-slate-900">{costoEnvio === 0 ? '¡Gratis!' : formatMoney(costoEnvio)}</span>
                 </div>
-                <div className="flex justify-between border-t border-gray-200 pt-3 text-base font-semibold text-gray-950">
-                  <span>Total</span>
-                  <span>{formatMoney(total)}</span>
+                <div className="flex justify-between border-t border-slate-200 pt-3 text-base font-black text-slate-950">
+                  <span>Total a Pagar</span>
+                  <span className="text-red-600">{formatMoney(total)}</span>
                 </div>
               </div>
 
@@ -222,20 +358,40 @@ function Checkout() {
                 type="button"
                 onClick={handleConfirmar}
                 disabled={cargando}
-                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-sm font-black text-white hover:bg-red-700 shadow-lg shadow-red-600/20 disabled:cursor-not-allowed disabled:opacity-50 transition-all active:scale-[0.98]"
               >
-                {cargando ? 'Confirmando...' : 'Crear pedido'}
-                {!cargando && <ArrowRight className="h-4 w-4" aria-hidden="true" />}
+                {cargando ? (
+                  <>Procesando Pago Seguro...</>
+                ) : (
+                  <>
+                    {metodoPago === 'TARJETA' && `Pagar ${formatMoney(total)}`}
+                    {metodoPago === 'YAPE' && `Pagar con Yape ${formatMoney(total)}`}
+                    {metodoPago === 'PLIN' && `Pagar con Plin ${formatMoney(total)}`}
+                    {metodoPago === 'TRANSFERENCIA' && `Confirmar Transferencia`}
+                    {metodoPago === 'EFECTIVO' && `Confirmar Pedido Tienda`}
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
               </button>
-              <p className="mt-3 text-center text-xs text-gray-500">
-                El stock se valida nuevamente antes de crear el pedido.
-              </p>
+
+              <div className="mt-4 flex items-center justify-center gap-2 text-[11px] font-semibold text-slate-400">
+                <Lock className="h-3 w-3 text-emerald-600" />
+                <span>Cifrado bancario seguro SSL 256-bit</span>
+              </div>
             </div>
           </aside>
         </div>
       </main>
+
+      {/* Modal de Comprobante Electrónico */}
+      <ComprobanteModal
+        comprobante={comprobanteExitoso}
+        pedido={pedidoExitoso}
+        onContinuar={handleContinuarTrasPago}
+      />
     </div>
   )
 }
 
 export default Checkout
+
