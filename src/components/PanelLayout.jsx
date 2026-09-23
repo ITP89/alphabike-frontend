@@ -76,9 +76,9 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
         )}
       </header>
 
-      <div className="mx-auto grid min-h-screen max-w-[1536px] grid-cols-1 lg:grid-cols-[250px_1fr]">
+      <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[260px_1fr]">
         {/* Sidebar Desktop Pro */}
-        <aside className="hidden border-r border-slate-800 bg-slate-950 px-4 py-6 text-white lg:flex lg:flex-col shadow-2xl">
+        <aside className="hidden border-r border-slate-800 bg-slate-950 px-4 py-6 text-white lg:flex lg:flex-col shadow-2xl sticky top-0 h-screen overflow-y-auto">
           <Link to="/" className="mb-8 flex items-center gap-3 group px-2">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-600 text-white font-black shadow-lg shadow-red-500/25 group-hover:scale-105 transition-transform">
               <Bike className="h-5 w-5" aria-hidden="true" />
@@ -120,9 +120,9 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
           </div>
         </aside>
 
-        {/* Main Content Area */}
-        <main className="min-w-0 bg-slate-50 p-4 sm:p-6 lg:p-8">
-          <div className="mx-auto max-w-7xl">{children}</div>
+        {/* Main Content Area: Ocupa todo el ancho de la pantalla sin cortes */}
+        <main className="min-w-0 w-full bg-slate-50 p-5 sm:p-7 lg:p-9 overflow-x-hidden">
+          <div className="w-full">{children}</div>
         </main>
       </div>
     </div>
