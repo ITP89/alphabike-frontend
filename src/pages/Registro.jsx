@@ -1,4 +1,4 @@
-import { UserPlus, Mail, Lock, User, Phone, Sparkles, ShieldCheck, ArrowRight } from 'lucide-react'
+import { UserPlus, Mail, Lock, User, Phone, Sparkles, ShieldCheck, ArrowRight, CheckCircle2, MailCheck } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
@@ -17,6 +17,7 @@ function Registro() {
   const [errors, setErrors] = useState({})
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(false)
+  const [registroExitoso, setRegistroExitoso] = useState(false)
 
   const { registrar } = useAuth()
   const navigate = useNavigate()
@@ -50,7 +51,7 @@ function Registro() {
 
     try {
       await registrar(nombre.trim(), email.trim(), password, telefono.trim())
-      navigate('/')
+      setRegistroExitoso(true)
     } catch (err) {
       setError(getApiErrorMessage(err, 'No se pudo crear la cuenta'))
     } finally {
@@ -121,7 +122,30 @@ function Registro() {
 
               {error && <Alert type="error" className="mb-5 font-bold shadow-sm">{error}</Alert>}
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              {registroExitoso ? (
+                <div className="space-y-6 text-center animate-in fade-in zoom-in-95 duration-200">
+                  <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-6">
+                    <MailCheck className="mx-auto h-14 w-14 text-emerald-600 mb-3" />
+                    <h2 className="text-base font-black text-emerald-950">¡Registro Exitoso!</h2>
+                    <p className="mt-2 text-xs font-medium text-emerald-800 leading-relaxed">
+                      Hemos enviado un correo de activación a <strong className="font-extrabold text-emerald-950">{email}</strong>.
+                    </p>
+                    <p className="mt-2 text-[11px] text-emerald-700">
+                      Por favor revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta antes de iniciar sesión.
+                    </p>
+                  </div>
+
+                  <Link
+                    to="/login"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 px-5 py-3 text-xs font-black text-white shadow-md hover:bg-red-600 transition-colors"
+                  >
+                    Ir a Iniciar Sesión
+                    <ArrowRight className="h-4 w-4 text-red-400" />
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1.5">Nombre Completo *</label>
                   <div className="relative">
@@ -232,6 +256,8 @@ function Registro() {
                   </Link>
                 </p>
               </div>
+              </>
+              )}
             </div>
           </div>
         </section>

@@ -15,9 +15,28 @@ function Login() {
   const [errors, setErrors] = useState({})
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(false)
+  const [mostrarReenvio, setMostrarReenvio] = useState(false)
+  const [reenviando, setReenviando] = useState(false)
 
-  const { login } = useAuth()
+  const { login, reenviarVerificacion } = useAuth()
   const navigate = useNavigate()
+
+  async function handleReenviarVerificacion() {
+    if (!email.trim()) {
+      toast.error('Ingresa tu correo para reenviar el enlace')
+      return
+    }
+
+    setReenviando(true)
+    try {
+      await reenviarVerificacion(email.trim())
+      toast.success('Se ha enviado un nuevo enlace de activación a tu correo')
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, 'No se pudo reenviar el enlace.'))
+    } finally {
+      setReenviando(false)
+    }
+  }
 
   function validate() {
     const nextErrors = {}
@@ -33,6 +52,7 @@ function Login() {
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
+    setMostrarReenvio(false)
 
     if (!validate()) return
 
@@ -53,6 +73,10 @@ function Login() {
       const mensajeError = !err.response
         ? 'No se pudo conectar con el backend. Verifica la conexión con el servidor.'
         : getApiErrorMessage(err, 'Correo o contraseña incorrectos')
+
+      if (mensajeError.toLowerCase().includes('activada') || mensajeError.toLowerCase().includes('verificada') || mensajeError.toLowerCase().includes('confirma')) {
+        setMostrarReenvio(true)
+      }
 
       setError(mensajeError)
       toast.error(mensajeError)
@@ -124,6 +148,20 @@ function Login() {
 
               {error && <Alert type="error" className="mb-5 font-bold shadow-sm">{error}</Alert>}
 
+              {mostrarReenvio && (
+                <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-xs">
+                  <p className="font-bold text-red-900 mb-2">¿Aún no te llega el enlace de confirmación a tu correo?</p>
+                  <button
+                    type="button"
+                    disabled={reenviando}
+                    onClick={handleReenviarVerificacion}
+                    className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-black text-white hover:bg-red-700 transition-colors disabled:opacity-50"
+                  >
+                    {reenviando ? 'Reenviando...' : 'Reenviar Enlace de Activación'}
+                  </button>
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="mb-1.5 block text-xs font-bold text-zinc-700">Correo Electrónico *</label>
@@ -144,7 +182,15 @@ function Login() {
                 </div>
 
                 <div>
-                  <label className="mb-1.5 block text-xs font-bold text-zinc-700">Contraseña *</label>
+                  <div className="mb-1.5 flex items-center justify-between">
+                    <label className="block text-xs font-bold text-zinc-700">Contraseña *</label>
+                    <Link
+                      to="/recuperar-password"
+                      className="text-[11px] font-bold text-red-600 hover:text-red-500 transition-colors"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </Link>
+                  </div>
                   <div className="relative">
                     <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
                     <input

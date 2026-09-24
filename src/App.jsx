@@ -11,6 +11,9 @@ import Login from './pages/Login'
 import Registro from './pages/Registro'
 
 // Paginas con Lazy Loading (Code Splitting)
+const RecuperarPassword = lazy(() => import('./pages/RecuperarPassword'))
+const RestablecerPassword = lazy(() => import('./pages/RestablecerPassword'))
+const VerificarEmail = lazy(() => import('./pages/VerificarEmail'))
 const Tienda = lazy(() => import('./pages/Tienda'))
 const DetalleProducto = lazy(() => import('./pages/DetalleProducto'))
 const Servicios = lazy(() => import('./pages/Servicios'))
@@ -65,6 +68,9 @@ function App() {
           <Route path="/contacto" element={<Contacto />} />
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
+          <Route path="/recuperar-password" element={<RecuperarPassword />} />
+          <Route path="/restablecer-password" element={<RestablecerPassword />} />
+          <Route path="/verificar-email" element={<VerificarEmail />} />
 
           {/* Cliente */}
           <Route path="/carrito" element={<Carrito />} />

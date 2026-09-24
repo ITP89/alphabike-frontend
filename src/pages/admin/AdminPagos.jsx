@@ -42,16 +42,13 @@ function AdminPagos() {
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState(null)
 
-  // Filtros y Búsqueda
   const [busqueda, setBusqueda] = useState('')
   const [filtroTipo, setFiltroTipo] = useState('todos')
   const [filtroMetodo, setFiltroMetodo] = useState('todos')
 
-  // Modales
   const [modalRegistroAbierto, setModalRegistroAbierto] = useState(false)
   const [pagoDetalle, setPagoDetalle] = useState(null)
 
-  // Formulario de Cobro Manual
   const [formCobro, setFormCobro] = useState({
     referenciaTipo: 'PEDIDO',
     referenciaId: '',
@@ -60,23 +57,18 @@ function AdminPagos() {
   })
   const [guardandoCobro, setGuardandoCobro] = useState(false)
 
-  // Cargar pagos del backend combinados con almacenamiento de comprobantes
   async function cargarPagos() {
     setCargando(true)
     setError('')
     try {
       const response = await api.get('/pagos')
       const pagosBackend = response.data.data || []
-
-      // Obtener comprobantes locales de la pasarela sandbox para enriquecer detalles de tarjeta
       let comprobantesLocales = {}
       try {
         comprobantesLocales = JSON.parse(localStorage.getItem('alphabike_comprobantes') || '{}')
       } catch {
         comprobantesLocales = {}
       }
-
-      // Enriquecer pagos con metadatos de comprobantes si existen
       const pagosEnriquecidos = pagosBackend.map((pago) => {
         const comp = comprobantesLocales[pago.referenciaId]
         if (comp) {
@@ -96,8 +88,6 @@ function AdminPagos() {
         }
       })
 
-      // Si hay comprobantes locales que aún no figuren en backend (por ejemplo si fueron creados por cliente),
-      // los mostramos en la auditoría con estado LOCAL_VERIFICADO
       const idsBackend = new Set(pagosBackend.map((p) => p.referenciaId))
       Object.entries(comprobantesLocales).forEach(([refId, comp]) => {
         if (!idsBackend.has(refId)) {
@@ -151,7 +141,6 @@ function AdminPagos() {
     })
   }, [pagos, filtroTipo, filtroMetodo, busqueda])
 
-  // Métricas financieras calculadas
   const metricas = useMemo(() => {
     let total = 0
     let tarjeta = 0
@@ -172,7 +161,6 @@ function AdminPagos() {
     return { total, tarjeta, yapePlin, transferencia, efectivo, cantidad: pagos.length }
   }, [pagos])
 
-  // Registro manual de cobro (para mostrador o transferencia validada)
   async function handleRegistrarCobroManual(e) {
     e.preventDefault()
     if (!formCobro.referenciaId.trim() || !formCobro.monto || Number(formCobro.monto) <= 0) {
@@ -206,7 +194,6 @@ function AdminPagos() {
     }
   }
 
-  // Exportar reporte a formato CSV para contabilidad
   function exportarCSV() {
     if (pagosFiltrados.length === 0) return
 
@@ -234,7 +221,7 @@ function AdminPagos() {
 
   return (
     <LayoutAdmin>
-      {/* Encabezado Principal */}
+      {}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5">
         <div>
           <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-red-600 mb-1">
@@ -274,7 +261,7 @@ function AdminPagos() {
         </Alert>
       )}
 
-      {/* Tarjetas de Métricas Financieras */}
+      {}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="flex items-center justify-between mb-2">
@@ -329,7 +316,7 @@ function AdminPagos() {
         </div>
       </div>
 
-      {/* Barra de Filtros y Búsqueda */}
+      {}
       <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         <div className="relative sm:col-span-2 lg:col-span-2">
           <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
@@ -370,7 +357,7 @@ function AdminPagos() {
         </div>
       </div>
 
-      {/* Tabla de Pagos */}
+      {}
       {cargando ? (
         <LoadingState text="Cargando transacciones financieras..." />
       ) : error ? (
