@@ -3,9 +3,7 @@ import {
   CreditCard,
   Sparkles,
   Receipt,
-  CheckCircle2,
   Search,
-  Filter,
   Download,
   Plus,
   X,
@@ -383,8 +381,8 @@ function AdminPagos() {
           {pagosFiltrados.map((pago) => {
             const metodoReal = pago.metodoPagoReal || pago.metodoPago
 
-            let badgeMetodoClass = 'bg-slate-100 text-slate-700 border-slate-200'
-            let IconoMetodo = CreditCard
+            let badgeMetodoClass
+            let IconoMetodo
 
             if (metodoReal === 'TARJETA') {
               badgeMetodoClass = 'bg-blue-50 text-blue-700 border-blue-200'

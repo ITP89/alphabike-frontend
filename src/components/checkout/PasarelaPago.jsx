@@ -8,14 +8,12 @@ import {
   Lock,
   Copy,
   Check,
-  AlertCircle,
   Sparkles,
 } from 'lucide-react'
 import {
   GATEWAY_CONFIG,
   TARJETAS_PRUEBA,
   detectarFranquicia,
-  validarDatosTarjeta,
 } from '../../services/paymentGateway'
 import { formatMoney } from '../../utils/formatters'
 

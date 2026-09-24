@@ -1,7 +1,7 @@
-import { CheckCircle2, Printer, ArrowRight, ShieldCheck, Download } from 'lucide-react'
+import { CheckCircle2, Printer, ArrowRight, ShieldCheck } from 'lucide-react'
 import { formatMoney } from '../../utils/formatters'
 
-export default function ComprobanteModal({ comprobante, pedido, onContinuar }) {
+export default function ComprobanteModal({ comprobante, onContinuar }) {
   if (!comprobante) return null
 
   function handleImprimir() {

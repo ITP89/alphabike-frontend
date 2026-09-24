@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import Navbar from '../components/Navbar'
-import Alert from '../components/ui/Alert'
 import { useAuth } from '../context/AuthContext'
 import { getApiErrorMessage } from '../utils/apiError'
 import alphaLogo from '../assets/alphabike-logo.png'
@@ -51,7 +50,7 @@ function VerificarEmail() {
     return () => {
       cancelado = true
     }
-  }, [token])
+  }, [token, verificarEmail])
 
   async function handleReenviar(e) {
     e.preventDefault()

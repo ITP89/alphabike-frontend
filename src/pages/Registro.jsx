@@ -1,6 +1,6 @@
-import { UserPlus, Mail, Lock, User, Phone, Sparkles, ShieldCheck, ArrowRight, CheckCircle2, MailCheck } from 'lucide-react'
+import { UserPlus, Mail, Lock, User, Phone, Sparkles, ShieldCheck, ArrowRight, MailCheck } from 'lucide-react'
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Alert from '../components/ui/Alert'
 import { useAuth } from '../context/AuthContext'
@@ -20,7 +20,6 @@ function Registro() {
   const [registroExitoso, setRegistroExitoso] = useState(false)
 
   const { registrar } = useAuth()
-  const navigate = useNavigate()
 
   function clearField(field) {
     setErrors((current) => ({ ...current, [field]: '' }))

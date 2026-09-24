@@ -14,7 +14,6 @@ function RecuperarPassword() {
   const [error, setError] = useState('')
   const [enviado, setEnviado] = useState(false)
   const [cargando, setCargando] = useState(false)
-  const [reintentos, setReintentos] = useState(0)
 
   const { solicitarRecuperacionPassword } = useAuth()
 
@@ -33,7 +32,6 @@ function RecuperarPassword() {
     try {
       await solicitarRecuperacionPassword(email.trim())
       setEnviado(true)
-      setReintentos((prev) => prev + 1)
       toast.success('Instrucciones enviadas correctamente a tu correo')
     } catch (err) {
       const mensaje = getApiErrorMessage(err, 'No se pudo procesar la solicitud en este momento.')

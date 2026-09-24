@@ -179,8 +179,8 @@ export async function procesarPago({
   const transaccionId = `TRX-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`
   const fechaOperacion = new Date().toISOString()
 
-  let codigoOperacion = ''
-  let detallesPago = {}
+  let codigoOperacion
+  let detallesPago
 
   if (metodo === 'TARJETA') {
     const marca = detectarFranquicia(numeroLimpio)
