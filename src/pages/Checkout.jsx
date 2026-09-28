@@ -176,6 +176,8 @@ function Checkout() {
 
     setCargando(true)
 
+    let pedidoCreadoId = null
+
     try {
       const detalles = items.map((item) => ({
         productoId: item.id,
@@ -194,6 +196,7 @@ function Checkout() {
       })
 
       const nuevoPedido = response.data?.data || response.data
+      pedidoCreadoId = nuevoPedido.id
 
       // 2. Procesar el pago mediante la pasarela modular (Sandbox o Real)
       const comprobante = await procesarPago({
@@ -211,7 +214,19 @@ function Checkout() {
       setPedidoExitoso(nuevoPedido)
       setComprobanteExitoso(comprobante)
     } catch (err) {
-      setError(getApiErrorMessage(err, 'No se pudo procesar la transacción. Intenta nuevamente.'))
+      let pedidoCancelado = false
+      if (pedidoCreadoId) {
+        try {
+          await api.patch(`/pedidos/${pedidoCreadoId}/cancelar`)
+          pedidoCancelado = true
+        } catch {
+          // Si el pago alcanzo a confirmarse, el backend impide cancelar y conserva el pedido pagado.
+        }
+      }
+      const mensajeFallback = pedidoCancelado
+        ? 'No se pudo procesar la transacción. El pedido pendiente fue cancelado y el stock restaurado.'
+        : 'No se pudo procesar la transacción. Revisa tus pedidos antes de volver a intentarlo.'
+      setError(getApiErrorMessage(err, mensajeFallback))
     } finally {
       setCargando(false)
     }
@@ -376,7 +391,7 @@ function Checkout() {
 
               <div className="mt-4 flex items-center justify-center gap-2 text-[11px] font-semibold text-slate-400">
                 <Lock className="h-3 w-3 text-emerald-600" />
-                <span>Cifrado bancario seguro SSL 256-bit</span>
+                <span>Entorno sandbox para demostración académica</span>
               </div>
             </div>
           </aside>

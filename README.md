@@ -63,7 +63,11 @@ Usar commits semanticos como:
 - Servicios consume `/servicios`.
 - Galeria consume `/trabajos`.
 - Tienda consume `/productos` y `/categorias`, con busqueda, categoria y ordenamiento.
-- Checkout crea pedidos en `/pedidos`; el pago queda pendiente para confirmacion por encargado/admin.
+- Checkout crea pedidos en `/pedidos` y registra pagos sandbox en `/pagos`. Si el pago falla, cancela el pedido pendiente para devolver el stock reservado. El backend vuelve a validar propietario, estado, importe exacto y duplicados.
+
+## Pagos
+
+`VITE_PAYMENT_GATEWAY_PROVIDER=SANDBOX` habilita solamente una simulacion academica; no mueve dinero real. Cualquier proveedor distinto falla de forma explicita hasta que se integre su SDK y la verificacion segura en el backend. Las llaves secretas nunca deben guardarse en variables `VITE_*`.
 
 ## Docker
 

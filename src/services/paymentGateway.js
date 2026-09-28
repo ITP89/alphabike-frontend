@@ -1,9 +1,7 @@
 /**
  * AlphaBike Payment Gateway Adapter & Engine
- * Diseñado para ser "Plug & Play":
- * - Si existen llaves en .env (VITE_PAYMENT_PUBLIC_KEY / VITE_PAYMENT_GATEWAY_PROVIDER),
- *   conmuta a la API real (Culqi, Mercado Pago o Stripe).
- * - En ausencia de llaves comerciales, opera en modo SANDBOX PROFESIONAL:
+ * Adaptador de demostracion para el flujo de pagos.
+ * Actualmente opera en modo SANDBOX:
  *   validación real de tarjetas (Luhn), generación de vouchers, códigos de autorización
  *   y registro transparente en el sistema.
  */
@@ -165,6 +163,10 @@ export async function procesarPago({
   datosTransferencia = {},
   cliente = {},
 }) {
+  if (GATEWAY_CONFIG.provider !== 'SANDBOX') {
+    throw new Error(`El proveedor ${GATEWAY_CONFIG.provider} aun no tiene un adaptador de pago real configurado.`)
+  }
+
   // Simular latencia de red de pasarela bancaria
   await new Promise((resolve) => setTimeout(resolve, 1100))
 
@@ -232,20 +234,16 @@ export async function procesarPago({
   }
 
   // 4. Registrar el pago en el backend en /pagos con soporte nativo de TARJETA y auditoría
-  try {
-    await api.post('/pagos', {
-      referenciaTipo: 'PEDIDO',
-      referenciaId: pedidoId,
-      monto: Number(monto),
-      metodoPago: metodo,
-      codigoAutorizacion: autorizacion,
-      transaccionId: transaccionId,
-      tarjetaMarca: detallesPago?.marca || null,
-      tarjetaUltimos4: detallesPago?.ultimos4 || null,
-    })
-  } catch (err) {
-    console.info('Registro de pago en backend con fallback local:', err.message)
-  }
+  await api.post('/pagos', {
+    referenciaTipo: 'PEDIDO',
+    referenciaId: pedidoId,
+    monto: Number(monto),
+    metodoPago: metodo,
+    codigoAutorizacion: autorizacion,
+    transaccionId: transaccionId,
+    tarjetaMarca: detallesPago?.marca || null,
+    tarjetaUltimos4: detallesPago?.ultimos4 || null,
+  })
 
   // 5. Persistir el comprobante en almacenamiento local para consulta inmediata
   try {

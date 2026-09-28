@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Bike, LogOut, Menu, X, Shield, Sparkles } from 'lucide-react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import alphaLogo from '../assets/alphabike-logo.png'
 import { useAuth } from '../context/AuthContext'
 import { classNames } from '../utils/formatters'
 
@@ -26,14 +27,21 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
           to={link.to}
           onClick={() => setMenuOpen(false)}
           className={classNames(
-            'flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-extrabold transition-all duration-200',
+            'group flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-xs font-black transition-all duration-200',
             compact && 'min-w-max',
             isActive
-              ? 'bg-red-600 text-white shadow-md shadow-red-500/20'
-              : 'text-slate-400 hover:bg-slate-900 hover:text-white',
+              ? 'bg-white text-slate-950 shadow-lg shadow-red-950/15'
+              : 'text-slate-300 hover:bg-white/[0.08] hover:text-white',
           )}
         >
-          {Icon && <Icon className={classNames('h-4 w-4 shrink-0', isActive ? 'text-slate-950' : 'text-red-400')} aria-hidden="true" />}
+          {Icon && (
+            <span className={classNames(
+              'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors',
+              isActive ? 'border-red-200 bg-red-50 text-red-600' : 'border-white/10 bg-white/5 text-red-300 group-hover:border-red-400/50',
+            )}>
+              <Icon className="h-4 w-4" aria-hidden="true" />
+            </span>
+          )}
           <span>{link.label}</span>
         </NavLink>
       )
@@ -41,20 +49,20 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-red-600 selection:text-white">
+    <div className="alpha-shell font-sans selection:bg-red-600 selection:text-white">
       {/* Mobile Top Header */}
-      <header className="sticky top-0 z-30 border-b border-slate-800 bg-slate-950 text-white lg:hidden">
+      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 text-slate-950 shadow-sm backdrop-blur-xl lg:hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <Link to="/" className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-600 text-white font-black shadow-md">
-              <Bike className="h-5 w-5" aria-hidden="true" />
+            <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
+              <img src={alphaLogo} alt="AlphaBike" className="h-full w-full object-contain" />
             </span>
-            <span className="font-black text-white text-base tracking-tight">AlphaBike <span className="text-red-400 text-xs font-bold">PRO</span></span>
+            <span className="text-base font-black tracking-tight">AlphaBike <span className="text-red-600 text-xs font-bold">PRO</span></span>
           </Link>
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-red-50 hover:text-red-600"
             aria-label="Abrir menu del panel"
             aria-expanded={menuOpen}
           >
@@ -62,7 +70,7 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
           </button>
         </div>
         {menuOpen && (
-          <div className="border-t border-slate-800 bg-slate-950 px-4 py-3 space-y-3">
+          <div className="space-y-3 border-t border-slate-200 bg-slate-950 px-4 py-3">
             <nav className="flex flex-col gap-1.5">{renderLinks()}</nav>
             <button
               type="button"
@@ -76,12 +84,13 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
         )}
       </header>
 
-      <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[260px_1fr]">
+      <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[282px_1fr]">
         {/* Sidebar Desktop Pro */}
-        <aside className="hidden border-r border-slate-800 bg-slate-950 px-4 py-6 text-white lg:flex lg:flex-col shadow-2xl sticky top-0 h-screen overflow-y-auto">
-          <Link to="/" className="mb-8 flex items-center gap-3 group px-2">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-600 text-white font-black shadow-lg shadow-red-500/25 group-hover:scale-105 transition-transform">
-              <Bike className="h-5 w-5" aria-hidden="true" />
+        <aside className="sticky top-0 hidden h-screen overflow-hidden border-r border-slate-900 bg-[radial-gradient(circle_at_top_left,rgba(239,68,68,0.28),transparent_32%),linear-gradient(180deg,#050816_0%,#0f172a_100%)] px-5 py-6 text-white lg:flex lg:flex-col shadow-2xl">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-red-600 via-white to-red-600" />
+          <Link to="/" className="group mb-8 flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.06] p-3 backdrop-blur">
+            <span className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/15 bg-white p-1 shadow-lg shadow-red-950/30 transition-transform group-hover:scale-105">
+              <img src={alphaLogo} alt="AlphaBike" className="h-full w-full object-contain" />
             </span>
             <div>
               <p className="text-base font-black tracking-tight text-white flex items-center gap-1.5">
@@ -91,16 +100,16 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
             </div>
           </Link>
 
-          <div className="px-2 mb-2">
-            <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">Menú de Gestión</span>
+          <div className="mb-3 px-2">
+            <span className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Menú de Gestión</span>
           </div>
 
-          <nav className="flex flex-col gap-1.5">{renderLinks()}</nav>
+          <nav className="flex flex-col gap-2">{renderLinks()}</nav>
 
           {/* User Profile Card Footer */}
-          <div className="mt-auto border-t border-slate-800/80 pt-4 px-2">
-            <div className="flex items-center gap-2.5 mb-3 bg-slate-900/90 border border-slate-800 p-2.5 rounded-xl">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600/20 border border-red-500/40 text-red-400 shrink-0 font-bold text-xs">
+          <div className="mt-auto border-t border-white/10 px-2 pt-4">
+            <div className="mb-3 flex items-center gap-2.5 rounded-lg border border-white/10 bg-white/[0.07] p-2.5">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-red-400/40 bg-red-500/15 text-red-200">
                 <Shield className="h-4 w-4" />
               </div>
               <div className="min-w-0 flex-1">
@@ -112,7 +121,7 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
             <button
               type="button"
               onClick={handleLogout}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs font-bold text-red-400 hover:bg-red-500 hover:text-white transition-all active:scale-95"
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-red-400/20 bg-red-500/10 px-3 py-2.5 text-xs font-black text-red-200 transition-all hover:bg-red-600 hover:text-white active:scale-95"
             >
               <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
               Cerrar Sesión
@@ -120,8 +129,18 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
           </div>
         </aside>
 
-        {/* Main Content Area: Ocupa todo el ancho de la pantalla sin cortes */}
-        <main className="min-w-0 w-full bg-slate-50 p-5 sm:p-7 lg:p-9 overflow-x-hidden">
+        {/* Main Content Area */}
+        <main className="min-w-0 w-full overflow-x-hidden p-4 sm:p-6 lg:p-8">
+          <div className="mb-6 hidden items-center justify-between rounded-lg border border-slate-200 bg-white/[0.86] px-5 py-4 shadow-sm backdrop-blur lg:flex">
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-red-600">{subtitle}</p>
+              <p className="mt-0.5 text-sm font-semibold text-slate-600">Gestión operativa AlphaBike Workshop</p>
+            </div>
+            <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+              <Bike className="h-4 w-4 text-red-600" aria-hidden="true" />
+              <span className="text-xs font-black text-slate-800">{usuario?.nombre || title}</span>
+            </div>
+          </div>
           <div className="w-full">{children}</div>
         </main>
       </div>
