@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { CalendarPlus } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useCitasRefresh } from '../hooks/useCitasRefresh'
 import api from '../api/axios'
 import AccountNav from '../components/AccountNav'
 import Navbar from '../components/Navbar'
@@ -34,6 +35,8 @@ function MisCitas() {
       setCargando(false)
     }
   }
+
+  useCitasRefresh(cargarCitas)
 
   useEffect(() => {
     cargarCitas()

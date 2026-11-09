@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { ArrowLeft, CreditCard, FileText } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
+import { useCitasRefresh } from '../../hooks/useCitasRefresh'
 import api from '../../api/axios'
 import LayoutAdmin from '../../components/LayoutAdmin'
 import Alert from '../../components/ui/Alert'
@@ -36,7 +37,8 @@ function AdminDetalleCita() {
         setCotizacion(cotRes.data.data)
         setDescCotizacion(cotRes.data.data.descripcion || '')
         setMontoCotizacion(cotRes.data.data.monto || '')
-      } catch {
+      } catch (err) {
+        if (err.response?.status !== 404) throw err
         setCotizacion(null)
       }
     } catch (err) {
@@ -45,6 +47,8 @@ function AdminDetalleCita() {
       setCargando(false)
     }
   }, [id])
+
+  useCitasRefresh(cargarDatos, id)
 
   useEffect(() => {
     cargarDatos()

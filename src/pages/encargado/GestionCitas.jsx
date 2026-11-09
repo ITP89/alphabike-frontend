@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useCitasRefresh } from '../../hooks/useCitasRefresh'
 import api from '../../api/axios'
 import LayoutEncargado from '../../components/LayoutEncargado'
 import Alert from '../../components/ui/Alert'
@@ -36,6 +37,8 @@ function GestionCitas() {
       setCargando(false)
     }
   }
+
+  useCitasRefresh(cargarCitas)
 
   useEffect(() => {
     cargarCitas()

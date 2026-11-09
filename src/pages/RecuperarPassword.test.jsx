@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import RecuperarPassword from './RecuperarPassword'
 import api from '../api/axios'
 import { AuthProvider } from '../context/AuthContext'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 vi.mock('../api/axios', () => ({
   default: {
@@ -33,11 +34,11 @@ describe('RecuperarPassword Page', () => {
     })
 
     render(
-      <MemoryRouter>
+      <QueryClientProvider client={new QueryClient()}><MemoryRouter>
         <AuthProvider>
           <RecuperarPassword />
         </AuthProvider>
-      </MemoryRouter>,
+      </MemoryRouter></QueryClientProvider>,
     )
 
     expect(screen.getByRole('heading', { name: /¿Olvidaste tu contraseña\?/i })).toBeInTheDocument()

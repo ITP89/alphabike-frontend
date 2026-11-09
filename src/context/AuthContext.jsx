@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from 'react'
 import api from '../api/axios'
+import { useQueryClient } from '@tanstack/react-query'
 
 const AuthContext = createContext(null)
 
@@ -21,6 +22,7 @@ function cargarUsuarioInicial() {
 }
 
 export function AuthProvider({ children }) {
+  const queryClient = useQueryClient()
   const [usuario, setUsuario] = useState(cargarUsuarioInicial)
   const cargando = false
 
@@ -37,6 +39,7 @@ export function AuthProvider({ children }) {
 
     localStorage.setItem('token', token)
     localStorage.setItem('usuario', JSON.stringify(datosUsuario))
+    queryClient.clear()
     setUsuario(datosUsuario)
 
     return datosUsuario
@@ -80,6 +83,7 @@ export function AuthProvider({ children }) {
   function actualizarUsuario(datos) {
     const datosUsuario = { ...usuario, ...datos }
     localStorage.setItem('usuario', JSON.stringify(datosUsuario))
+    queryClient.clear()
     setUsuario(datosUsuario)
     return datosUsuario
   }
@@ -87,6 +91,8 @@ export function AuthProvider({ children }) {
   function logout() {
     localStorage.removeItem('token')
     localStorage.removeItem('usuario')
+    queryClient.clear()
+    localStorage.removeItem('alphabike_comprobantes')
     setUsuario(null)
   }
 

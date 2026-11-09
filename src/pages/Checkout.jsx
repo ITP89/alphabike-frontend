@@ -201,7 +201,7 @@ function Checkout() {
       // 2. Procesar el pago mediante la pasarela modular (Sandbox o Real)
       const comprobante = await procesarPago({
         metodo: metodoPago,
-        monto: total,
+        monto: nuevoPedido.total,
         pedidoId: nuevoPedido.id,
         datosTarjeta: datosPago.tarjeta,
         datosYape: datosPago.yape,
