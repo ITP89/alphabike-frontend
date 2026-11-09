@@ -29,7 +29,7 @@ npm run build
 npm audit --audit-level=high
 ```
 
-## Cumplimiento Avance 1 - Semana 8
+## Base del frontend y Avance 2 - Semana 14
 
 - Configuracion del entorno: Vite + React, npm, scripts de desarrollo/build/lint/test/typecheck y variable `VITE_API_URL`.
 - Estructura modular: `components`, `components/ui`, `context`, `hooks`, `pages`, `api`, `utils` y `types`.
@@ -87,3 +87,55 @@ Servicios:
 - `CLIENTE`: carrito, checkout, pedidos, citas y perfil.
 - `ENCARGADO`: dashboard, citas, productos, venta presencial, entregas, pagos y galeria interna.
 - `ADMIN`: dashboard, usuarios, citas, productos, pedidos, pagos, categorias, servicios y reportes.
+
+
+## Tiempo real con WebSockets
+
+Configura `.env` antes de arrancar Vite:
+
+```properties
+VITE_API_URL=http://localhost:8080/api/v1
+VITE_WS_URL=ws://localhost:8080/ws/citas
+VITE_PAYMENT_GATEWAY_PROVIDER=SANDBOX
+```
+
+`VITE_WS_URL` es opcional: si se omite se deriva del origen de VITE_API_URL. Usar `wss://` si la web usa HTTPS. Las variables VITE se fijan al compilar. El backend debe permitir el origen real del frontend en CORS_ALLOWED_ORIGINS y WS_ALLOWED_ORIGINS.
+
+RealtimeProvider mantiene una conexión autenticada por sesión. Envía AUTH, solicita SYNC, comprueba PING/PONG y reintenta fallos de red entre 1 y 15 segundos. Tras reconectar, CITAS_SYNC vuelve a consultar el estado actual de la BD. Al salir se cierra el socket y se limpia la caché privada.
+
+Las pantallas Mis citas, Detalle de cita, Gestión de citas y sus equivalentes de administración reaccionan a CITA_UPDATED sin recargar. La interfaz muestra «Citas en vivo», reconexión o sesión expirada. El cliente no puede cambiar citas por mensajes WebSocket: las mutaciones requieren los endpoints REST autorizados.
+
+## Modelo de datos
+
+```mermaid
+erDiagram
+    USUARIOS ||--o{ PEDIDOS : compra
+    USUARIOS ||--o{ CITAS : agenda
+    USUARIOS o|--o{ CITAS : atiende
+    CATEGORIAS ||--o{ PRODUCTOS : clasifica
+    PROVEEDORES o|--o{ PRODUCTOS : suministra
+    PEDIDOS ||--|{ DETALLE_PEDIDOS : contiene
+    PRODUCTOS ||--o{ DETALLE_PEDIDOS : vendido
+    SERVICIOS ||--o{ CITAS : solicitado
+    CITAS ||--o| COTIZACIONES : presupuesto
+    CITAS o|--o{ TRABAJOS_REALIZADOS : documenta
+```
+
+Los pagos apuntan a pedido o cotización por tipo e ID; se validan en servicio y tienen unicidad de pago confirmado en PostgreSQL.
+
+El modelo detallado y el protocolo están en `docs/diagrama-er.md` y `docs/avance-2.md` del repositorio hermano **alphabike-backend**.
+
+## Demostración del Avance 2
+
+1. Levantar PostgreSQL y backend siguiendo el README de alphabike-backend; ejecutar este cliente con `npm ci` y `npm run dev`.
+2. Como ADMIN, demostrar crear, consultar, editar y eliminar un servicio sin citas asociadas. Crear un CLIENTE y un ENCARGADO desde Gestión de usuarios.
+3. Abrir dos sesiones separadas (una privada): cliente en `/citas` y encargado en `/encargado/citas`. Agendar una cita futura.
+4. Cambiar el estado desde el encargado y observar la actualización inmediata del cliente. Mostrar los frames WS en DevTools, ocultando el token AUTH.
+5. Interrumpir la red y restaurarla; comprobar reconexión y reconciliación del estado. Reiniciar el backend con la misma BD para mostrar persistencia.
+6. Explicar el flujo React → Axios → Controller → Service → Repository → PostgreSQL → commit → WebSocket → actualización de interfaz.
+
+Las pruebas `citasSocket.test.js` cubren autenticación por frame, sincronización, recepción de cambios, reconexión, rechazo de credenciales y limpieza al salir. El backend añade pruebas de conexiones WebSocket reales y CRUD por rol.
+
+## Control de versiones
+
+Los cambios de este avance se preparan en `codex/avance-2-tiempo-real`. Revisar el diff, crear commits semánticos y abrir el PR hacia main. La exposición oral y la entrega del PR son evidencias del equipo, no acciones que las pruebas automáticas puedan reemplazar.
