@@ -138,4 +138,4 @@ Las pruebas `citasSocket.test.js` cubren autenticación por frame, sincronizaci�
 
 ## Control de versiones
 
-Los cambios de este avance se preparan en `codex/avance-2-tiempo-real`. Revisar el diff, crear commits semánticos y abrir el PR hacia main. La exposición oral y la entrega del PR son evidencias del equipo, no acciones que las pruebas automáticas puedan reemplazar.
+La versión del Avance 2 se mantiene en `main`. El historial conserva commits semánticos y pull requests para revisar los cambios. La exposición oral es parte de la entrega del equipo y debe demostrar CRUD, persistencia y eventos en tiempo real.
