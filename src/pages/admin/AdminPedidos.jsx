@@ -1,3 +1,4 @@
+import { useRefreshCatalogo } from '../../hooks/useRefreshCatalogo'
 import { useEffect, useMemo, useState } from 'react'
 import {
   Sparkles,
@@ -38,6 +39,7 @@ const LABELS_ESTADO = {
 }
 
 function AdminPedidos() {
+  const refreshCatalogo = useRefreshCatalogo()
   const [pedidos, setPedidos] = useState([])
   const [pagosMap, setPagosMap] = useState({})
   const [cargando, setCargando] = useState(true)
@@ -103,6 +105,7 @@ function AdminPedidos() {
     setMensaje(null)
     try {
       const response = await api.patch(`/pedidos/${id}/estado?estado=${estado}`)
+      await refreshCatalogo()
       setPedidos((prev) => prev.map((p) => (p.id === id ? response.data.data : p)))
       setMensaje({ type: 'success', text: 'Estado del pedido actualizado correctamente' })
     } catch (err) {
@@ -120,6 +123,7 @@ function AdminPedidos() {
     setMensaje(null)
     try {
       const response = await api.patch(`/pedidos/${id}/seguimiento?numeroSeguimiento=${encodeURIComponent(numero)}`)
+      await refreshCatalogo()
       setPedidos((prev) => prev.map((p) => (p.id === id ? response.data.data : p)))
       setSeguimientos((prev) => ({ ...prev, [id]: '' }))
       setMensaje({ type: 'success', text: 'Número de seguimiento registrado exitosamente' })

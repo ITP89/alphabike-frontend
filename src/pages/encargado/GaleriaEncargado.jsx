@@ -1,3 +1,4 @@
+import { useRefreshCatalogo } from '../../hooks/useRefreshCatalogo'
 import { useEffect, useState } from 'react'
 import { Camera, Trash2 } from 'lucide-react'
 import api from '../../api/axios'
@@ -17,6 +18,7 @@ const FORM_INICIAL = {
 }
 
 function GaleriaEncargado() {
+  const refreshCatalogo = useRefreshCatalogo()
   const [trabajos, setTrabajos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
@@ -55,6 +57,7 @@ function GaleriaEncargado() {
         imagenAntesUrl: form.imagenAntesUrl.trim(),
         imagenDespuesUrl: form.imagenDespuesUrl.trim(),
       })
+      await refreshCatalogo()
       setTrabajos((prev) => [...prev, response.data.data])
       setMostrarFormulario(false)
       setForm(FORM_INICIAL)
@@ -69,6 +72,7 @@ function GaleriaEncargado() {
 
     try {
       await api.delete(`/trabajos/${id}`)
+      await refreshCatalogo()
       setTrabajos((prev) => prev.filter((trabajo) => trabajo.id !== id))
       setMensaje({ type: 'success', text: 'Trabajo eliminado correctamente' })
     } catch (err) {

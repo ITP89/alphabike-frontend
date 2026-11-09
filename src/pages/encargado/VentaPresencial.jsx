@@ -1,3 +1,4 @@
+import { useRefreshCatalogo } from '../../hooks/useRefreshCatalogo'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CreditCard, Search, ShoppingCart, Trash2 } from 'lucide-react'
 import api from '../../api/axios'
@@ -13,6 +14,7 @@ function getPrecioMinimo(producto) {
 }
 
 function VentaPresencial() {
+  const refreshCatalogo = useRefreshCatalogo()
   const [productos, setProductos] = useState([])
   const [busqueda, setBusqueda] = useState('')
   const [carrito, setCarrito] = useState([])
@@ -130,6 +132,7 @@ function VentaPresencial() {
         })),
       })
 
+      await refreshCatalogo()
       await api.post('/pagos', {
         referenciaTipo: 'PEDIDO',
         referenciaId: response.data.data.id,

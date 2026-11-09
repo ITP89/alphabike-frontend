@@ -139,3 +139,11 @@ Las pruebas `citasSocket.test.js` cubren autenticación por frame, sincronizaci�
 ## Control de versiones
 
 La versión del Avance 2 se mantiene en `main`. El historial conserva commits semánticos y pull requests para revisar los cambios. La exposición oral es parte de la entrega del equipo y debe demostrar CRUD, persistencia y eventos en tiempo real.
+
+## Sincronizacion y contacto
+
+Las mutaciones de categorias, productos, stock y galeria invalidan las consultas relacionadas del catalogo, incluidos detalles de producto. Compras, ventas y cancelaciones administrativas tambien invalidan el stock publicado. `CatalogoSync.test.jsx` verifica la navegacion entre panel y tienda sin recargar desde ADMIN y ENCARGADO.
+
+El formulario Contacto prepara un mensaje completo para el numero de WhatsApp mostrado. El usuario revisa y envia el mensaje desde WhatsApp; la web conserva el borrador y no afirma que se haya entregado. No se almacena como ticket ni se envia correo desde ese formulario. `Contacto.test.jsx` verifica este comportamiento sin contactar al servicio externo.
+
+Las cuentas registradas publicamente deben verificar su correo antes de iniciar sesion; el backend requiere SMTP configurado para entregar los enlaces. En una demostracion sin SMTP, el administrador puede crear usuarios desde su panel.

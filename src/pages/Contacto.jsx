@@ -42,13 +42,18 @@ function Contacto() {
 
     if (!validate()) return
 
-    setForm(initialForm)
-    setSuccess('¡Gracias! Tu mensaje ha sido enviado al equipo técnico de AlphaBike. Te responderemos a la brevedad.')
+    const text = encodeURIComponent(`Hola AlphaBike, soy ${form.nombre}.
+Correo: ${form.email}
+Telefono: ${form.telefono}
+Asunto: ${form.asunto}
+${form.mensaje}`)
+    window.open(`https://wa.me/51902280036?text=${text}`, '_blank', 'noopener,noreferrer')
+    setSuccess('Tu consulta esta preparada. Pulsa Enviar en WhatsApp para entregarla al taller. Si no se abrio la ventana, permite las ventanas emergentes y vuelve a intentarlo.')
   }
 
   const handleWhatsAppDirect = () => {
     const text = encodeURIComponent(`Hola AlphaBike, quisiera consultar sobre un servicio de mantenimiento o producto. Mi nombre es: ${form.nombre || 'Cliente'}`)
-    window.open(`https://wa.me/51902280036?text=${text}`, '_blank')
+    window.open(`https://wa.me/51902280036?text=${text}`, '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -81,7 +86,7 @@ function Contacto() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-zinc-100 pb-4">
             <div>
               <h2 className="text-xl font-black text-zinc-950">Envíanos un mensaje</h2>
-              <p className="text-xs text-zinc-500 mt-0.5">Completa tus datos y te responderemos en menos de 2 horas.</p>
+              <p className="text-xs text-zinc-500 mt-0.5">Completa tus datos para preparar tu consulta. Revisa el mensaje y envialo desde WhatsApp.</p>
             </div>
             <button
               type="button"
@@ -163,7 +168,7 @@ function Contacto() {
                 type="submit"
                 className="flex-1 inline-flex items-center justify-center gap-2 rounded-md bg-red-600 px-6 py-3 text-xs font-black text-white transition-all hover:bg-red-700 shadow-md shadow-red-500/20 active:scale-95"
               >
-                <span>Enviar Mensaje</span>
+                <span>Preparar consulta por WhatsApp</span>
                 <Send className="h-4 w-4" />
               </button>
 

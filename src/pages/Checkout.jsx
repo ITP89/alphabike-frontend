@@ -1,3 +1,4 @@
+import { useRefreshCatalogo } from '../hooks/useRefreshCatalogo'
 import { useState } from 'react'
 import { ArrowRight, Lock, MapPin, PackageCheck, UserCircle } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
@@ -26,6 +27,7 @@ const LABELS_ENTREGA = {
 }
 
 function Checkout() {
+  const refreshCatalogo = useRefreshCatalogo()
   const { items, subtotal, vaciarCarrito } = useCarrito()
   const { usuario } = useAuth()
   const location = useLocation()
@@ -195,6 +197,7 @@ function Checkout() {
         detalles,
       })
 
+      await refreshCatalogo()
       const nuevoPedido = response.data?.data || response.data
       pedidoCreadoId = nuevoPedido.id
 
@@ -218,6 +221,7 @@ function Checkout() {
       if (pedidoCreadoId) {
         try {
           await api.patch(`/pedidos/${pedidoCreadoId}/cancelar`)
+          await refreshCatalogo()
           pedidoCancelado = true
         } catch {
           // Si el pago alcanzo a confirmarse, el backend impide cancelar y conserva el pedido pagado.

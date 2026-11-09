@@ -1,3 +1,4 @@
+import { useRefreshCatalogo } from '../../hooks/useRefreshCatalogo'
 import { useState, useEffect } from 'react'
 import { ImagePlus, Upload, Trash2, Edit, Plus, Search, X } from 'lucide-react'
 import api from '../../api/axios'
@@ -9,6 +10,7 @@ import { getApiErrorMessage } from '../../utils/apiError'
 import { formatMoney } from '../../utils/formatters'
 
 function AdminProductos() {
+  const refreshCatalogo = useRefreshCatalogo()
   const [productos, setProductos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [busqueda, setBusqueda] = useState('')
@@ -105,7 +107,7 @@ function AdminProductos() {
     const precio = Number(form.precio)
     const precioMinimo = form.precioMinimoVenta === '' ? precio : Number(form.precioMinimoVenta)
 
-    if (precio <= 0 || Number(form.stock) < 0 || precioMinimo <= 0 || precioMinimo > precio) {
+    if (!Number.isFinite(precio) || !Number.isFinite(precioMinimo) || precio <= 0 || !Number.isInteger(Number(form.stock)) || Number(form.stock) < 0 || precioMinimo <= 0 || precioMinimo > precio) {
       setMensaje({ type: 'error', text: 'Revisa precio y stock antes de guardar' })
       return
     }
@@ -121,13 +123,15 @@ function AdminProductos() {
       if (modoEdicion) {
         // Actualizar producto existente
         const response = await api.put(`/productos/${modoEdicion}`, payload)
+        await refreshCatalogo()
         setProductos((prev) => prev.map((p) => p.id === modoEdicion ? response.data.data : p))
-        setMensaje({ type: 'success', text: 'Producto actualizado y guardado en Supabase' })
+        setMensaje({ type: 'success', text: 'Producto actualizado correctamente' })
       } else {
         // Crear nuevo producto
         const response = await api.post('/productos', payload)
+        await refreshCatalogo()
         setProductos((prev) => [response.data.data, ...prev])
-        setMensaje({ type: 'success', text: 'Nuevo producto creado y almacenado en Supabase' })
+        setMensaje({ type: 'success', text: 'Nuevo producto creado correctamente' })
       }
 
       setMostrarFormulario(false)
@@ -139,13 +143,14 @@ function AdminProductos() {
   }
 
   async function handleActualizarStock(id) {
-    if (Number(nuevoStock) < 0) {
-      setMensaje({ type: 'error', text: 'El stock no puede ser negativo' })
+    if (String(nuevoStock).trim() === '' || !Number.isInteger(Number(nuevoStock)) || Number(nuevoStock) < 0 || Number(nuevoStock) > 2147483647) {
+      setMensaje({ type: 'error', text: 'El stock debe ser un entero entre 0 y 2147483647' })
       return
     }
 
     try {
       const response = await api.patch(`/productos/${id}/stock?stock=${nuevoStock}`)
+      await refreshCatalogo()
       setProductos((prev) => prev.map((p) => p.id === id ? response.data.data : p))
       setEditandoStock(null)
       setNuevoStock('')
@@ -158,6 +163,7 @@ function AdminProductos() {
   async function handleEliminar(id) {
     try {
       await api.delete(`/productos/${id}`)
+      await refreshCatalogo()
       setProductos((prev) => prev.map((p) => p.id === id ? { ...p, estado: 'DESCONTINUADO' } : p))
       setMensaje({ type: 'success', text: 'Producto descontinuado correctamente' })
     } catch (err) {
@@ -170,7 +176,7 @@ function AdminProductos() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-black text-slate-900">Gestión de Productos</h1>
-          <p className="text-xs text-slate-500 mt-1">Sube imágenes, administra precios y controla el inventario en Supabase.</p>
+          <p className="text-xs text-slate-500 mt-1">Sube imágenes, administra precios y controla el inventario.</p>
         </div>
         <button
           onClick={mostrarFormulario ? () => setMostrarFormulario(false) : handleNuevoProducto}
@@ -205,6 +211,7 @@ function AdminProductos() {
                   <input
                     type="text"
                     placeholder="Ej. Freno Shimano Deore"
+                    maxLength={255}
                     value={form.nombre}
                     onChange={(e) => setForm({ ...form, nombre: e.target.value })}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
@@ -216,6 +223,7 @@ function AdminProductos() {
                   <input
                     type="text"
                     placeholder="Ej. Shimano, FOX, RockShox"
+                    maxLength={255}
                     value={form.marca}
                     onChange={(e) => setForm({ ...form, marca: e.target.value })}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
@@ -294,7 +302,8 @@ function AdminProductos() {
                 <textarea
                   rows="2"
                   placeholder="Detalles del componente o accesorio..."
-                  value={form.descripcion}
+                  maxLength={255}
+                    value={form.descripcion}
                   onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
                 />

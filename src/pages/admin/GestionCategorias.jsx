@@ -1,3 +1,4 @@
+import { useRefreshCatalogo } from '../../hooks/useRefreshCatalogo'
 import { useEffect, useState } from 'react'
 import { FolderTree, Plus, Sparkles, Edit, Trash2, X } from 'lucide-react'
 import api from '../../api/axios'
@@ -9,6 +10,7 @@ import { getApiErrorMessage } from '../../utils/apiError'
 const FORM_INICIAL = { nombre: '', descripcion: '' }
 
 function GestionCategorias() {
+  const refreshCatalogo = useRefreshCatalogo()
   const [categorias, setCategorias] = useState([])
   const [cargando, setCargando] = useState(true)
   const [editando, setEditando] = useState(null)
@@ -48,9 +50,10 @@ function GestionCategorias() {
 
     try {
       const response = await api.post('/categorias', form)
+      await refreshCatalogo()
       setCategorias((prev) => [...prev, response.data.data])
       resetForm()
-      setMensaje({ type: 'success', text: 'Categoría creada correctamente en Supabase' })
+      setMensaje({ type: 'success', text: 'Categoría creada correctamente' })
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo crear la categoría') })
     }
@@ -62,6 +65,7 @@ function GestionCategorias() {
 
     try {
       const response = await api.put(`/categorias/${editando.id}`, form)
+      await refreshCatalogo()
       setCategorias((prev) => prev.map((categoria) => (
         categoria.id === editando.id ? response.data.data : categoria
       )))
@@ -77,6 +81,7 @@ function GestionCategorias() {
 
     try {
       await api.delete(`/categorias/${id}`)
+      await refreshCatalogo()
       setCategorias((prev) => prev.filter((categoria) => categoria.id !== id))
       setMensaje({ type: 'success', text: 'Categoría eliminada correctamente' })
     } catch (err) {
@@ -136,6 +141,7 @@ function GestionCategorias() {
                 <input
                   type="text"
                   placeholder="Ej. Frenos e Hidráulicos"
+                  maxLength={255}
                   value={form.nombre}
                   onChange={(e) => setForm({ ...form, nombre: e.target.value })}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
@@ -147,6 +153,7 @@ function GestionCategorias() {
                 <label className="block text-xs font-bold text-slate-700 mb-1">Descripción</label>
                 <textarea
                   placeholder="Descripción de los repuestos incluidos..."
+                  maxLength={255}
                   value={form.descripcion}
                   onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
                   rows="3"

@@ -1,3 +1,4 @@
+import { useRefreshCatalogo } from '../../hooks/useRefreshCatalogo'
 import { useState, useEffect } from 'react'
 import { ImagePlus, Upload, Edit, Plus, Search, X } from 'lucide-react'
 import api from '../../api/axios'
@@ -9,6 +10,7 @@ import { getApiErrorMessage } from '../../utils/apiError'
 import { formatMoney } from '../../utils/formatters'
 
 function GestionProductos() {
+  const refreshCatalogo = useRefreshCatalogo()
   const [productos, setProductos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [busqueda, setBusqueda] = useState('')
@@ -115,7 +117,7 @@ function GestionProductos() {
     const precio = Number(form.precio)
     const precioMinimo = form.precioMinimoVenta === '' ? precio : Number(form.precioMinimoVenta)
 
-    if (precio <= 0 || Number(form.stock) < 0 || precioMinimo <= 0 || precioMinimo > precio) {
+    if (!Number.isFinite(precio) || !Number.isFinite(precioMinimo) || precio <= 0 || !Number.isInteger(Number(form.stock)) || Number(form.stock) < 0 || precioMinimo <= 0 || precioMinimo > precio) {
       setMensaje({ type: 'error', text: 'Revisa precio, mínimo de regateo y stock antes de guardar' })
       return
     }
@@ -131,11 +133,13 @@ function GestionProductos() {
       if (modoEdicion) {
         // Actualizar producto existente
         const response = await api.put(`/productos/${modoEdicion}`, payload)
+        await refreshCatalogo()
         setProductos((prev) => prev.map((p) => p.id === modoEdicion ? response.data.data : p))
         setMensaje({ type: 'success', text: 'Producto actualizado correctamente' })
       } else {
         // Crear nuevo producto
         const response = await api.post('/productos', payload)
+        await refreshCatalogo()
         setProductos((prev) => [response.data.data, ...prev])
         setMensaje({ type: 'success', text: 'Nuevo producto creado correctamente' })
       }
@@ -159,13 +163,14 @@ function GestionProductos() {
   }
 
   async function handleActualizarStock(id) {
-    if (Number(nuevoStock) < 0) {
-      setMensaje({ type: 'error', text: 'El stock no puede ser negativo' })
+    if (String(nuevoStock).trim() === '' || !Number.isInteger(Number(nuevoStock)) || Number(nuevoStock) < 0 || Number(nuevoStock) > 2147483647) {
+      setMensaje({ type: 'error', text: 'El stock debe ser un entero entre 0 y 2147483647' })
       return
     }
 
     try {
       const response = await api.patch(`/productos/${id}/stock?stock=${nuevoStock}`)
+      await refreshCatalogo()
       setProductos((prev) => prev.map((p) => p.id === id ? response.data.data : p))
       setEditandoStock(null)
       setNuevoStock('')
@@ -215,6 +220,7 @@ function GestionProductos() {
                   <input
                     type="text"
                     placeholder="Ej. Freno Shimano Deore"
+                    maxLength={255}
                     value={form.nombre}
                     onChange={(e) => setForm({ ...form, nombre: e.target.value })}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
@@ -226,6 +232,7 @@ function GestionProductos() {
                   <input
                     type="text"
                     placeholder="Ej. Shimano, FOX, RockShox"
+                    maxLength={255}
                     value={form.marca}
                     onChange={(e) => setForm({ ...form, marca: e.target.value })}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
@@ -307,7 +314,8 @@ function GestionProductos() {
                 <textarea
                   rows="2"
                   placeholder="Detalles del componente o accesorio..."
-                  value={form.descripcion}
+                  maxLength={255}
+                    value={form.descripcion}
                   onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-900 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                 />
