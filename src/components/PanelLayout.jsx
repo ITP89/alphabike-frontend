@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Bike, LogOut, Menu, X, Shield, Sparkles } from 'lucide-react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import alphaLogo from '../assets/alphabike-logo.png'
+import RealtimeStatus from './RealtimeStatus'
 import { useAuth } from '../context/AuthContext'
 import { classNames } from '../utils/formatters'
 
@@ -50,6 +51,7 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
 
   return (
     <div className="alpha-shell font-sans selection:bg-red-600 selection:text-white">
+      <div className="flex justify-end bg-white px-4 py-1"><RealtimeStatus /></div>
       {/* Mobile Top Header */}
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 text-slate-950 shadow-sm backdrop-blur-xl lg:hidden">
         <div className="flex items-center justify-between px-4 py-3">

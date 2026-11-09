@@ -6,6 +6,7 @@ import { AuthProvider } from './context/AuthContext'
 import { CarritoProvider } from './context/CarritoContext'
 import './index.css'
 import App from './App.jsx'
+import { RealtimeProvider } from './context/RealtimeContext'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,10 +25,12 @@ createRoot(document.getElementById('root')).render(
       <BrowserRouter>
         <AuthProvider>
           <CarritoProvider>
-            <App />
+            <RealtimeProvider>
+              <App />
+            </RealtimeProvider>
           </CarritoProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>,
-)
+)

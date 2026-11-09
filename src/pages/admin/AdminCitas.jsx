@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Sparkles, Play, CheckCircle2, Eye } from 'lucide-react'
+import { useCitasRefresh } from '../../hooks/useCitasRefresh'
 import api from '../../api/axios'
 import LayoutAdmin from '../../components/LayoutAdmin'
 import Alert from '../../components/ui/Alert'
@@ -37,6 +38,8 @@ function AdminCitas() {
       setCargando(false)
     }
   }
+
+  useCitasRefresh(cargarCitas)
 
   useEffect(() => {
     cargarCitas()

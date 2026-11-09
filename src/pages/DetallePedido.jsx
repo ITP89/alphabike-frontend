@@ -54,7 +54,7 @@ function DetallePedido() {
     )
   }
 
-  const estadoPago = pedido.estado === 'PAGADO' || pedido.estado === 'ENTREGADO' ? 'PAGADO' : 'PENDIENTE'
+  const estadoPago = pedido.estadoPago || 'PENDIENTE'
   const pago = LABELS_ESTADO_PAGO[estadoPago]
 
   return (

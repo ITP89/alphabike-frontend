@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { ArrowLeft, CalendarCheck, ClipboardCheck } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
+import { useCitasRefresh } from '../hooks/useCitasRefresh'
 import api from '../api/axios'
 import Navbar from '../components/Navbar'
 import Alert from '../components/ui/Alert'
@@ -41,7 +42,8 @@ function DetalleCita() {
       try {
         const cotizacionResponse = await api.get(`/cotizaciones/cita/${id}`)
         setCotizacion(cotizacionResponse.data.data)
-      } catch {
+      } catch (err) {
+        if (err.response?.status !== 404) throw err
         setCotizacion(null)
       }
     } catch (err) {
@@ -50,6 +52,8 @@ function DetalleCita() {
       setCargando(false)
     }
   }, [id])
+
+  useCitasRefresh(cargarDatos, id)
 
   useEffect(() => {
     cargarDatos()

@@ -61,51 +61,11 @@ function AdminPagos() {
     try {
       const response = await api.get('/pagos')
       const pagosBackend = response.data.data || []
-      let comprobantesLocales = {}
-      try {
-        comprobantesLocales = JSON.parse(localStorage.getItem('alphabike_comprobantes') || '{}')
-      } catch {
-        comprobantesLocales = {}
-      }
-      const pagosEnriquecidos = pagosBackend.map((pago) => {
-        const comp = comprobantesLocales[pago.referenciaId]
-        if (comp) {
-          return {
-            ...pago,
-            metodoPagoReal: comp.metodoPago || pago.metodoPago,
-            autorizacion: comp.autorizacion,
-            transaccionId: comp.transaccionId,
-            detallesPago: comp.detallesPago,
-            clienteNombre: comp.cliente?.nombre,
-            clienteEmail: comp.cliente?.email,
-          }
-        }
-        return {
-          ...pago,
-          metodoPagoReal: pago.metodoPago,
-        }
-      })
-
-      const idsBackend = new Set(pagosBackend.map((p) => p.referenciaId))
-      Object.entries(comprobantesLocales).forEach(([refId, comp]) => {
-        if (!idsBackend.has(refId)) {
-          pagosEnriquecidos.unshift({
-            id: comp.transaccionId || `local-${refId}`,
-            referenciaId: refId,
-            referenciaTipo: 'PEDIDO',
-            monto: comp.monto,
-            metodoPago: comp.metodoPago === 'TARJETA' ? 'TRANSFERENCIA' : comp.metodoPago,
-            metodoPagoReal: comp.metodoPago,
-            estado: 'PAGADO',
-            fecha: comp.fecha,
-            autorizacion: comp.autorizacion,
-            transaccionId: comp.transaccionId,
-            detallesPago: comp.detallesPago,
-            clienteNombre: comp.cliente?.nombre,
-            clienteEmail: comp.cliente?.email,
-          })
-        }
-      })
+      const pagosEnriquecidos = pagosBackend.map((pago) => ({
+        ...pago,
+        metodoPagoReal: pago.metodoPago,
+        autorizacion: pago.codigoAutorizacion,
+      }))
 
       setPagos(pagosEnriquecidos)
     } catch (err) {

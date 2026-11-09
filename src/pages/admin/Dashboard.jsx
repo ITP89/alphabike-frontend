@@ -81,28 +81,7 @@ function DashboardAdmin() {
 
       const pagosBackend = pagosRes.data.data || []
 
-      // Complementar con comprobantes locales si existen
-      let comprobantesLocales = {}
-      try {
-        comprobantesLocales = JSON.parse(localStorage.getItem('alphabike_comprobantes') || '{}')
-      } catch {
-        comprobantesLocales = {}
-      }
-
-      const pagosCompletos = [...pagosBackend]
-      const idsBackend = new Set(pagosBackend.map((p) => p.referenciaId))
-      Object.entries(comprobantesLocales).forEach(([refId, comp]) => {
-        if (!idsBackend.has(refId)) {
-          pagosCompletos.push({
-            id: comp.transaccionId || refId,
-            referenciaId: refId,
-            monto: comp.monto,
-            metodoPago: comp.metodoPago,
-            metodoPagoReal: comp.metodoPago,
-            estado: 'PAGADO',
-          })
-        }
-      })
+      const pagosCompletos = pagosBackend
 
       setDatos({
         usuarios: usuariosRes.data.data || [],

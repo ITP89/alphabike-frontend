@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { LogIn, LogOut, Menu, ShieldCheck, ShoppingCart, UserCircle, Wrench, X } from 'lucide-react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import alphaLogo from '../assets/alphabike-logo.png'
+import RealtimeStatus from './RealtimeStatus'
 import { useAuth } from '../context/AuthContext'
 import { useCarrito } from '../context/CarritoContext'
 import { classNames } from '../utils/formatters'
@@ -83,6 +84,7 @@ function Navbar() {
 
         {/* Right Actions */}
         <div className="flex items-center gap-3">
+          <RealtimeStatus />
           {panelLink && PanelIcon && (
             <Link
               to={panelLink.to}

@@ -70,28 +70,6 @@ function AdminPedidos() {
         mapa[pago.referenciaId] = pago
       })
 
-      // Complementar con comprobantes locales si existen
-      try {
-        const locales = JSON.parse(localStorage.getItem('alphabike_comprobantes') || '{}')
-        Object.entries(locales).forEach(([refId, comp]) => {
-          if (!mapa[refId]) {
-            mapa[refId] = {
-              metodoPago: comp.metodoPago,
-              autorizacion: comp.autorizacion,
-              transaccionId: comp.transaccionId,
-              monto: comp.monto,
-              estado: 'PAGADO',
-            }
-          } else {
-            mapa[refId].metodoPagoReal = comp.metodoPago
-            mapa[refId].autorizacion = comp.autorizacion
-            mapa[refId].transaccionId = comp.transaccionId
-          }
-        })
-      } catch {
-        // Ignorar
-      }
-
       setPedidos(listPedidos)
       setPagosMap(mapa)
     } catch (err) {
