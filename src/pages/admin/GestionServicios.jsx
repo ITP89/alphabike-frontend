@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Wrench, Plus, Sparkles, Edit, Trash2, X, Clock3 } from 'lucide-react'
 import api from '../../api/axios'
 import LayoutAdmin from '../../components/LayoutAdmin'
@@ -15,6 +16,8 @@ const FORM_INICIAL = {
 }
 
 function GestionServicios() {
+  const queryClient = useQueryClient()
+  const actualizarCatalogo = () => queryClient.invalidateQueries({ queryKey: ['api-get', '/servicios'] })
   const [servicios, setServicios] = useState([])
   const [cargando, setCargando] = useState(true)
   const [editando, setEditando] = useState(null)
@@ -69,7 +72,8 @@ function GestionServicios() {
       })
       setServicios((prev) => [...prev, response.data.data])
       resetForm()
-      setMensaje({ type: 'success', text: 'Servicio creado correctamente en Supabase' })
+      await actualizarCatalogo()
+      setMensaje({ type: 'success', text: 'Servicio creado correctamente' })
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo crear el servicio') })
     }
@@ -94,6 +98,7 @@ function GestionServicios() {
         servicio.id === editando.id ? response.data.data : servicio
       )))
       resetForm()
+      await actualizarCatalogo()
       setMensaje({ type: 'success', text: 'Servicio actualizado correctamente' })
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo actualizar el servicio') })
@@ -106,6 +111,7 @@ function GestionServicios() {
     try {
       await api.delete(`/servicios/${id}`)
       setServicios((prev) => prev.filter((servicio) => servicio.id !== id))
+      await actualizarCatalogo()
       setMensaje({ type: 'success', text: 'Servicio eliminado correctamente' })
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo eliminar el servicio') })
@@ -162,34 +168,40 @@ function GestionServicios() {
             </h2>
             <div className="flex flex-col gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Nombre del servicio *</label>
+                <label htmlFor="servicio-nombre" className="block text-xs font-bold text-slate-700 mb-1">Nombre del servicio *</label>
                 <input
+                  id="servicio-nombre"
                   type="text"
                   placeholder="Ej. Purga de Frenos Hidráulicos"
                   value={form.nombre}
                   onChange={(e) => setForm({ ...form, nombre: e.target.value })}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
+                  maxLength={255}
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Descripción técnica</label>
+                <label htmlFor="servicio-descripcion" className="block text-xs font-bold text-slate-700 mb-1">Descripción técnica</label>
                 <textarea
+                  id="servicio-descripcion"
                   placeholder="Detalles del trabajo ejecutado..."
                   value={form.descripcion}
                   onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
                   rows="3"
+                  maxLength={255}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-semibold text-slate-900 focus:bg-white focus:border-amber-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Precio Base (S/) *</label>
+                  <label htmlFor="servicio-precio" className="block text-xs font-bold text-slate-700 mb-1">Precio Base (S/) *</label>
                   <input
                     type="number"
-                    min="0"
+                    id="servicio-precio"
+                    min="0.01"
+                    max="99999999.99"
                     step="0.01"
                     placeholder="0.00"
                     value={form.precioBase}
@@ -199,10 +211,13 @@ function GestionServicios() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Duración (min) *</label>
+                  <label htmlFor="servicio-duracion" className="block text-xs font-bold text-slate-700 mb-1">Duración (min) *</label>
                   <input
                     type="number"
+                    id="servicio-duracion"
                     min="1"
+                    max="2147483647"
+                    step="1"
                     placeholder="45"
                     value={form.duracionMin}
                     onChange={(e) => setForm({ ...form, duracionMin: e.target.value })}

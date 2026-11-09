@@ -154,6 +154,7 @@ function AgendarCita() {
                     <FormField label="Marca, modelo o referencia" error={fieldErrors.biciDescripcion}>
                       <input
                         type="text"
+                        maxLength={255}
                         value={biciDescripcion}
                         onChange={(e) => {
                           setBiciDescripcion(e.target.value)
@@ -163,7 +164,7 @@ function AgendarCita() {
                       />
                     </FormField>
                     <FormField label="Observaciones" hint="Opcional">
-                      <textarea
+                      <textarea maxLength={255}
                         value={observaciones}
                         onChange={(e) => setObservaciones(e.target.value)}
                         rows="3"

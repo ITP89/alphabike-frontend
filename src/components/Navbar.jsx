@@ -61,13 +61,13 @@ function Navbar() {
         {/* Brand Logo */}
         <Link
           to="/"
-          className="group flex min-w-0 items-center gap-3 transition-transform duration-200 active:scale-95"
+          className="group flex shrink-0 items-center gap-3 transition-transform duration-200 active:scale-95"
           onClick={() => setMenuOpen(false)}
         >
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white p-1 shadow-sm shadow-zinc-950/10 transition-all group-hover:border-red-500/50 group-hover:shadow-red-600/15">
             <img src={alphaLogo} alt="AlphaBike Workshop" className="h-full w-full object-contain" />
           </span>
-          <div className="flex min-w-0 flex-col leading-none">
+          <div className="hidden min-w-0 flex-col leading-none min-[360px]:flex">
             <span className="font-black text-lg tracking-tight text-zinc-950">
               ALPHA<span className="text-red-500">BIKE</span>
             </span>
@@ -76,19 +76,19 @@ function Navbar() {
         </Link>
 
         {/* Desktop Links */}
-        <div className="hidden items-center gap-1 rounded-xl border border-zinc-200/80 bg-zinc-100/70 p-1 md:flex">
+        <div className="hidden items-center gap-1 rounded-xl border border-zinc-200/80 bg-zinc-100/70 p-1 xl:flex">
           {publicLinks.map((link) => (
             <NavItem key={link.to} {...link} />
           ))}
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <RealtimeStatus />
           {panelLink && PanelIcon && (
             <Link
               to={panelLink.to}
-              className="hidden items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-xs font-bold text-zinc-700 transition-all hover:bg-zinc-100 hover:text-zinc-950 sm:inline-flex"
+              className="hidden items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-xs font-bold text-zinc-700 transition-all hover:bg-zinc-100 hover:text-zinc-950 xl:inline-flex"
             >
               <PanelIcon className="h-4 w-4 text-red-500" aria-hidden="true" />
               {panelLink.label}
@@ -99,7 +99,7 @@ function Navbar() {
             <button
               type="button"
               onClick={handleLogout}
-              className="hidden items-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-xs font-bold text-zinc-600 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 sm:inline-flex"
+              className="hidden items-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-xs font-bold text-zinc-600 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 xl:inline-flex"
             >
               <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
               Salir
@@ -107,7 +107,7 @@ function Navbar() {
           ) : (
             <Link
               to="/login"
-              className="hidden items-center gap-2 rounded-lg bg-zinc-950 px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:bg-red-700 hover:shadow-md sm:inline-flex active:scale-95"
+              className="hidden items-center gap-2 rounded-lg bg-zinc-950 px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:bg-red-700 hover:shadow-md xl:inline-flex active:scale-95"
             >
               <LogIn className="h-4 w-4 text-red-300" aria-hidden="true" />
               Ingresar
@@ -132,7 +132,7 @@ function Navbar() {
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-700 transition-all hover:bg-zinc-100 md:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-700 transition-all hover:bg-zinc-100 xl:hidden"
             aria-label="Abrir menu"
             aria-expanded={menuOpen}
           >
@@ -143,7 +143,7 @@ function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {menuOpen && (
-        <div className="animate-fade-in border-t border-zinc-200 bg-white/95 backdrop-blur-md px-4 py-4 shadow-lg md:hidden">
+        <div className="animate-fade-in border-t border-zinc-200 bg-white/95 backdrop-blur-md px-4 py-4 shadow-lg xl:hidden">
           <div className="mx-auto flex max-w-6xl flex-col gap-1.5">
             {publicLinks.map((link) => (
               <NavItem key={link.to} {...link} onClick={() => setMenuOpen(false)} />
