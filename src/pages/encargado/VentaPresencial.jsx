@@ -1,5 +1,6 @@
+import { useAuth } from '../../context/AuthContext'
 import { useRefreshCatalogo } from '../../hooks/useRefreshCatalogo'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CreditCard, Search, ShoppingCart, Trash2 } from 'lucide-react'
 import api from '../../api/axios'
 import LayoutEncargado from '../../components/LayoutEncargado'
@@ -15,10 +16,19 @@ function getPrecioMinimo(producto) {
 
 function VentaPresencial() {
   const refreshCatalogo = useRefreshCatalogo()
+  const { usuario } = useAuth()
+  const pendingKey = `alphabike_venta_pendiente_${usuario.id}`
+  const [ventaPendiente, setVentaPendiente] = useState(() => {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(pendingKey))
+      return saved?.request?.operacionId && Array.isArray(saved.carrito) ? saved : null
+    } catch { return null }
+  })
+  const enviando = useRef(false)
   const [productos, setProductos] = useState([])
   const [busqueda, setBusqueda] = useState('')
-  const [carrito, setCarrito] = useState([])
-  const [metodoPago, setMetodoPago] = useState('EFECTIVO')
+  const [carrito, setCarrito] = useState(ventaPendiente?.carrito || [])
+  const [metodoPago, setMetodoPago] = useState(ventaPendiente?.request.metodoPago || 'EFECTIVO')
   const [procesando, setProcesando] = useState(false)
   const [mensaje, setMensaje] = useState(null)
   const [cargandoProductos, setCargandoProductos] = useState(true)
@@ -96,9 +106,10 @@ function VentaPresencial() {
     setCarrito((prev) => prev.filter((item) => item.id !== id))
   }
 
-  const total = carrito.reduce((sum, item) => sum + Number(item.precioAcordado || 0) * item.cantidad, 0)
+  const total = carrito.reduce((sum, item) => sum + Math.round(Number(item.precioAcordado || 0) * 100) * item.cantidad, 0) / 100
 
   async function handleRegistrarVenta() {
+    if (enviando.current) return
     if (carrito.length === 0) {
       setMensaje({ type: 'error', text: 'Agrega al menos un producto para registrar la venta' })
       return
@@ -118,34 +129,49 @@ function VentaPresencial() {
       return
     }
 
+    enviando.current = true
     setProcesando(true)
     setMensaje(null)
 
-    try {
-      const response = await api.post('/pedidos', {
-        tipoEntrega: 'RECOJO_TIENDA',
-        direccionEntrega: null,
-        detalles: carrito.map((item) => ({
-          productoId: item.id,
-          cantidad: item.cantidad,
-          precioAcordado: item.precioAcordado,
-        })),
-      })
-
-      await refreshCatalogo()
-      await api.post('/pagos', {
-        referenciaTipo: 'PEDIDO',
-        referenciaId: response.data.data.id,
-        monto: total,
+    const operacion = ventaPendiente || {
+      request: {
+        operacionId: crypto.randomUUID(),
         metodoPago,
-      })
-
+        detalles: carrito.map(item => ({ productoId: item.id, cantidad: item.cantidad, precioAcordado: item.precioAcordado })),
+      },
+      carrito: carrito.map(({ id, nombre, cantidad, precioAcordado, precioMinimoVenta, stock }) => (
+        { id, nombre, cantidad, precioAcordado, precioMinimoVenta, stock }
+      )),
+    }
+    // Persist before sending so a reload can recover the same operation.
+    try {
+      sessionStorage.setItem(pendingKey, JSON.stringify(operacion))
+    } catch {
+      setMensaje({ type: 'error', text: 'No se pudo guardar la operacion en este navegador. Habilita el almacenamiento de sesion y vuelve a intentarlo.' })
+      enviando.current = false
+      setProcesando(false)
+      return
+    }
+    setVentaPendiente(operacion)
+    try {
+      await api.post('/pedidos/venta-presencial', operacion.request)
+      sessionStorage.removeItem(pendingKey)
+      setVentaPendiente(null)
       setCarrito([])
       setMensaje({ type: 'success', text: 'Venta registrada correctamente' })
-      cargarProductos()
+      await refreshCatalogo()
+      await cargarProductos()
     } catch (err) {
-      setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo registrar la venta') })
+      if (err.response?.status >= 400 && err.response.status < 500) {
+        // Rejected atomically: neither an order nor a stock reservation was committed.
+        sessionStorage.removeItem(pendingKey)
+        setVentaPendiente(null)
+        setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo registrar la venta') })
+      } else {
+        setMensaje({ type: 'error', text: 'No se pudo confirmar el resultado. Reintenta la confirmacion: se conserva el mismo identificador para evitar otra venta.' })
+      }
     } finally {
+      enviando.current = false
       setProcesando(false)
     }
   }
@@ -200,7 +226,7 @@ function VentaPresencial() {
                     <button
                       type="button"
                       onClick={() => agregarAlCarrito(producto)}
-                      disabled={sinStock}
+                      disabled={sinStock || procesando || Boolean(ventaPendiente)}
                       className="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       <ShoppingCart className="h-4 w-4" aria-hidden="true" />
@@ -247,6 +273,7 @@ function VentaPresencial() {
                         </div>
                         <button
                           type="button"
+                          disabled={procesando || Boolean(ventaPendiente)}
                           onClick={() => eliminarDelCarrito(item.id)}
                           className="inline-flex h-8 w-8 items-center justify-center rounded-md text-red-600 hover:bg-red-50"
                           aria-label="Eliminar producto de la venta"
@@ -260,6 +287,7 @@ function VentaPresencial() {
                           type="number"
                           min={precioMinimo}
                           step="0.01"
+                          disabled={procesando || Boolean(ventaPendiente)}
                           value={item.precioAcordado}
                           onChange={(e) => actualizarPrecio(item.id, e.target.value)}
                           className={precioInvalido ? 'mt-1 w-full rounded-md border border-red-400 px-2 py-1.5 text-sm outline-none ring-2 ring-red-100' : 'mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm'}
@@ -283,6 +311,7 @@ function VentaPresencial() {
                 <label className="mb-4 block">
                   <span className="mb-1 block text-sm font-medium text-gray-700">Metodo de pago</span>
                   <select
+                    disabled={procesando || Boolean(ventaPendiente)}
                     value={metodoPago}
                     onChange={(e) => setMetodoPago(e.target.value)}
                     className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
@@ -300,7 +329,7 @@ function VentaPresencial() {
                   disabled={procesando}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {procesando ? 'Registrando...' : 'Registrar venta'}
+                  {procesando ? 'Registrando...' : ventaPendiente ? 'Reintentar confirmacion' : 'Registrar venta'}
                 </button>
               </>
             )}

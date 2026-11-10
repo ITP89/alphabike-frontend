@@ -125,21 +125,21 @@ function Reportes() {
             <MetricCard
               title="Ingresos Totales Acumulados"
               value={formatMoney(ventas?.ingresosTotales)}
-              note="Ventas tienda + Servicios taller"
+              note="Pagos confirmados de tienda y taller"
               icon={Banknote}
               color="emerald"
             />
             <MetricCard
               title="Descuentos Otorgados"
               value={formatMoney(ventas?.totalDescuentos)}
-              note="Diferencial lista vs final"
+              note="Descuentos en pedidos pagados"
               icon={Percent}
               color="blue"
             />
             <MetricCard
-              title="Servicios Ejecutados"
+              title="Citas registradas"
               value={`${ventas?.totalCitas || 0} citas`}
-              note="Atenciones concluidas"
+              note="Incluye todos los estados"
               icon={Wrench}
               color="amber"
             />

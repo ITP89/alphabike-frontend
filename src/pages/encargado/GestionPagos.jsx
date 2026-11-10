@@ -12,6 +12,7 @@ const LABELS_TIPO = {
 
 const LABELS_METODO = {
   EFECTIVO: 'Efectivo',
+  TARJETA: 'Tarjeta',
   YAPE: 'Yape',
   PLIN: 'Plin',
   TRANSFERENCIA: 'Transferencia',
@@ -50,19 +51,20 @@ function GestionPagos() {
     <LayoutEncargado>
       <h1 className="text-xl font-semibold text-gray-900 mb-6">Gestion de pagos</h1>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <p className="text-gray-500 text-sm">Total ingresos</p>
-          <p className="text-2xl font-semibold text-gray-900">{formatMoney(totalIngresos)}</p>
+          <p className="break-words text-2xl font-semibold text-gray-900">{formatMoney(totalIngresos)}</p>
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <p className="text-gray-500 text-sm">Total pagos</p>
-          <p className="text-2xl font-semibold text-gray-900">{pagos.length}</p>
+          <p className="break-words text-2xl font-semibold text-gray-900">{pagos.length}</p>
         </div>
       </div>
 
       <div className="flex gap-3 mb-4">
         <select
+          aria-label="Filtrar pagos por tipo"
           value={filtro}
           onChange={(e) => setFiltro(e.target.value)}
           className="border border-gray-300 rounded-md px-3 py-2 text-sm bg-white"
@@ -79,7 +81,7 @@ function GestionPagos() {
         <ErrorState message={error} />
       ) : (
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <div className="grid grid-cols-5 px-4 py-2 bg-gray-50 text-xs font-medium text-gray-500">
+          <div className="hidden lg:grid lg:grid-cols-5 px-4 py-2 bg-gray-50 text-xs font-medium text-gray-500">
             <span>Referencia</span>
             <span>Tipo</span>
             <span>Monto</span>
@@ -92,12 +94,12 @@ function GestionPagos() {
           )}
 
           {pagosFiltrados.map((pago) => (
-            <div key={pago.id} className="grid grid-cols-5 px-4 py-3 border-t border-gray-200 text-sm items-center">
-              <span className="text-gray-900">#{pago.referenciaId.slice(0, 8)}</span>
-              <span>{LABELS_TIPO[pago.referenciaTipo] || pago.referenciaTipo}</span>
-              <span className="font-medium">{formatMoney(pago.monto)}</span>
-              <span>{LABELS_METODO[pago.metodoPago] || pago.metodoPago}</span>
-              <span className="text-gray-500">
+            <div key={pago.id} className="grid grid-cols-1 gap-3 px-4 py-4 border-t border-gray-200 text-sm sm:grid-cols-2 lg:grid-cols-5 lg:items-center">
+              <span className="min-w-0 break-words text-gray-900"><span className="mb-1 block text-xs text-gray-500 lg:sr-only">Referencia</span>#{pago.referenciaId.slice(0, 8)}</span>
+              <span className="min-w-0 break-words"><span className="mb-1 block text-xs text-gray-500 lg:sr-only">Tipo</span>{LABELS_TIPO[pago.referenciaTipo] || pago.referenciaTipo}</span>
+              <span className="min-w-0 break-words font-medium"><span className="mb-1 block text-xs text-gray-500 lg:sr-only">Monto</span>{formatMoney(pago.monto)}</span>
+              <span className="min-w-0 break-words"><span className="mb-1 block text-xs text-gray-500 lg:sr-only">Metodo</span>{LABELS_METODO[pago.metodoPago] || pago.metodoPago}</span>
+              <span className="min-w-0 break-words text-gray-500"><span className="mb-1 block text-xs lg:sr-only">Fecha</span>
                 {new Date(pago.fecha).toLocaleDateString('es-PE')}
               </span>
             </div>
