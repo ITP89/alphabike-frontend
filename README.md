@@ -147,3 +147,7 @@ Las mutaciones de categorias, productos, stock y galeria invalidan las consultas
 El formulario Contacto prepara un mensaje completo para el numero de WhatsApp mostrado. El usuario revisa y envia el mensaje desde WhatsApp; la web conserva el borrador y no afirma que se haya entregado. No se almacena como ticket ni se envia correo desde ese formulario. `Contacto.test.jsx` verifica este comportamiento sin contactar al servicio externo.
 
 Las cuentas registradas publicamente deben verificar su correo antes de iniciar sesion; el backend requiere SMTP configurado para entregar los enlaces. En una demostracion sin SMTP, el administrador puede crear usuarios desde su panel.
+
+## Inventario adaptable
+
+ADMIN y ENCARGADO comparten `InventarioProductos.jsx`. En movil muestra tarjetas con nombre, categoria, proveedor, precio, minimo, stock y acciones; en pantallas amplias usa una tabla con desplazamiento horizontal interno si hace falta. Los controles de stock incluyen etiqueta accesible y la descontinuacion se ofrece solamente al administrador.

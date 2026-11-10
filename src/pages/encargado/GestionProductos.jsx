@@ -1,13 +1,13 @@
 import { useRefreshCatalogo } from '../../hooks/useRefreshCatalogo'
 import { useState, useEffect } from 'react'
-import { ImagePlus, Upload, Edit, Plus, Search, X } from 'lucide-react'
+import { ImagePlus, Upload, Plus, Search, X } from 'lucide-react'
 import api from '../../api/axios'
 import LayoutEncargado from '../../components/LayoutEncargado'
 import Alert from '../../components/ui/Alert'
 import { ErrorState, LoadingState } from '../../components/ui/AsyncState'
+import InventarioProductos from '../../components/InventarioProductos'
 import ImageFallback from '../../components/ui/ImageFallback'
 import { getApiErrorMessage } from '../../utils/apiError'
-import { formatMoney } from '../../utils/formatters'
 
 function GestionProductos() {
   const refreshCatalogo = useRefreshCatalogo()
@@ -404,99 +404,18 @@ function GestionProductos() {
       ) : error ? (
         <ErrorState message={error} />
       ) : (
-        <div className="glass-card rounded-2xl overflow-hidden shadow-sm border border-slate-200">
-          <div className="grid grid-cols-12 px-6 py-3 bg-slate-900 text-xs font-bold text-slate-300">
-            <span className="col-span-1">Imagen</span>
-            <span className="col-span-3">Producto</span>
-            <span className="col-span-1">Categoría</span>
-            <span className="col-span-2">Proveedor</span>
-            <span className="col-span-1">Precio</span>
-            <span className="col-span-1">Mínimo</span>
-            <span className="col-span-1">Stock</span>
-            <span className="col-span-2 text-right">Acciones</span>
-          </div>
-
-          {productosFiltrados.map((producto) => (
-            <div
-              key={producto.id}
-              className="grid grid-cols-12 px-6 py-3.5 border-t border-slate-100 text-xs items-center hover:bg-slate-50/80 transition-colors"
-            >
-              {/* Thumbnail de la Imagen */}
-              <div className="col-span-1">
-                <div className="h-10 w-10 rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
-                  <ImageFallback src={producto.imagenUrl} alt={producto.nombre} className="h-full w-full object-cover" />
-                </div>
-              </div>
-
-              {/* Nombre y Marca */}
-              <div className="col-span-3">
-                <p className="font-extrabold text-slate-900">{producto.nombre}</p>
-                <p className="text-slate-400 text-[11px] font-semibold">{producto.marca || 'Sin Marca'}</p>
-              </div>
-
-              {/* Categoría */}
-              <div className="col-span-1 font-bold text-slate-700">
-                {producto.categoriaNombre || 'Sin Categoría'}
-              </div>
-
-              <div className="col-span-2 font-bold text-slate-600">
-                {producto.proveedorNombre || 'Sin proveedor'}
-              </div>
-
-              {/* Precio */}
-              <div className="col-span-1 font-black text-slate-950 text-sm">
-                {formatMoney(producto.precio)}
-              </div>
-
-              <div className="col-span-1 text-xs font-black text-red-700">
-                {formatMoney(producto.precioMinimoVenta || producto.precio)}
-              </div>
-
-              {/* Stock */}
-              <div className="col-span-1">
-                {editandoStock === producto.id ? (
-                  <div className="flex gap-1 items-center">
-                    <input
-                      type="number"
-                      value={nuevoStock}
-                      onChange={(e) => setNuevoStock(e.target.value)}
-                      className="border border-slate-300 rounded-lg px-2 py-1 text-xs w-14 font-bold"
-                    />
-                    <button
-                      onClick={() => handleActualizarStock(producto.id)}
-                      className="text-xs bg-slate-950 text-white font-bold px-2 py-1 rounded-lg"
-                    >
-                      OK
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => {
-                      setEditandoStock(producto.id)
-                      setNuevoStock(producto.stock)
-                    }}
-                    className={`text-xs font-bold px-2.5 py-1 rounded-lg ${
-                      producto.stock < 5 ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700'
-                    }`}
-                  >
-                    {producto.stock} uds
-                  </button>
-                )}
-              </div>
-
-              {/* Botón de Acción (Solo Editar, sin Eliminar) */}
-              <div className="col-span-2 flex items-center justify-end">
-                <button
-                  onClick={() => handleEditarProducto(producto)}
-                  className="inline-flex items-center gap-1 text-xs font-bold bg-red-50 text-red-700 border border-red-200 px-3 py-1.5 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm active:scale-95"
-                  title="Editar producto e imagen"
-                >
-                  <Edit className="h-3.5 w-3.5" /> Editar
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+        <InventarioProductos
+          productos={productosFiltrados}
+          editandoStock={editandoStock}
+          nuevoStock={nuevoStock}
+          onNuevoStock={setNuevoStock}
+          onEditarStock={(producto) => {
+            setEditandoStock(producto.id)
+            setNuevoStock(producto.stock)
+          }}
+          onGuardarStock={handleActualizarStock}
+          onEditar={handleEditarProducto}
+        />
       )}
     </LayoutEncargado>
   )
