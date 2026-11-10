@@ -2,6 +2,12 @@
 
 Frontend de AlphaBike construido con React, Vite, JavaScript, Tailwind CSS, Axios y React Router. El proyecto queda preparado para migracion progresiva a TypeScript.
 
+## Persistencia SQL y NoSQL
+
+Los detalles de cita de cliente, encargado y administrador muestran un historial persistente almacenado en MongoDB mediante la API autenticada. PostgreSQL conserva las operaciones de negocio. El historial se actualiza cada cinco segundos y admite reintento y paginacion; una interrupcion de MongoDB se muestra como error recuperable, sin ocultar la cita. No se ponen credenciales MongoDB en variables `VITE_*`.
+
+Configuracion de ambos motores y prueba reproducible en [documentacion del backend](https://github.com/ITP89/alphabike-backend/blob/master/docs/persistencia-sql-nosql.md).
+
 ## Variables requeridas
 
 Crea `.env` tomando como base `.env.example`:

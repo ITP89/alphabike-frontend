@@ -1,3 +1,4 @@
+import HistorialCita from '../components/HistorialCita'
 import { useCallback, useEffect, useState } from 'react'
 import { ArrowLeft, CalendarCheck, ClipboardCheck } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
@@ -189,6 +190,7 @@ function DetalleCita() {
             </div>
           </aside>
         </div>
+      <HistorialCita key={id} citaId={id} />
       </main>
     </div>
   )

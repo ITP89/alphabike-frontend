@@ -1,3 +1,4 @@
+import HistorialCita from '../../components/HistorialCita'
 import { useCallback, useEffect, useState } from 'react'
 import { ArrowLeft, CreditCard, FileText } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
@@ -235,6 +236,7 @@ function AdminDetalleCita() {
           )}
         </section>
       </div>
+      <HistorialCita key={id} citaId={id} />
     </LayoutAdmin>
   )
 }
