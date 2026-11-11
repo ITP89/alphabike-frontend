@@ -8,6 +8,11 @@ Los detalles de cita de cliente, encargado y administrador muestran un historial
 
 Configuracion de ambos motores y prueba reproducible en [documentacion del backend](https://github.com/ITP89/alphabike-backend/blob/master/docs/persistencia-sql-nosql.md).
 
+## Entornos publicados
+
+- [Tienda principal](https://alphabike-frontend.vercel.app) en Vercel, desde `main`, con API en [Render](https://alphabike-backend.onrender.com/api/v1/servicios).
+- [Tienda de pruebas de Mercado Pago](https://alphabike-pagos-pruebas.onrender.com), con su propio backend y base de datos. Crea allí una cuenta de cliente para la demostración.
+
 ## Variables requeridas
 
 Crea `.env` tomando como base `.env.example`:
@@ -69,11 +74,13 @@ Usar commits semanticos como:
 - Servicios consume `/servicios`.
 - Galeria consume `/trabajos`.
 - Tienda consume `/productos` y `/categorias`, con busqueda, categoria y ordenamiento.
-- Checkout crea pedidos en `/pedidos` y registra pagos sandbox en `/pagos`. Si el pago falla, cancela el pedido pendiente para devolver el stock reservado. El backend vuelve a validar propietario, estado, importe exacto y duplicados.
+- Checkout crea pedidos en `/pedidos` y consulta `/mercado-pago/config` para determinar si debe ofrecer Checkout Pro. En el flujo interno de simulación, registra pagos en `/pagos` y cancela el pedido pendiente si el pago falla.
 
 ## Pagos
 
-`VITE_PAYMENT_GATEWAY_PROVIDER=SANDBOX` habilita solamente una simulacion academica; no mueve dinero real. Cualquier proveedor distinto falla de forma explicita hasta que se integre su SDK y la verificacion segura en el backend. Las llaves secretas nunca deben guardarse en variables `VITE_*`.
+Mercado Pago Checkout Pro redirige al cliente desde el detalle de su pedido. El backend crea la sesión de pago y verifica el resultado antes de marcar el pedido como **Pagado**. Para la entrega usa la tienda de pruebas y una tarjeta de prueba de Mercado Pago.
+
+`VITE_PAYMENT_GATEWAY_PROVIDER=SANDBOX` corresponde al simulador interno. La disponibilidad de Checkout Pro depende de la configuración del backend. Las credenciales privadas se configuran únicamente en el servidor. Consulta la [guía de Mercado Pago del backend](https://github.com/ITP89/alphabike-backend/blob/master/docs/despliegue-render.md#mercado-pago-checkout-pro-para-pedidos-de-la-tienda).
 
 ## Docker
 
@@ -152,7 +159,7 @@ Las mutaciones de categorias, productos, stock y galeria invalidan las consultas
 
 El formulario Contacto prepara un mensaje completo para el numero de WhatsApp mostrado. El usuario revisa y envia el mensaje desde WhatsApp; la web conserva el borrador y no afirma que se haya entregado. No se almacena como ticket ni se envia correo desde ese formulario. `Contacto.test.jsx` verifica este comportamiento sin contactar al servicio externo.
 
-Las cuentas registradas publicamente deben verificar su correo antes de iniciar sesion; el backend requiere SMTP configurado para entregar los enlaces. En una demostracion sin SMTP, el administrador puede crear usuarios desde su panel.
+Las cuentas registradas publicamente deben verificar su correo antes de iniciar sesion; la tienda principal usa Resend para enviar los enlaces de verificación y recuperación. En desarrollo puedes configurar SMTP o crear usuarios desde el panel administrativo.
 
 ## Inventario adaptable
 
