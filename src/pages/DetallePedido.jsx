@@ -1,3 +1,6 @@
+import { useState } from 'react'
+import api from '../api/axios'
+import { getApiErrorMessage } from '../utils/apiError'
 import { ArrowLeft, PackageCheck } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import Navbar from '../components/Navbar'
@@ -31,6 +34,30 @@ const LABELS_ENTREGA = {
 function DetallePedido() {
   const { id } = useParams()
   const { data: pedido, loading, error, refetch } = useApiGet(`/pedidos/${id}`, null, 'No se pudo cargar el pedido')
+
+  const { data: paymentConfig } = useApiGet('/mercado-pago/config', null)
+  const [accionPago, setAccionPago] = useState('')
+  const [errorPago, setErrorPago] = useState('')
+  const [avisoPago, setAvisoPago] = useState('')
+
+  async function gestionarPago(accion) {
+    setAccionPago(accion)
+    setErrorPago('')
+    setAvisoPago('')
+    try {
+      const respuesta = await api.post(`/mercado-pago/pedidos/${id}/${accion}`)
+      if (accion === 'inicio') {
+        window.location.assign(respuesta.data.data.checkoutUrl)
+        return
+      }
+      const resultado = await refetch()
+      if (resultado.data?.estado === 'PENDIENTE') setAvisoPago('El pedido sigue pendiente de pago.')
+    } catch (err) {
+      setErrorPago(getApiErrorMessage(err, 'No se pudo completar la consulta de pago.'))
+    } finally {
+      setAccionPago('')
+    }
+  }
 
   if (loading) {
     return (
@@ -143,6 +170,21 @@ function DetallePedido() {
                 </div>
               </div>
             </div>
+            {pedido.estado === 'PENDIENTE' && paymentConfig?.ready && (
+              <div className="space-y-3 rounded-md border border-gray-200 p-4 text-sm">
+                {!paymentConfig.live && <p>Mercado Pago en modo de prueba.</p>}
+                {errorPago && <p role="alert" className="text-red-700">{errorPago}</p>}
+                {avisoPago && <p role="status">{avisoPago}</p>}
+                <button type="button" disabled={Boolean(accionPago)} onClick={() => gestionarPago('inicio')}
+                  className="w-full rounded-md bg-blue-700 px-4 py-2 font-semibold text-white disabled:opacity-50">
+                  {accionPago === 'inicio' ? 'Abriendo Mercado Pago...' : 'Pagar con Mercado Pago'}
+                </button>
+                <button type="button" disabled={Boolean(accionPago)} onClick={() => gestionarPago('sincronizar')}
+                  className="w-full rounded-md border border-gray-300 px-4 py-2 font-semibold disabled:opacity-50">
+                  {accionPago === 'sincronizar' ? 'Comprobando...' : 'Comprobar pago'}
+                </button>
+              </div>
+            )}
           </aside>
         </div>
       </main>

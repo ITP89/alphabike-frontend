@@ -1,3 +1,4 @@
+import { useApiGet } from '../hooks/useApiGet'
 import { useRefreshCatalogo } from '../hooks/useRefreshCatalogo'
 import { useState } from 'react'
 import { ArrowRight, Lock, MapPin, PackageCheck, UserCircle } from 'lucide-react'
@@ -30,6 +31,11 @@ function Checkout() {
   const refreshCatalogo = useRefreshCatalogo()
   const { items, subtotal, vaciarCarrito } = useCarrito()
   const { usuario } = useAuth()
+  const { data: paymentConfig, error: configError } = useApiGet(
+    usuario ? '/mercado-pago/config' : null, null, 'No se pudo consultar el medio de pago',
+  )
+  const mercadoPago = paymentConfig?.enabled
+  const pagoDisponible = paymentConfig && !configError && (!mercadoPago || paymentConfig.ready)
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -168,8 +174,10 @@ function Checkout() {
   async function handleConfirmar() {
     setError('')
 
+    if (!pagoDisponible) return
+
     const entregaOk = validarEntrega()
-    const pagoOk = validarPago()
+    const pagoOk = mercadoPago || validarPago()
 
     if (!entregaOk || !pagoOk) {
       setError('Por favor revisa los campos requeridos en el formulario antes de continuar.')
@@ -197,9 +205,17 @@ function Checkout() {
         detalles,
       })
 
-      await refreshCatalogo()
       const nuevoPedido = response.data?.data || response.data
       pedidoCreadoId = nuevoPedido.id
+
+      if (mercadoPago) {
+        vaciarCarrito()
+        navigate(`/pedidos/${nuevoPedido.id}`)
+        void refreshCatalogo()
+        return
+      }
+
+      await refreshCatalogo()
 
       // 2. Procesar el pago mediante la pasarela modular (Sandbox o Real)
       const comprobante = await procesarPago({
@@ -260,6 +276,9 @@ function Checkout() {
           </div>
         </div>
 
+        {(configError || (mercadoPago && !paymentConfig.ready)) && (
+          <Alert type="error" className="mb-5">{configError || 'Mercado Pago no está disponible.'}</Alert>
+        )}
         {error && <Alert type="error" className="mb-5 shadow-sm font-semibold">{error}</Alert>}
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
@@ -326,7 +345,13 @@ function Checkout() {
             </div>
 
             {/* 3. Pasarela de Pago Completa */}
-            <div>
+            {mercadoPago && (
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-700">
+                <h2 className="mb-2 font-bold text-slate-950">Mercado Pago</h2>
+                Después de crear el pedido podrás elegir un medio de pago en Mercado Pago.
+              </div>
+            )}
+            {paymentConfig && !mercadoPago && (
               <PasarelaPago
                 total={total}
                 tipoEntrega={tipoEntrega}
@@ -336,7 +361,7 @@ function Checkout() {
                 onDatosPagoChange={handleDatosPagoChange}
                 fieldErrors={fieldErrors}
               />
-            </div>
+            )}
           </section>
 
           {/* Columna Derecha: Resumen y CTA */}
@@ -376,11 +401,13 @@ function Checkout() {
               <button
                 type="button"
                 onClick={handleConfirmar}
-                disabled={cargando}
+                disabled={cargando || !pagoDisponible}
                 className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-sm font-black text-white hover:bg-red-700 shadow-lg shadow-red-600/20 disabled:cursor-not-allowed disabled:opacity-50 transition-all active:scale-[0.98]"
               >
                 {cargando ? (
-                  <>Procesando Pago Seguro...</>
+                  <>Creando pedido...</>
+                ) : mercadoPago ? (
+                  <>Crear pedido y continuar <ArrowRight className="h-4 w-4" /></>
                 ) : (
                   <>
                     {metodoPago === 'TARJETA' && `Pagar ${formatMoney(total)}`}
@@ -395,7 +422,7 @@ function Checkout() {
 
               <div className="mt-4 flex items-center justify-center gap-2 text-[11px] font-semibold text-slate-400">
                 <Lock className="h-3 w-3 text-emerald-600" />
-                <span>Entorno sandbox para demostración académica</span>
+                <span>{paymentConfig?.live ? 'Pago en Mercado Pago' : 'Modo de prueba'}</span>
               </div>
             </div>
           </aside>

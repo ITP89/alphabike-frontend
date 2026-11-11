@@ -32,6 +32,7 @@ const LABELS_METODO = {
   YAPE: 'Yape Móvil',
   PLIN: 'Plin Móvil',
   TRANSFERENCIA: 'Transferencia Bancaria',
+  MERCADO_PAGO: 'Mercado Pago',
 }
 
 function AdminPagos() {
@@ -105,6 +106,7 @@ function AdminPagos() {
     let yapePlin = 0
     let transferencia = 0
     let efectivo = 0
+    let mercadoPago = 0
 
     pagos.forEach((p) => {
       const m = Number(p.monto) || 0
@@ -113,10 +115,11 @@ function AdminPagos() {
       if (metodo === 'TARJETA') tarjeta += m
       else if (metodo === 'YAPE' || metodo === 'PLIN') yapePlin += m
       else if (metodo === 'TRANSFERENCIA') transferencia += m
-      else efectivo += m
+      else if (metodo === 'MERCADO_PAGO') mercadoPago += m
+      else if (metodo === 'EFECTIVO') efectivo += m
     })
 
-    return { total, tarjeta, yapePlin, transferencia, efectivo, cantidad: pagos.length }
+    return { total, tarjeta, yapePlin, transferencia, efectivo, mercadoPago, cantidad: pagos.length }
   }, [pagos])
 
   async function handleRegistrarCobroManual(e) {
@@ -220,7 +223,7 @@ function AdminPagos() {
       )}
 
       {}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">Total Recaudado</span>
@@ -272,6 +275,15 @@ function AdminPagos() {
             BCP / BBVA / Presencial
           </span>
         </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">Mercado Pago</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600 border border-blue-100">
+              <ShieldCheck className="h-4 w-4" />
+            </div>
+          </div>
+          <p className="text-2xl font-black text-slate-950">{formatMoney(metricas.mercadoPago)}</p>
+        </div>
       </div>
 
       {}
@@ -294,6 +306,7 @@ function AdminPagos() {
             className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 shadow-sm focus:border-red-500"
           >
             <option value="todos">Todos los Métodos de Pago</option>
+            <option value="MERCADO_PAGO">Mercado Pago</option>
             <option value="TARJETA">Tarjeta (Crédito/Débito)</option>
             <option value="YAPE">Yape Móvil</option>
             <option value="PLIN">Plin Móvil</option>
@@ -344,7 +357,7 @@ function AdminPagos() {
             let badgeMetodoClass
             let IconoMetodo
 
-            if (metodoReal === 'TARJETA') {
+            if (metodoReal === 'TARJETA' || metodoReal === 'MERCADO_PAGO') {
               badgeMetodoClass = 'bg-blue-50 text-blue-700 border-blue-200'
               IconoMetodo = CreditCard
             } else if (metodoReal === 'YAPE' || metodoReal === 'PLIN') {
@@ -571,7 +584,7 @@ function AdminPagos() {
               <div className="grid grid-cols-2 gap-1 text-[11px]">
                 <span className="text-slate-500">Método de Pago:</span>
                 <span className="font-bold text-right uppercase text-slate-900">
-                  {pagoDetalle.metodoPagoReal || pagoDetalle.metodoPago}
+                  {LABELS_METODO[pagoDetalle.metodoPago] || pagoDetalle.metodoPago}
                 </span>
               </div>
 
