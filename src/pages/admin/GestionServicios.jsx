@@ -52,7 +52,7 @@ function GestionServicios() {
   }
 
   function validarNumeros() {
-    return Number(form.precioBase) > 0 && Number(form.duracionMin) > 0
+    return Number(form.precioBase) >= 30 && Number(form.duracionMin) > 0
   }
 
   async function handleCrear(e) {
@@ -200,7 +200,7 @@ function GestionServicios() {
                   <input
                     type="number"
                     id="servicio-precio"
-                    min="0.01"
+                    min="30.00"
                     max="99999999.99"
                     step="0.01"
                     placeholder="0.00"
