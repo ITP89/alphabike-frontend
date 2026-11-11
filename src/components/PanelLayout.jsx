@@ -72,7 +72,7 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
           </button>
         </div>
         {menuOpen && (
-          <div className="space-y-3 border-t border-slate-200 bg-slate-950 px-4 py-3">
+          <div className="max-h-[calc(100dvh-100px)] space-y-3 overflow-y-auto border-t border-slate-200 bg-slate-950 px-4 py-3">
             <nav className="flex flex-col gap-1.5">{renderLinks()}</nav>
             <button
               type="button"
@@ -88,9 +88,9 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
 
       <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[282px_1fr]">
         {/* Sidebar Desktop Pro */}
-        <aside className="sticky top-0 hidden h-screen overflow-hidden border-r border-slate-900 bg-[radial-gradient(circle_at_top_left,rgba(239,68,68,0.28),transparent_32%),linear-gradient(180deg,#050816_0%,#0f172a_100%)] px-5 py-6 text-white lg:flex lg:flex-col shadow-2xl">
+        <aside className="sticky top-0 hidden h-[calc(100dvh-36px)] overflow-hidden border-r border-slate-900 bg-[radial-gradient(circle_at_top_left,rgba(239,68,68,0.28),transparent_32%),linear-gradient(180deg,#050816_0%,#0f172a_100%)] px-5 py-6 text-white lg:flex lg:flex-col shadow-2xl">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-red-600 via-white to-red-600" />
-          <Link to="/" className="group mb-8 flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.06] p-3 backdrop-blur">
+          <Link to="/" className="group mb-8 flex shrink-0 items-center gap-3 rounded-lg border border-white/10 bg-white/[0.06] p-3 backdrop-blur">
             <span className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/15 bg-white p-1 shadow-lg shadow-red-950/30 transition-transform group-hover:scale-105">
               <img src={alphaLogo} alt="AlphaBike" className="h-full w-full object-contain" />
             </span>
@@ -102,14 +102,14 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
             </div>
           </Link>
 
-          <div className="mb-3 px-2">
+          <div className="mb-3 shrink-0 px-2">
             <span className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Menú de Gestión</span>
           </div>
 
-          <nav className="flex flex-col gap-2">{renderLinks()}</nav>
+          <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain"><div className="flex flex-col gap-2">{renderLinks()}</div></nav>
 
           {/* User Profile Card Footer */}
-          <div className="mt-auto border-t border-white/10 px-2 pt-4">
+          <div className="mt-3 shrink-0 border-t border-white/10 px-2 pt-4">
             <div className="mb-3 flex items-center gap-2.5 rounded-lg border border-white/10 bg-white/[0.07] p-2.5">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-red-400/40 bg-red-500/15 text-red-200">
                 <Shield className="h-4 w-4" />
