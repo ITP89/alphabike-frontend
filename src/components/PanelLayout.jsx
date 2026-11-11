@@ -51,9 +51,8 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
 
   return (
     <div className="alpha-shell font-sans selection:bg-red-600 selection:text-white">
-      <div className="sticky top-0 z-40 flex h-9 items-center justify-end bg-white px-4"><RealtimeStatus /></div>
       {/* Mobile Top Header */}
-      <header className="sticky top-9 z-30 border-b border-slate-200 bg-white/95 text-slate-950 shadow-sm backdrop-blur-xl lg:hidden">
+      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 text-slate-950 shadow-sm backdrop-blur-xl lg:hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <Link to="/" className="flex items-center gap-2">
             <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
@@ -61,6 +60,8 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
             </span>
             <span className="text-base font-black tracking-tight">AlphaBike <span className="text-red-600 text-xs font-bold">PRO</span></span>
           </Link>
+          <div className="flex items-center gap-2">
+            <RealtimeStatus />
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
@@ -70,6 +71,7 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
           >
             {menuOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
           </button>
+          </div>
         </div>
         {menuOpen && (
           <div className="max-h-[calc(100dvh-100px)] space-y-3 overflow-y-auto border-t border-slate-200 bg-slate-950 px-4 py-3">
@@ -86,9 +88,9 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
         )}
       </header>
 
-      <div className="grid min-h-[calc(100dvh-36px)] w-full grid-cols-1 lg:grid-cols-[282px_1fr]">
+      <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[282px_1fr]">
         {/* Sidebar Desktop Pro */}
-        <aside className="sticky top-9 hidden h-[calc(100dvh-36px)] overflow-hidden border-r border-slate-900 bg-[radial-gradient(circle_at_top_left,rgba(239,68,68,0.28),transparent_32%),linear-gradient(180deg,#050816_0%,#0f172a_100%)] px-5 py-6 text-white lg:flex lg:flex-col shadow-2xl">
+        <aside className="sticky top-0 hidden h-dvh overflow-hidden border-r border-slate-900 bg-[radial-gradient(circle_at_top_left,rgba(239,68,68,0.28),transparent_32%),linear-gradient(180deg,#050816_0%,#0f172a_100%)] px-5 py-6 text-white lg:flex lg:flex-col shadow-2xl">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-red-600 via-white to-red-600" />
           <Link to="/" className="group mb-8 flex shrink-0 items-center gap-3 rounded-lg border border-white/10 bg-white/[0.06] p-3 backdrop-blur">
             <span className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/15 bg-white p-1 shadow-lg shadow-red-950/30 transition-transform group-hover:scale-105">
@@ -138,9 +140,12 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
               <p className="text-[11px] font-black uppercase tracking-[0.16em] text-red-600">{subtitle}</p>
               <p className="mt-0.5 text-sm font-semibold text-slate-600">Gestión operativa AlphaBike Workshop</p>
             </div>
-            <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+            <div className="flex items-center gap-3">
+              <RealtimeStatus />
+              <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
               <Bike className="h-4 w-4 text-red-600" aria-hidden="true" />
               <span className="text-xs font-black text-slate-800">{usuario?.nombre || title}</span>
+              </div>
             </div>
           </div>
           <div className="w-full">{children}</div>
