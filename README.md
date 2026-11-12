@@ -170,3 +170,19 @@ ADMIN y ENCARGADO comparten `InventarioProductos.jsx`. En movil muestra tarjetas
 La venta interna usa una sola llamada a `/pedidos/venta-presencial`; el importe del pago lo calcula el backend. Antes de enviarla se conserva un UUID y el borrador en sessionStorage, separados por usuario. Si se pierde la respuesta, la interfaz bloquea cambios y permite reintentar la confirmacion con el mismo UUID, incluso tras recargar esa pestana. Un rechazo 4xx permite corregir el borrador; la confirmacion satisfactoria limpia la operacion pendiente. Cerrar la pestana elimina sessionStorage: para continuar desde otra pestana debe revisarse primero la lista de pedidos.
 
 Pagos e historial usan campos etiquetados en movil. El historial distingue Total pagado en pedidos de pedidos pendientes/cancelados y conserva los centimos.
+
+
+## Paneles revisados (11/11/2026)
+
+- Admin y encargado comparten las acciones válidas de pedidos: iniciar preparación, despachar según entrega y confirmar recepción, incluyendo provincia. No se ofrecen despachos de pedidos pendientes o cancelados.
+- Los detalles usan precioAcordado y clienteEmail del servidor. Los estados de pago no disponibles se muestran como tales. Los cobros manuales permiten elegir una referencia pendiente y cargan su importe, sin escribir UUID ni monto libremente.
+- Usuarios permite editar nombre/teléfono y protege en pantalla al administrador de la sesión y al último administrador activo; la protección definitiva también existe en el servidor.
+- Editar un producto no reemplaza su stock. El ajuste se hace desde la columna Stock y envía el valor observado; un conflicto exige actualizar el inventario.
+- Citas permite asignar responsable o tomar cita libre; filtra estados disponibles y bloquea cotizaciones/cobros en citas cerradas. El botón de cobro de taller indica que finaliza el servicio.
+- Galería permite crear, editar y eliminar trabajos. Servicios, categorías y galería confirman los borrados definitivos. Formularios impiden doble envío.
+- Reportes incluye período de consulta e informa errores parciales, sin presentarlos como cero ventas.
+- La agenda usa la fecha de America/Lima y consulta la política opcional del taller. No se inventaron horarios ni capacidad.
+- Los modales administrativos se desplazan dentro de la pantalla, contienen el foco, cierran con Escape y devuelven el foco al control de origen. El menú y los controles comparten tamaños legibles y foco visible.
+- El simulador identifica los datos comerciales de demostración y advierte que no deben usarse tarjetas ni transferencias reales. Checkout Pro conserva su configuración propia en backend.
+
+Pruebas nuevas: entrega por tipo, precio/correo del pedido, fecha de Lima y reportes parcialmente fallidos. Ejecutar npm test -- --run, npm run lint y npm run build. El backend debe actualizarse junto con esta versión del frontend, especialmente por stockEsperado y referencias-pendientes.

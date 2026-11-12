@@ -256,7 +256,7 @@ function Checkout() {
     if (pedidoExitoso?.id) {
       navigate(`/pedidos/${pedidoExitoso.id}`)
     } else {
-      navigate('/mis-pedidos')
+      navigate('/pedidos')
     }
   }
 

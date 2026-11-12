@@ -73,19 +73,19 @@ export default function PasarelaPago({
         <div>
           <div className="inline-flex items-center gap-1.5 text-xs font-bold text-red-600">
             <ShieldCheck className="h-4 w-4" />
-            <span>Pasarela de Pago Segura AlphaBike</span>
+            <span>Pago de demostración AlphaBike</span>
           </div>
           <h2 className="text-lg font-black tracking-tight text-zinc-950 sm:text-xl">
             Método de Pago
           </h2>
           <p className="text-xs font-medium text-zinc-500">
-            Selecciona tu forma de pago. Cifrado de extremo a extremo SSL 256-bit.
+            Simulación académica. Usa únicamente datos de prueba; no envíes dinero ni ingreses una tarjeta real.
           </p>
         </div>
 
         <div className="mt-2 inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-800 sm:mt-0">
           <Lock className="h-3 w-3 text-emerald-600" />
-          <span>Sandbox Ready & API Plug-in</span>
+          <span>Modo de prueba</span>
         </div>
       </div>
 
@@ -403,7 +403,7 @@ export default function PasarelaPago({
       {metodoSeleccionado === 'TRANSFERENCIA' && (
         <div className="space-y-4 pt-1">
           <p className="text-xs font-bold text-zinc-600">
-            Realiza tu depósito a cualquiera de nuestras cuentas corrientes y registra el número de constancia:
+            Estas cuentas son ejemplos de demostración. No realices depósitos. Ingresa un número de operación ficticio para probar el formulario:
           </p>
 
           <div className="space-y-2.5">

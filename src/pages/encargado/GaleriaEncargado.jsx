@@ -24,6 +24,8 @@ function GaleriaEncargado() {
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [mensaje, setMensaje] = useState(null)
   const [error, setError] = useState('')
+  const [editando, setEditando] = useState(null)
+  const [guardando, setGuardando] = useState(false)
   const [form, setForm] = useState(FORM_INICIAL)
 
   async function cargarTrabajos() {
@@ -47,27 +49,33 @@ function GaleriaEncargado() {
 
   async function handlePublicar(e) {
     e.preventDefault()
+    if (guardando) return
+    setGuardando(true)
     setMensaje(null)
 
     try {
-      const response = await api.post('/trabajos', {
+      const payload = {
         ...form,
         titulo: form.titulo.trim(),
         descripcion: form.descripcion.trim(),
         imagenAntesUrl: form.imagenAntesUrl.trim(),
         imagenDespuesUrl: form.imagenDespuesUrl.trim(),
-      })
+      }
+      const response = editando ? await api.put(`/trabajos/${editando}`, payload) : await api.post('/trabajos', payload)
       await refreshCatalogo()
-      setTrabajos((prev) => [...prev, response.data.data])
+      setTrabajos((prev) => editando ? prev.map(t => t.id === editando ? response.data.data : t) : [...prev, response.data.data])
+      setEditando(null)
       setMostrarFormulario(false)
       setForm(FORM_INICIAL)
       setMensaje({ type: 'success', text: 'Trabajo publicado correctamente' })
     } catch (err) {
-      setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo publicar el trabajo') })
-    }
+      setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo guardar el trabajo') })
+    } finally { setGuardando(false) }
   }
 
   async function handleEliminar(id) {
+    const registro = trabajos.find(item => item.id === id)
+    if (!window.confirm(`¿Eliminar definitivamente el trabajo «${registro?.nombre || registro?.titulo || ''}»? Esta acción no se puede deshacer.`)) return
     setMensaje(null)
 
     try {
@@ -89,7 +97,7 @@ function GaleriaEncargado() {
         </div>
         <button
           type="button"
-          onClick={() => setMostrarFormulario((open) => !open)}
+          onClick={() => { setEditando(null); setForm(FORM_INICIAL); setMostrarFormulario((open) => !open) }}
           className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
         >
           {mostrarFormulario ? 'Cancelar' : '+ Publicar trabajo'}
@@ -143,8 +151,8 @@ function GaleriaEncargado() {
               className="rounded-md border border-gray-300 px-3 py-2 text-sm md:col-span-2"
             />
           </div>
-          <button type="submit" className="mt-3 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-            Publicar
+          <button type="submit" disabled={guardando} className="mt-3 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+            {guardando ? 'Guardando…' : editando ? 'Guardar cambios' : 'Publicar'}
           </button>
         </form>
       )}
@@ -170,7 +178,7 @@ function GaleriaEncargado() {
                   <span className="absolute left-2 top-2 rounded bg-blue-600/90 px-2 py-1 text-xs font-medium text-white">Despues</span>
                 </div>
               </div>
-              <div className="flex items-start justify-between gap-3 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3 p-4">
                 <div className="min-w-0">
                   <p className="font-medium text-gray-950">{trabajo.titulo}</p>
                   <p className="mt-1 line-clamp-2 text-sm text-gray-500">{trabajo.descripcion || 'Sin descripcion'}</p>
@@ -179,6 +187,7 @@ function GaleriaEncargado() {
                     {trabajo.destacado && <span className="rounded-md bg-emerald-100 px-2 py-0.5 font-medium text-emerald-700">Destacado</span>}
                   </div>
                 </div>
+                <button type="button" onClick={() => { setEditando(trabajo.id); setForm({ ...FORM_INICIAL, ...trabajo }); setMostrarFormulario(true); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="rounded-lg border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-700">Editar trabajo</button>
                 <button
                   type="button"
                   onClick={() => handleEliminar(trabajo.id)}

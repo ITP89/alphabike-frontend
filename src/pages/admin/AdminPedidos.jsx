@@ -1,10 +1,10 @@
+import { useDialog } from '../../hooks/useDialog'
+import { useCallback } from 'react'
+import AccionesPedido from '../../components/AccionesPedido'
 import { useRefreshCatalogo } from '../../hooks/useRefreshCatalogo'
 import { useEffect, useMemo, useState } from 'react'
 import {
   Sparkles,
-  Truck,
-  PackageCheck,
-  Send,
   Search,
   Eye,
   Clock,
@@ -41,26 +41,29 @@ const LABELS_ESTADO = {
 function AdminPedidos() {
   const refreshCatalogo = useRefreshCatalogo()
   const [pedidos, setPedidos] = useState([])
+  const [errorPagos, setErrorPagos] = useState('')
   const [pagosMap, setPagosMap] = useState({})
   const [cargando, setCargando] = useState(true)
   const [filtroTipo, setFiltroTipo] = useState('')
   const [filtroEstado, setFiltroEstado] = useState('')
   const [busqueda, setBusqueda] = useState('')
-  const [seguimientos, setSeguimientos] = useState({})
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState(null)
 
   // Modal de Detalle de Pedido
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null)
+  const cerrarDialogo = useCallback(() => setPedidoSeleccionado(null), [])
+  useDialog(Boolean(pedidoSeleccionado), cerrarDialogo)
 
   async function cargarPedidos() {
     setCargando(true)
     setError('')
+    setErrorPagos('')
 
     try {
       const [pedidosRes, pagosRes] = await Promise.all([
         api.get('/pedidos'),
-        api.get('/pagos').catch(() => ({ data: { data: [] } })),
+        api.get('/pagos').catch(() => { setErrorPagos('No se pudo consultar el estado de los pagos. Actualiza la página antes de registrar un cobro.'); return { data: { data: [] } } }),
       ])
 
       const listPedidos = pedidosRes.data.data || []
@@ -69,7 +72,7 @@ function AdminPedidos() {
       // Mapa de pagos por referenciaId
       const mapa = {}
       listPagos.forEach((pago) => {
-        mapa[pago.referenciaId] = pago
+        if (pago.estado === 'PAGADO') mapa[pago.referenciaId] = pago
       })
 
       setPedidos(listPedidos)
@@ -113,8 +116,7 @@ function AdminPedidos() {
     }
   }
 
-  async function registrarSeguimiento(id) {
-    const numero = seguimientos[id]?.trim()
+  async function registrarSeguimiento(id, numero) {
     if (!numero) {
       setMensaje({ type: 'error', text: 'Ingresa el número de seguimiento de la agencia' })
       return
@@ -125,7 +127,6 @@ function AdminPedidos() {
       const response = await api.patch(`/pedidos/${id}/seguimiento?numeroSeguimiento=${encodeURIComponent(numero)}`)
       await refreshCatalogo()
       setPedidos((prev) => prev.map((p) => (p.id === id ? response.data.data : p)))
-      setSeguimientos((prev) => ({ ...prev, [id]: '' }))
       setMensaje({ type: 'success', text: 'Número de seguimiento registrado exitosamente' })
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo registrar el seguimiento') })
@@ -134,6 +135,7 @@ function AdminPedidos() {
 
   // Acción rápida para registrar cobro directo de un pedido pendiente
   async function confirmarCobroRapido(pedido) {
+    if (!window.confirm(`¿Registrar un cobro en EFECTIVO de ${formatMoney(pedido.total)} para el pedido #${pedido.id.slice(0, 8)}? Confirma solo si ya recibiste el importe.`)) return
     try {
       await api.post('/pagos', {
         referenciaTipo: 'PEDIDO',
@@ -141,8 +143,7 @@ function AdminPedidos() {
         monto: Number(pedido.total),
         metodoPago: 'EFECTIVO',
       })
-      await cambiarEstado(pedido.id, 'PAGADO')
-      cargarPedidos()
+      await cargarPedidos()
       setMensaje({ type: 'success', text: `¡Pago de ${formatMoney(pedido.total)} confirmado para el pedido!` })
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo confirmar el cobro') })
@@ -150,83 +151,7 @@ function AdminPedidos() {
   }
 
   function accionesPorTipo(pedido) {
-    if (pedido.tipoEntrega === 'RECOJO_TIENDA') {
-      if (pedido.estado === 'PAGADO' || pedido.estado === 'PENDIENTE') {
-        return (
-          <button
-            type="button"
-            onClick={() => cambiarEstado(pedido.id, 'LISTO_PARA_RECOJO')}
-            className="inline-flex items-center gap-1 rounded-xl bg-blue-600 px-3 py-1.5 text-xs font-black text-white hover:bg-blue-700 shadow-sm transition-all"
-          >
-            <PackageCheck className="h-3.5 w-3.5" /> Listo p/ Recojo
-          </button>
-        )
-      }
-      if (pedido.estado === 'LISTO_PARA_RECOJO') {
-        return (
-          <button
-            type="button"
-            onClick={() => cambiarEstado(pedido.id, 'ENTREGADO')}
-            className="inline-flex items-center gap-1 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-black text-white hover:bg-emerald-700 shadow-sm transition-all"
-          >
-            ✓ Entregado
-          </button>
-        )
-      }
-    }
-
-    if (pedido.tipoEntrega === 'DELIVERY_LIMA') {
-      if (pedido.estado === 'PAGADO' || pedido.estado === 'PENDIENTE') {
-        return (
-          <button
-            type="button"
-            onClick={() => cambiarEstado(pedido.id, 'EN_CAMINO')}
-            className="inline-flex items-center gap-1 rounded-xl bg-blue-600 px-3 py-1.5 text-xs font-black text-white hover:bg-blue-700 shadow-sm transition-all"
-          >
-            <Truck className="h-3.5 w-3.5" /> Enviar Motorizado
-          </button>
-        )
-      }
-      if (pedido.estado === 'EN_CAMINO') {
-        return (
-          <button
-            type="button"
-            onClick={() => cambiarEstado(pedido.id, 'ENTREGADO')}
-            className="inline-flex items-center gap-1 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-black text-white hover:bg-emerald-700 shadow-sm transition-all"
-          >
-            ✓ Marcar Entregado
-          </button>
-        )
-      }
-    }
-
-    if (pedido.tipoEntrega === 'ENVIO_PROVINCIA') {
-      if (pedido.estado !== 'ENVIADO' && pedido.estado !== 'ENTREGADO') {
-        return (
-          <div className="flex items-center gap-1.5">
-            <input
-              type="text"
-              placeholder="Nro. Guía Olva/Shalom"
-              value={seguimientos[pedido.id] || ''}
-              onChange={(e) => setSeguimientos((prev) => ({ ...prev, [pedido.id]: e.target.value }))}
-              className="w-28 rounded-xl border border-slate-300 bg-white px-2 py-1 text-xs font-semibold"
-            />
-            <button
-              type="button"
-              onClick={() => registrarSeguimiento(pedido.id)}
-              className="inline-flex items-center gap-1 rounded-xl bg-purple-600 px-2.5 py-1 text-xs font-black text-white hover:bg-purple-700 shadow-sm transition-all"
-            >
-              <Send className="h-3 w-3" /> Guía
-            </button>
-          </div>
-        )
-      }
-      if (pedido.estado === 'ENVIADO') {
-        return <span className="text-xs font-extrabold text-purple-700">Guía: {pedido.numeroSeguimiento || '-'}</span>
-      }
-    }
-
-    return <span className="text-xs font-semibold text-slate-400">Finalizado</span>
+    return <AccionesPedido pedido={pedido} onEstado={cambiarEstado} onSeguimiento={registrarSeguimiento} />
   }
 
   return (
@@ -277,6 +202,8 @@ function AdminPedidos() {
           <option value="">Todos los Estados de Pedido</option>
           <option value="PENDIENTE">Pendientes</option>
           <option value="PAGADO">Pagados</option>
+          <option value="EN_PREPARACION">En preparación</option>
+          <option value="CANCELADO">Cancelados</option>
           <option value="LISTO_PARA_RECOJO">Listos para Recojo</option>
           <option value="EN_CAMINO">En Camino</option>
           <option value="ENVIADO">Enviados (Agencia)</option>
@@ -284,6 +211,7 @@ function AdminPedidos() {
         </select>
       </div>
 
+      {errorPagos && <Alert type="error" className="mb-4">{errorPagos}</Alert>}
       {mensaje && <Alert type={mensaje.type} className="mb-4 font-bold shadow-sm">{mensaje.text}</Alert>}
       {cargando && <LoadingState text="Cargando pedidos de la tienda..." />}
       {error && <ErrorState message={error} onRetry={cargarPedidos} />}
@@ -336,7 +264,7 @@ function AdminPedidos() {
                   ) : (
                     <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 mt-0.5">
                       <Clock className="h-3 w-3" />
-                      Por Cobrar
+                      {errorPagos ? 'No disponible' : pedido.estado === 'CANCELADO' ? 'Cancelado' : 'Por cobrar'}
                     </span>
                   )}
                 </div>
@@ -356,7 +284,7 @@ function AdminPedidos() {
                     type="button"
                     onClick={() => setPedidoSeleccionado(pedido)}
                     className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 shadow-sm transition-all"
-                    title="Ver detalles completos del pedido"
+                    title="Ver detalles completos del pedido" aria-label="Ver detalles completos del pedido"
                   >
                     <Eye className="h-3.5 w-3.5" />
                   </button>
@@ -370,8 +298,8 @@ function AdminPedidos() {
 
       {/* Modal: Detalle Completo del Pedido */}
       {pedidoSeleccionado && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+        <div role="dialog" aria-modal="true" aria-label="Detalle del pedido" className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
               <div className="flex items-center gap-2">
                 <ShoppingBag className="h-5 w-5 text-red-600" />
@@ -382,6 +310,7 @@ function AdminPedidos() {
               <button
                 type="button"
                 onClick={() => setPedidoSeleccionado(null)}
+                aria-label="Cerrar detalle del pedido"
                 className="text-slate-400 hover:text-slate-600"
               >
                 <X className="h-5 w-5" />
@@ -430,7 +359,7 @@ function AdminPedidos() {
                         <div>
                           <p className="font-extrabold text-slate-900">{d.productoNombre}</p>
                           <p className="text-slate-400 text-[11px]">
-                            {d.cantidad} unid. × {formatMoney(d.precioUnitario)}
+                            {d.cantidad} unid. × {formatMoney(d.precioAcordado)}
                           </p>
                         </div>
                         <span className="font-black text-slate-950">{formatMoney(d.subtotal)}</span>
@@ -448,7 +377,7 @@ function AdminPedidos() {
             </div>
 
             <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
-              {!pagosMap[pedidoSeleccionado.id] && pedidoSeleccionado.estado === 'PENDIENTE' ? (
+              {!errorPagos && !pagosMap[pedidoSeleccionado.id] && pedidoSeleccionado.estado === 'PENDIENTE' ? (
                 <button
                   type="button"
                   onClick={() => {
@@ -457,11 +386,11 @@ function AdminPedidos() {
                   }}
                   className="rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-black text-white hover:bg-emerald-700 shadow-md shadow-emerald-600/20"
                 >
-                  Confirmar Cobro Manual
+                  Registrar cobro en efectivo
                 </button>
               ) : (
                 <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                  ✓ Transacción Verificada
+                  {errorPagos ? 'Estado de pago no disponible' : pedidoSeleccionado.estado === 'CANCELADO' ? 'Pedido cancelado' : pagosMap[pedidoSeleccionado.id]?.estado === 'PAGADO' ? 'Pago registrado' : 'Sin pago confirmado'}
                 </span>
               )}
 

@@ -11,14 +11,16 @@ import { useApiGet } from '../hooks/useApiGet'
 import { getApiErrorMessage } from '../utils/apiError'
 import { formatMoney } from '../utils/formatters'
 
-const fechaMinima = new Date().toISOString().slice(0, 10)
+import { fechaLima, useFechaLima } from '../hooks/useFechaLima'
 
 function AgendarCita() {
+  const fechaMinima = useFechaLima()
   const { usuario } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const { data: servicios, loading, error: errorServicios, refetch } = useApiGet('/servicios', [], 'No se pudieron cargar los servicios')
 
+  const { data: agenda } = useApiGet('/citas/disponibilidad', null)
   const [servicioId, setServicioId] = useState(location.state?.servicioId || '')
   const [fecha, setFecha] = useState('')
   const [hora, setHora] = useState('')
@@ -55,7 +57,7 @@ function AgendarCita() {
 
     if (!servicioId) errors.servicioId = 'Selecciona un servicio'
     if (!fecha) errors.fecha = 'Selecciona una fecha'
-    if (fecha && fecha < fechaMinima) errors.fecha = 'La fecha no puede ser anterior a hoy'
+    if (fecha && fecha < fechaLima()) errors.fecha = 'La fecha no puede ser anterior a hoy'
     if (!hora) errors.hora = 'Selecciona una hora'
     if (biciDescripcion.trim().length < 4) errors.biciDescripcion = 'Describe la bicicleta'
 
@@ -179,6 +181,7 @@ function AgendarCita() {
                     <Clock3 className="h-5 w-5 text-blue-600" aria-hidden="true" />
                     Fecha y hora
                   </h2>
+                  {agenda?.apertura && agenda?.cierre && <p className="mb-3 text-sm text-slate-600">Horario de atención: {agenda.apertura} a {agenda.cierre} (hora de Lima). La disponibilidad se confirma al reservar.</p>}
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <FormField label="Fecha" error={fieldErrors.fecha}>
                       <input
@@ -194,6 +197,8 @@ function AgendarCita() {
                     </FormField>
                     <FormField label="Hora" error={fieldErrors.hora}>
                       <input
+                        min={agenda?.apertura || undefined}
+                        max={agenda?.cierre || undefined}
                         type="time"
                         value={hora}
                         onChange={(e) => {

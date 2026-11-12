@@ -173,3 +173,11 @@
   }
 }
 
+
+/* Consistent panel controls and dialogs at narrow widths and browser zoom. */
+.alpha-shell :is(button, input, select, textarea) { font-size: max(.875rem, 1em); }
+.alpha-shell :is(button, a, input, select, textarea):focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }
+.alpha-shell [class*="text-[10px]"], .alpha-shell [class*="text-[11px]"] { font-size: .75rem; }
+.alpha-shell :is(button, input, select, textarea) { max-width: 100%; }
+.alpha-shell input:disabled { background: #f1f5f9; color: #475569; }
+.alpha-shell [role="dialog"] { overflow-y: auto; }

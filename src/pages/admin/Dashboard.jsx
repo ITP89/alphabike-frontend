@@ -36,7 +36,7 @@ function MetricCard({ title, value, icon: Icon, color = 'amber' }) {
           <Icon className="h-5 w-5" aria-hidden="true" />
         </div>
         <span className="inline-flex items-center text-[10px] font-extrabold uppercase text-slate-400 gap-1 bg-slate-100 px-2 py-0.5 rounded-md">
-          <TrendingUp className="h-3 w-3 text-emerald-500" /> Operativo
+          <TrendingUp className="h-3 w-3 text-emerald-500" /> Registrado
         </span>
       </div>
       <p className="text-xs font-bold uppercase tracking-wider text-slate-500">{title}</p>
@@ -63,6 +63,8 @@ function EstadoBadge({ estado }) {
 }
 
 function DashboardAdmin() {
+  const [configPago, setConfigPago] = useState(null)
+  useEffect(() => { api.get('/mercado-pago/config').then(r => setConfigPago(r.data.data)).catch(() => setConfigPago(null)) }, [])
   const [datos, setDatos] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
@@ -118,7 +120,7 @@ function DashboardAdmin() {
         if (metodo === 'TARJETA') tarjeta += m
         else if (metodo === 'YAPE' || metodo === 'PLIN') yape += m
         else if (metodo === 'TRANSFERENCIA') transfer += m
-        else efectivo += m
+        else if (metodo === 'EFECTIVO') efectivo += m
       }
     })
 
@@ -144,8 +146,8 @@ function DashboardAdmin() {
         <div className="flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-xs font-bold text-emerald-800 shadow-sm">
           <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
           <div>
-            <span className="block font-black text-[11px] uppercase tracking-wide">Pasarela de Pago Lista</span>
-            <span className="text-[10px] text-emerald-700">Sandbox Activo • Plug-in Comercial Ready</span>
+            <span className="block font-black text-[11px] uppercase tracking-wide">{configPago ? configPago.enabled ? configPago.ready ? 'Mercado Pago configurado' : 'Mercado Pago pendiente' : 'Pagos de demostración' : 'Estado de pagos no disponible'}</span>
+            <span className="text-[10px] text-emerald-700">{configPago?.enabled ? configPago.live ? 'Modo de producción' : 'Modo de prueba' : 'Consulta el detalle de cada operación'}</span>
           </div>
         </div>
       </div>
@@ -198,7 +200,7 @@ function DashboardAdmin() {
                   <span>Tarjetas (Visa/Master)</span>
                 </div>
                 <p className="text-xl font-black text-slate-900">{formatMoney(desgloseMetodos.tarjeta)}</p>
-                <span className="text-[10px] text-blue-600 font-semibold">Cifrado SSL 256-bit</span>
+                <span className="text-[10px] text-blue-600 font-semibold">Pagos registrados con tarjeta</span>
               </div>
 
               <div className="rounded-xl border border-purple-100 bg-purple-50/50 p-3.5">

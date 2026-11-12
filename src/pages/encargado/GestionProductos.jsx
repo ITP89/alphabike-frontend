@@ -1,3 +1,4 @@
+import { useSubmission } from '../../hooks/useSubmission'
 import { useRefreshCatalogo } from '../../hooks/useRefreshCatalogo'
 import { useState, useEffect } from 'react'
 import { ImagePlus, Upload, Plus, Search, X } from 'lucide-react'
@@ -10,6 +11,7 @@ import ImageFallback from '../../components/ui/ImageFallback'
 import { getApiErrorMessage } from '../../utils/apiError'
 
 function GestionProductos() {
+  const submission = useSubmission()
   const refreshCatalogo = useRefreshCatalogo()
   const [productos, setProductos] = useState([])
   const [cargando, setCargando] = useState(true)
@@ -122,6 +124,7 @@ function GestionProductos() {
       return
     }
 
+    if (!submission.start()) return
     try {
       const payload = {
         ...form,
@@ -159,7 +162,7 @@ function GestionProductos() {
       })
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo guardar el producto') })
-    }
+    } finally { submission.end() }
   }
 
   async function handleActualizarStock(id) {
@@ -169,13 +172,16 @@ function GestionProductos() {
     }
 
     try {
-      const response = await api.patch(`/productos/${id}/stock?stock=${nuevoStock}`)
+      const response = await api.patch(`/productos/${id}/stock?stock=${nuevoStock}&stockEsperado=${productos.find((p) => p.id === id)?.stock}`)
       await refreshCatalogo()
       setProductos((prev) => prev.map((p) => p.id === id ? response.data.data : p))
       setEditandoStock(null)
       setNuevoStock('')
       setMensaje({ type: 'success', text: 'Stock actualizado correctamente' })
     } catch (err) {
+      if (err.response?.status === 409) {
+        try { const res = await api.get('/productos/todos'); setProductos(res.data.data || []); setEditandoStock(null) } catch { /* Keep the conflict message visible. */ }
+      }
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo actualizar el stock') })
     }
   }
@@ -271,6 +277,8 @@ function GestionProductos() {
                   <input
                     type="number"
                     placeholder="0"
+                    disabled={Boolean(modoEdicion)}
+                    title={modoEdicion ? "El stock se ajusta desde la columna Stock del inventario" : undefined}
                     value={form.stock}
                     onChange={(e) => setForm({ ...form, stock: e.target.value })}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
@@ -372,7 +380,7 @@ function GestionProductos() {
               Cancelar
             </button>
             <button
-              type="submit"
+              type="submit" disabled={submission.busy}
               className="rounded-xl bg-red-600 px-6 py-2.5 text-xs font-extrabold text-white shadow-md hover:bg-red-700 active:scale-95 transition-all"
             >
               {modoEdicion ? 'Guardar Cambios' : 'Crear Producto'}

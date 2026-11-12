@@ -72,18 +72,12 @@ function MiPerfil() {
       return
     }
 
-    if (!telefono.trim()) {
-      setMensajePassword({ type: 'error', text: 'Completa tu telefono antes de cambiar la contrasena' })
-      return
-    }
 
     setGuardandoPassword(true)
 
     try {
       const response = await api.put('/usuarios/perfil', {
-        nombre: nombre.trim(),
-        email,
-        telefono: telefono.trim(),
+        nombre: usuario.nombre,
         passwordActual,
         passwordNueva,
       })

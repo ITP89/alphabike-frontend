@@ -1,3 +1,4 @@
+import { useSubmission } from '../../hooks/useSubmission'
 import { useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Wrench, Plus, Sparkles, Edit, Trash2, X, Clock3 } from 'lucide-react'
@@ -16,6 +17,7 @@ const FORM_INICIAL = {
 }
 
 function GestionServicios() {
+  const submission = useSubmission()
   const queryClient = useQueryClient()
   const actualizarCatalogo = () => queryClient.invalidateQueries({ queryKey: ['api-get', '/servicios'] })
   const [servicios, setServicios] = useState([])
@@ -60,10 +62,11 @@ function GestionServicios() {
     setMensaje(null)
 
     if (!validarNumeros()) {
-      setMensaje({ type: 'error', text: 'El precio y la duración deben ser mayores a cero' })
+      setMensaje({ type: 'error', text: 'El precio base mínimo es S/30.00 y la duración debe ser mayor a cero' })
       return
     }
 
+    if (!submission.start()) return
     try {
       const response = await api.post('/servicios', {
         ...form,
@@ -76,7 +79,7 @@ function GestionServicios() {
       setMensaje({ type: 'success', text: 'Servicio creado correctamente' })
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo crear el servicio') })
-    }
+    } finally { submission.end() }
   }
 
   async function handleActualizar(e) {
@@ -84,10 +87,11 @@ function GestionServicios() {
     setMensaje(null)
 
     if (!validarNumeros()) {
-      setMensaje({ type: 'error', text: 'El precio y la duración deben ser mayores a cero' })
+      setMensaje({ type: 'error', text: 'El precio base mínimo es S/30.00 y la duración debe ser mayor a cero' })
       return
     }
 
+    if (!submission.start()) return
     try {
       const response = await api.put(`/servicios/${editando.id}`, {
         ...form,
@@ -102,10 +106,12 @@ function GestionServicios() {
       setMensaje({ type: 'success', text: 'Servicio actualizado correctamente' })
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo actualizar el servicio') })
-    }
+    } finally { submission.end() }
   }
 
   async function handleEliminar(id) {
+    const registro = servicios.find(item => item.id === id)
+    if (!window.confirm(`¿Eliminar definitivamente el servicio «${registro?.nombre || registro?.titulo || ''}»? Esta acción no se puede deshacer.`)) return
     setMensaje(null)
 
     try {
@@ -229,7 +235,7 @@ function GestionServicios() {
 
               <div className="flex gap-2 pt-2">
                 <button
-                  type="submit"
+                  type="submit" disabled={submission.busy}
                   className="flex-1 rounded-xl bg-amber-500 py-2.5 text-xs font-black text-slate-950 hover:bg-amber-400 transition-all shadow-md active:scale-95"
                 >
                   {editando ? 'Actualizar' : 'Guardar Servicio'}

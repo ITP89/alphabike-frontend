@@ -1,3 +1,4 @@
+import AccionesPedido from '../../components/AccionesPedido'
 import { useEffect, useMemo, useState } from 'react'
 import api from '../../api/axios'
 import LayoutEncargado from '../../components/LayoutEncargado'
@@ -28,7 +29,6 @@ function GestionEntregas() {
   const [cargando, setCargando] = useState(true)
   const [filtroTipo, setFiltroTipo] = useState('')
   const [filtroEstado, setFiltroEstado] = useState('')
-  const [seguimientos, setSeguimientos] = useState({})
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState(null)
 
@@ -71,8 +71,7 @@ function GestionEntregas() {
     }
   }
 
-  async function registrarSeguimiento(id) {
-    const numero = seguimientos[id]?.trim()
+  async function registrarSeguimiento(id, numero) {
     if (!numero) {
       setMensaje({ type: 'error', text: 'Ingresa el numero de seguimiento' })
       return
@@ -83,7 +82,6 @@ function GestionEntregas() {
     try {
       const response = await api.patch(`/pedidos/${id}/seguimiento?numeroSeguimiento=${encodeURIComponent(numero)}`)
       setPedidos((prev) => prev.map((pedido) => (pedido.id === id ? response.data.data : pedido)))
-      setSeguimientos((prev) => ({ ...prev, [id]: '' }))
       setMensaje({ type: 'success', text: 'Numero de seguimiento registrado' })
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo registrar el seguimiento') })
@@ -91,83 +89,7 @@ function GestionEntregas() {
   }
 
   function accionesPorTipo(pedido) {
-    if (pedido.tipoEntrega === 'RECOJO_TIENDA') {
-      if (pedido.estado === 'PAGADO' || pedido.estado === 'PENDIENTE') {
-        return (
-          <button
-            type="button"
-            onClick={() => cambiarEstado(pedido.id, 'LISTO_PARA_RECOJO')}
-            className="rounded-md bg-blue-600 px-2 py-1 text-xs font-medium text-white hover:bg-blue-700"
-          >
-            Listo para recojo
-          </button>
-        )
-      }
-      if (pedido.estado === 'LISTO_PARA_RECOJO') {
-        return (
-          <button
-            type="button"
-            onClick={() => cambiarEstado(pedido.id, 'ENTREGADO')}
-            className="rounded-md bg-emerald-600 px-2 py-1 text-xs font-medium text-white hover:bg-emerald-700"
-          >
-            Marcar entregado
-          </button>
-        )
-      }
-    }
-
-    if (pedido.tipoEntrega === 'DELIVERY_LIMA') {
-      if (pedido.estado === 'PAGADO' || pedido.estado === 'PENDIENTE') {
-        return (
-          <button
-            type="button"
-            onClick={() => cambiarEstado(pedido.id, 'EN_CAMINO')}
-            className="rounded-md bg-blue-600 px-2 py-1 text-xs font-medium text-white hover:bg-blue-700"
-          >
-            Marcar en camino
-          </button>
-        )
-      }
-      if (pedido.estado === 'EN_CAMINO') {
-        return (
-          <button
-            type="button"
-            onClick={() => cambiarEstado(pedido.id, 'ENTREGADO')}
-            className="rounded-md bg-emerald-600 px-2 py-1 text-xs font-medium text-white hover:bg-emerald-700"
-          >
-            Marcar entregado
-          </button>
-        )
-      }
-    }
-
-    if (pedido.tipoEntrega === 'ENVIO_PROVINCIA') {
-      if (pedido.estado !== 'ENVIADO' && pedido.estado !== 'ENTREGADO') {
-        return (
-          <div className="flex flex-wrap items-center gap-2">
-            <input
-              type="text"
-              placeholder="Nro. seguimiento"
-              value={seguimientos[pedido.id] || ''}
-              onChange={(e) => setSeguimientos((prev) => ({ ...prev, [pedido.id]: e.target.value }))}
-              className="w-36 rounded-md border border-gray-300 px-2 py-1 text-xs"
-            />
-            <button
-              type="button"
-              onClick={() => registrarSeguimiento(pedido.id)}
-              className="rounded-md bg-blue-600 px-2 py-1 text-xs font-medium text-white hover:bg-blue-700"
-            >
-              Enviado
-            </button>
-          </div>
-        )
-      }
-      if (pedido.estado === 'ENVIADO') {
-        return <span className="text-xs text-gray-500">Seguimiento: {pedido.numeroSeguimiento || '-'}</span>
-      }
-    }
-
-    return <span className="text-xs text-gray-400">Sin accion</span>
+    return <AccionesPedido pedido={pedido} onEstado={cambiarEstado} onSeguimiento={registrarSeguimiento} />
   }
 
   return (

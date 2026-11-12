@@ -28,6 +28,7 @@ function setup() {
  return page => rerender(wrap(page))
 }
 it('retira la categoria eliminada del filtro al volver a tienda sin recargar', async () => {
+  vi.spyOn(window, 'confirm').mockReturnValue(true)
  productos = []
  const go = setup()
  await screen.findByRole('option', { name: 'Categoria de prueba' })

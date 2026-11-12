@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../../api/axios'
+import { Link } from 'react-router-dom'
 import LayoutEncargado from '../../components/LayoutEncargado'
 import { ErrorState, LoadingState } from '../../components/ui/AsyncState'
 import { getApiErrorMessage } from '../../utils/apiError'
@@ -13,6 +14,7 @@ const LABELS_TIPO = {
 const LABELS_METODO = {
   EFECTIVO: 'Efectivo',
   TARJETA: 'Tarjeta',
+  MERCADO_PAGO: 'Mercado Pago',
   YAPE: 'Yape',
   PLIN: 'Plin',
   TRANSFERENCIA: 'Transferencia',
@@ -81,12 +83,13 @@ function GestionPagos() {
         <ErrorState message={error} />
       ) : (
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <div className="hidden lg:grid lg:grid-cols-5 px-4 py-2 bg-gray-50 text-xs font-medium text-gray-500">
+          <div className="hidden lg:grid lg:grid-cols-6 px-4 py-2 bg-gray-50 text-xs font-medium text-gray-500">
             <span>Referencia</span>
             <span>Tipo</span>
             <span>Monto</span>
             <span>Metodo</span>
             <span>Fecha</span>
+            <span>Estado</span>
           </div>
 
           {pagosFiltrados.length === 0 && (
@@ -94,14 +97,15 @@ function GestionPagos() {
           )}
 
           {pagosFiltrados.map((pago) => (
-            <div key={pago.id} className="grid grid-cols-1 gap-3 px-4 py-4 border-t border-gray-200 text-sm sm:grid-cols-2 lg:grid-cols-5 lg:items-center">
-              <span className="min-w-0 break-words text-gray-900"><span className="mb-1 block text-xs text-gray-500 lg:sr-only">Referencia</span>#{pago.referenciaId.slice(0, 8)}</span>
+            <div key={pago.id} className="grid grid-cols-1 gap-3 px-4 py-4 border-t border-gray-200 text-sm sm:grid-cols-2 lg:grid-cols-6 lg:items-center">
+              <span className="min-w-0 break-words text-gray-900"><span className="mb-1 block text-xs text-gray-500 lg:sr-only">Referencia</span>#{pago.referenciaId.slice(0, 8)}{pago.referenciaTipo === 'PEDIDO' && <Link to="/encargado/entregas" className="ml-2 text-blue-700 underline">Ver pedidos</Link>}</span>
               <span className="min-w-0 break-words"><span className="mb-1 block text-xs text-gray-500 lg:sr-only">Tipo</span>{LABELS_TIPO[pago.referenciaTipo] || pago.referenciaTipo}</span>
               <span className="min-w-0 break-words font-medium"><span className="mb-1 block text-xs text-gray-500 lg:sr-only">Monto</span>{formatMoney(pago.monto)}</span>
               <span className="min-w-0 break-words"><span className="mb-1 block text-xs text-gray-500 lg:sr-only">Metodo</span>{LABELS_METODO[pago.metodoPago] || pago.metodoPago}</span>
               <span className="min-w-0 break-words text-gray-500"><span className="mb-1 block text-xs lg:sr-only">Fecha</span>
                 {new Date(pago.fecha).toLocaleDateString('es-PE')}
               </span>
+              <span><span className="mb-1 block text-xs text-gray-500 lg:sr-only">Estado</span>{pago.estado === 'PAGADO' ? 'Pagado' : 'Pendiente'}</span>
             </div>
           ))}
         </div>

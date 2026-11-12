@@ -146,7 +146,7 @@ function DetalleCita() {
                   Monto: {formatMoney(cotizacion.monto)}
                 </p>
 
-                {cotizacion.estado === 'PENDIENTE' && (
+                {cotizacion.estado === 'PENDIENTE' && !['COMPLETADO', 'CANCELADO'].includes(cita.estado) && (
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <button
                       type="button"

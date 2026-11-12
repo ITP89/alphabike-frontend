@@ -1,3 +1,5 @@
+import AsignacionCita from '../../components/AsignacionCita'
+import { citaCerrada, estadosDisponibles, ESTADOS_CITA } from '../../utils/citaWorkflow'
 import HistorialCita from '../../components/HistorialCita'
 import { useCallback, useEffect, useState } from 'react'
 import { ArrowLeft, CreditCard, FileText } from 'lucide-react'
@@ -144,19 +146,19 @@ function AdminDetalleCita() {
           <p className="mt-1 text-sm text-gray-500">Cliente: {cita.clienteNombre}</p>
         </div>
         <select
+          aria-label="Estado de la cita"
+          disabled={citaCerrada(cita)}
           value={cita.estado}
           onChange={(e) => cambiarEstado(e.target.value)}
           className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm lg:w-56"
         >
-          <option value="PENDIENTE">Pendiente</option>
-          <option value="EN_PROCESO">En proceso</option>
-          <option value="COMPLETADO">Completado</option>
-          <option value="CANCELADO">Cancelado</option>
+          {estadosDisponibles(cita.estado).map(estado => <option key={estado} value={estado}>{ESTADOS_CITA[estado]}</option>)}
         </select>
       </div>
 
       {mensaje && <Alert type={mensaje.type} className="mb-4">{mensaje.text}</Alert>}
 
+      <AsignacionCita cita={cita} onChange={setCita} />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <section className="space-y-4">
           <div className="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
@@ -176,6 +178,8 @@ function AdminDetalleCita() {
               Cotizacion
             </h2>
             <textarea
+              aria-label="Descripción de la cotización"
+              required maxLength={255} disabled={citaCerrada(cita)}
               placeholder="Descripcion del trabajo"
               value={descCotizacion}
               onChange={(e) => setDescCotizacion(e.target.value)}
@@ -184,8 +188,10 @@ function AdminDetalleCita() {
             />
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-[160px_1fr]">
               <input
+                aria-label="Monto de la cotización"
+                required disabled={citaCerrada(cita)}
                 type="number"
-                min="0"
+                min="0.01"
                 step="0.01"
                 placeholder="Monto S/"
                 value={montoCotizacion}
@@ -194,7 +200,7 @@ function AdminDetalleCita() {
               />
               <button
                 type="submit"
-                disabled={guardandoCotizacion}
+                disabled={guardandoCotizacion || citaCerrada(cita)}
                 className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {guardandoCotizacion ? 'Guardando...' : 'Guardar cotizacion'}
@@ -209,7 +215,7 @@ function AdminDetalleCita() {
             <CreditCard className="h-4 w-4 text-blue-600" aria-hidden="true" />
             Registrar pago
           </h2>
-          {cotizacion ? (
+          {cotizacion && !citaCerrada(cita) && cotizacion.estado !== 'RECHAZADA' ? (
             <>
               <p className="mb-3 text-sm text-gray-600">Monto: {formatMoney(cotizacion.monto)}</p>
               <select
@@ -228,11 +234,11 @@ function AdminDetalleCita() {
                 disabled={registrandoPago}
                 className="w-full rounded-md bg-emerald-600 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {registrandoPago ? 'Registrando...' : 'Registrar pago'}
+                {registrandoPago ? 'Registrando...' : 'Registrar pago y finalizar servicio'}
               </button>
             </>
           ) : (
-            <p className="text-sm text-gray-500">Genera una cotizacion primero.</p>
+            <p className="text-sm text-gray-500">{citaCerrada(cita) ? 'Esta cita está cerrada. No hay cobros disponibles desde esta pantalla.' : cotizacion?.estado === 'RECHAZADA' ? 'La cotización fue rechazada por el cliente.' : 'Genera una cotización primero.'}</p>
           )}
         </section>
       </div>

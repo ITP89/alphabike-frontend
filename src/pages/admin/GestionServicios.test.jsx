@@ -11,6 +11,7 @@ vi.mock('../../components/LayoutAdmin', () => ({ default: ({ children }) => <mai
 vi.mock('../../components/Navbar', () => ({ default: () => <nav>AlphaBike</nav> }))
 
 it('actualiza el catalogo publico tras crear, editar y eliminar desde administracion', async () => {
+  vi.spyOn(window, 'confirm').mockReturnValue(true)
   let rows = [{ id: '1', nombre: 'Servicio original', descripcion: 'Revision', precioBase: 50, duracionMin: 30 }]
   api.get.mockImplementation(async () => ({ data: { data: [...rows] } }))
   api.post.mockImplementation(async (_, body) => {

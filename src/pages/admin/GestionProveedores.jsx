@@ -1,3 +1,4 @@
+import { useSubmission } from '../../hooks/useSubmission'
 import { useEffect, useMemo, useState } from 'react'
 import { Building2, Edit, Mail, MapPin, Phone, Plus, Search, ShieldCheck, ToggleLeft, ToggleRight, X } from 'lucide-react'
 import api from '../../api/axios'
@@ -16,6 +17,7 @@ const FORM_INICIAL = {
 }
 
 function GestionProveedores() {
+  const submission = useSubmission()
   const [proveedores, setProveedores] = useState([])
   const [cargando, setCargando] = useState(true)
   const [busqueda, setBusqueda] = useState('')
@@ -83,6 +85,7 @@ function GestionProveedores() {
     event.preventDefault()
     setMensaje(null)
 
+    if (!submission.start()) return
     try {
       const response = editando
         ? await api.put(`/proveedores/${editando.id}`, form)
@@ -98,7 +101,7 @@ function GestionProveedores() {
       setMensaje({ type: 'success', text: editando ? 'Proveedor actualizado correctamente' : 'Proveedor registrado correctamente' })
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo guardar el proveedor') })
-    }
+    } finally { submission.end() }
   }
 
   async function cambiarEstado(proveedor) {
@@ -220,7 +223,7 @@ function GestionProveedores() {
               </div>
 
               <button
-                type="submit"
+                type="submit" disabled={submission.busy}
                 className="w-full rounded-xl bg-red-600 py-2.5 text-xs font-black text-white shadow-md transition-all hover:bg-red-500 active:scale-95"
               >
                 {editando ? 'Guardar Cambios' : 'Registrar Proveedor'}

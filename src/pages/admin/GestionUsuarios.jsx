@@ -1,3 +1,5 @@
+import { useSubmission } from '../../hooks/useSubmission'
+import { useAuth } from '../../context/AuthContext'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { UserPlus, Search, UserCheck, Lock, Unlock, History, Sparkles } from 'lucide-react'
@@ -17,6 +19,9 @@ const LABELS_ROL = {
 const FORM_INICIAL = { nombre: '', email: '', password: '', telefono: '', rol: 'ENCARGADO' }
 
 function GestionUsuarios() {
+  const submission = useSubmission()
+  const { usuario: sesion } = useAuth()
+  const [editando, setEditando] = useState(null)
   const [usuarios, setUsuarios] = useState([])
   const [cargando, setCargando] = useState(true)
   const [filtroRol, setFiltroRol] = useState('')
@@ -62,21 +67,25 @@ function GestionUsuarios() {
     e.preventDefault()
     setMensaje(null)
 
+    if (!submission.start()) return
     try {
-      const response = await api.post('/usuarios', {
+      const payload = {
         nombre: form.nombre.trim(),
         email: form.email.trim(),
         password: form.password,
         telefono: form.telefono.trim(),
         rol: form.rol,
-      })
-      setUsuarios((prev) => [...prev, response.data.data])
+      }
+      if (editando) delete payload.password
+      const response = editando ? await api.put(`/usuarios/${editando}`, payload) : await api.post('/usuarios', payload)
+      setUsuarios((prev) => editando ? prev.map(u => u.id === editando ? response.data.data : u) : [...prev, response.data.data])
+      setEditando(null)
       setMostrarFormulario(false)
       setForm(FORM_INICIAL)
-      setMensaje({ type: 'success', text: 'Usuario registrado correctamente' })
+      setMensaje({ type: 'success', text: editando ? 'Usuario actualizado correctamente' : 'Usuario registrado correctamente' })
     } catch (err) {
-      setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo crear el usuario') })
-    }
+      setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo guardar el usuario') })
+    } finally { submission.end() }
   }
 
   async function handleCambiarEstado(id, estadoActual) {
@@ -131,7 +140,7 @@ function GestionUsuarios() {
         <form onSubmit={handleCrearUsuario} className="mb-8 rounded-2xl border border-amber-200 bg-white p-6 shadow-lg animate-fade-in">
           <h2 className="mb-4 text-base font-black text-slate-900 flex items-center gap-2">
             <UserCheck className="h-5 w-5 text-amber-500" />
-            Registrar Nuevo Usuario
+            {editando ? 'Editar datos del usuario' : 'Registrar Nuevo Usuario'}
           </h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             <div>
@@ -139,7 +148,7 @@ function GestionUsuarios() {
               <input
                 type="text"
                 placeholder="Ej. Juan Pérez"
-                value={form.nombre}
+                aria-label="Nombre del usuario" value={form.nombre}
                 onChange={(e) => setForm({ ...form, nombre: e.target.value })}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
                 required
@@ -150,7 +159,7 @@ function GestionUsuarios() {
               <input
                 type="email"
                 placeholder="juan@ejemplo.com"
-                value={form.email}
+                disabled={Boolean(editando)} aria-label="Correo del usuario" value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
                 required
@@ -161,7 +170,7 @@ function GestionUsuarios() {
               <input
                 type="text"
                 placeholder="+51 987 654 321"
-                value={form.telefono}
+                aria-label="Teléfono del usuario" value={form.telefono}
                 onChange={(e) => setForm({ ...form, telefono: e.target.value })}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
                 required
@@ -172,7 +181,7 @@ function GestionUsuarios() {
               <input
                 type="password"
                 placeholder="••••••••"
-                value={form.password}
+                disabled={Boolean(editando)} aria-label="Contraseña inicial" value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
                 required
@@ -181,7 +190,7 @@ function GestionUsuarios() {
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Rol de asignación *</label>
               <select
-                value={form.rol}
+                disabled={Boolean(editando)} aria-label="Rol del nuevo usuario" value={form.rol}
                 onChange={(e) => setForm({ ...form, rol: e.target.value })}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-extrabold text-slate-900 focus:bg-white focus:border-amber-500"
               >
@@ -193,10 +202,10 @@ function GestionUsuarios() {
           </div>
           <div className="mt-4 flex justify-end gap-2">
             <button
-              type="submit"
+              type="submit" disabled={submission.busy}
               className="rounded-xl bg-amber-500 px-6 py-2.5 text-xs font-black text-slate-950 hover:bg-amber-400 transition-all shadow-md active:scale-95"
             >
-              Guardar Usuario
+              {editando ? 'Guardar cambios' : 'Guardar Usuario'}
             </button>
           </div>
         </form>
@@ -265,6 +274,8 @@ function GestionUsuarios() {
                 <div>
                   <select
                     value={usuario.rol}
+                    disabled={usuario.id === sesion.id || (usuario.rol === 'ADMIN' && usuario.estado === 'ACTIVO' && usuarios.filter(u => u.rol === 'ADMIN' && u.estado === 'ACTIVO').length <= 1)}
+                    aria-label={`Rol de ${usuario.nombre}`}
                     onChange={(e) => handleCambiarRol(usuario.id, e.target.value)}
                     className={classNames('rounded-xl border px-2.5 py-1 text-[11px] cursor-pointer focus:outline-none', rol.color)}
                   >
@@ -284,6 +295,7 @@ function GestionUsuarios() {
                 <div className="flex items-center justify-end gap-2">
                   <button
                     type="button"
+                    disabled={usuario.id === sesion.id || (usuario.rol === 'ADMIN' && usuario.estado === 'ACTIVO' && usuarios.filter(u => u.rol === 'ADMIN' && u.estado === 'ACTIVO').length <= 1)}
                     onClick={() => handleCambiarEstado(usuario.id, usuario.estado)}
                     className={classNames(
                       'inline-flex items-center gap-1 rounded-xl border px-2.5 py-1.5 text-[11px] font-bold transition-all',
@@ -295,6 +307,7 @@ function GestionUsuarios() {
                     {usuario.estado === 'ACTIVO' ? <Lock className="h-3 w-3" /> : <Unlock className="h-3 w-3" />}
                     {usuario.estado === 'ACTIVO' ? 'Inactivar' : 'Activar'}
                   </button>
+                  <button type="button" onClick={() => { setEditando(usuario.id); setForm({ ...FORM_INICIAL, ...usuario, password: '' }); setMostrarFormulario(true); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="rounded-lg border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-700">Editar datos</button>
                   <Link
                     to={`/admin/usuarios/${usuario.id}`}
                     className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-bold text-slate-700 hover:bg-slate-100 transition-all"

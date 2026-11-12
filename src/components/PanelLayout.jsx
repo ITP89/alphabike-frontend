@@ -53,12 +53,12 @@ function PanelLayout({ children, title, subtitle, links = [] }) {
     <div className="alpha-shell font-sans selection:bg-red-600 selection:text-white">
       {/* Mobile Top Header */}
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 text-slate-950 shadow-sm backdrop-blur-xl lg:hidden">
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center justify-between gap-2 px-3 py-3 sm:px-4">
           <Link to="/" className="flex items-center gap-2">
             <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
               <img src={alphaLogo} alt="AlphaBike" className="h-full w-full object-contain" />
             </span>
-            <span className="text-base font-black tracking-tight">AlphaBike <span className="text-red-600 text-xs font-bold">PRO</span></span>
+            <span className="text-sm font-black tracking-tight sm:text-base">AlphaBike <span className="hidden text-red-600 text-xs font-bold sm:inline">PRO</span></span>
           </Link>
           <div className="flex items-center gap-2">
             <RealtimeStatus />

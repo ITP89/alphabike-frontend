@@ -34,7 +34,7 @@ export default function ComprobanteModal({ comprobante, onContinuar }) {
         <div className="my-5 rounded-xl border border-dashed border-zinc-300 bg-zinc-50/80 p-4 font-mono text-xs text-zinc-800 space-y-2.5">
           <div className="flex justify-between border-b border-zinc-200 pb-2 text-[11px] font-bold">
             <span>ALPHABIKE TALLER & STORE S.A.C.</span>
-            <span>RUC: 20608945123</span>
+            <span>Demostración académica · Sin valor tributario</span>
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-[11px]">

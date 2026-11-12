@@ -1,3 +1,5 @@
+import { useDialog } from '../../hooks/useDialog'
+import { useCallback } from 'react'
 import { useState, useEffect, useMemo } from 'react'
 import {
   CreditCard,
@@ -36,6 +38,9 @@ const LABELS_METODO = {
 }
 
 function AdminPagos() {
+  const [referencias, setReferencias] = useState([])
+  const [errorReferencias, setErrorReferencias] = useState('')
+  const [cargandoReferencias, setCargandoReferencias] = useState(false)
   const [pagos, setPagos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
@@ -47,6 +52,8 @@ function AdminPagos() {
 
   const [modalRegistroAbierto, setModalRegistroAbierto] = useState(false)
   const [pagoDetalle, setPagoDetalle] = useState(null)
+  const cerrarDialogo = useCallback(() => { setModalRegistroAbierto(false); setPagoDetalle(null) }, [])
+  useDialog(modalRegistroAbierto || Boolean(pagoDetalle), cerrarDialogo)
 
   const [formCobro, setFormCobro] = useState({
     referenciaTipo: 'PEDIDO',
@@ -55,6 +62,16 @@ function AdminPagos() {
     metodoPago: 'EFECTIVO',
   })
   const [guardandoCobro, setGuardandoCobro] = useState(false)
+  useEffect(() => {
+    if (!modalRegistroAbierto) return
+    let active = true
+    setCargandoReferencias(true); setErrorReferencias('')
+    api.get('/pagos/referencias-pendientes').then(r => { if (active) setReferencias(r.data.data) })
+      .catch(err => { if (active) { setReferencias([]); setErrorReferencias(getApiErrorMessage(err, 'No se pudieron consultar los cobros pendientes')) } })
+      .finally(() => { if (active) setCargandoReferencias(false) })
+    return () => { active = false }
+  }, [modalRegistroAbierto])
+
 
   async function cargarPagos() {
     setCargando(true)
@@ -109,6 +126,7 @@ function AdminPagos() {
     let mercadoPago = 0
 
     pagos.forEach((p) => {
+      if (p.estado !== 'PAGADO') return
       const m = Number(p.monto) || 0
       const metodo = p.metodoPagoReal || p.metodoPago
       total += m
@@ -191,7 +209,7 @@ function AdminPagos() {
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Gestión Financiera de Pagos</h1>
           <p className="mt-0.5 text-xs text-slate-500 font-medium">
-            Control de cobros en tiempo real vía Tarjetas (Sandbox/Culqi/MP), Yape, Plin, Transferencias y Caja Presencial.
+            Consulta y registro de pagos de pedidos y servicios. El estado de cada operación se confirma en el sistema.
           </p>
         </div>
 
@@ -442,8 +460,8 @@ function AdminPagos() {
 
       {/* Modal: Registrar Cobro Manual */}
       {modalRegistroAbierto && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+        <div role="dialog" aria-modal="true" aria-label="Gestión de pago" className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
               <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600">
@@ -454,6 +472,7 @@ function AdminPagos() {
               <button
                 type="button"
                 onClick={() => setModalRegistroAbierto(false)}
+                aria-label="Cerrar registro de cobro"
                 className="text-slate-400 hover:text-slate-600"
               >
                 <X className="h-5 w-5" />
@@ -465,7 +484,7 @@ function AdminPagos() {
                 <label className="block text-xs font-bold text-slate-700 mb-1">Tipo de Origen</label>
                 <select
                   value={formCobro.referenciaTipo}
-                  onChange={(e) => setFormCobro({ ...formCobro, referenciaTipo: e.target.value })}
+                  aria-label="Tipo de cobro" onChange={(e) => setFormCobro({ ...formCobro, referenciaTipo: e.target.value, referenciaId: '', monto: '' })}
                   className="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs font-bold text-slate-800 focus:border-red-500"
                 >
                   <option value="PEDIDO">Pedido de Tienda</option>
@@ -474,17 +493,15 @@ function AdminPagos() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  ID de Referencia (UUID del Pedido o Cotización)
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ej. c2807f43-85b9-..."
-                  value={formCobro.referenciaId}
-                  onChange={(e) => setFormCobro({ ...formCobro, referenciaId: e.target.value })}
-                  required
-                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs font-bold text-slate-800 focus:border-red-500"
-                />
+                <label htmlFor="referencia-cobro" className="mb-1 block text-sm font-semibold">Pedido o servicio pendiente</label>
+                {cargandoReferencias ? <p role="status">Consultando cobros pendientes…</p> : <select id="referencia-cobro" required value={formCobro.referenciaId} onChange={e => {
+                  const referencia = referencias.find(r => r.id === e.target.value && r.tipo === formCobro.referenciaTipo)
+                  setFormCobro({ ...formCobro, referenciaId: referencia?.id || '', monto: referencia?.monto ?? '' })
+                }} className="w-full rounded-lg border p-3 text-sm">
+                  <option value="">Selecciona una referencia pendiente</option>
+                  {referencias.filter(r => r.tipo === formCobro.referenciaTipo).map(r => <option key={r.id} value={r.id}>{r.descripcion} · {formatMoney(r.monto)}</option>)}
+                </select>}
+                {errorReferencias && <p role="alert" className="text-sm text-red-700">{errorReferencias}</p>}
               </div>
 
               <div>
@@ -494,6 +511,7 @@ function AdminPagos() {
                   step="0.01"
                   min="0.10"
                   placeholder="0.00"
+                  aria-label="Monto del cobro" readOnly
                   value={formCobro.monto}
                   onChange={(e) => setFormCobro({ ...formCobro, monto: e.target.value })}
                   required
@@ -525,7 +543,7 @@ function AdminPagos() {
                 </button>
                 <button
                   type="submit"
-                  disabled={guardandoCobro}
+                  disabled={guardandoCobro || cargandoReferencias || !formCobro.referenciaId || Boolean(errorReferencias)}
                   className="rounded-xl bg-red-600 px-4 py-2 text-xs font-black text-white hover:bg-red-700 shadow-md shadow-red-600/20 disabled:opacity-50"
                 >
                   {guardandoCobro ? 'Guardando...' : 'Confirmar Cobro'}
@@ -538,8 +556,8 @@ function AdminPagos() {
 
       {/* Modal: Auditoría de Voucher / Comprobante */}
       {pagoDetalle && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+        <div role="dialog" aria-modal="true" aria-label="Gestión de pago" className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
               <div className="flex items-center gap-2">
                 <Receipt className="h-5 w-5 text-red-600" />
@@ -548,6 +566,7 @@ function AdminPagos() {
               <button
                 type="button"
                 onClick={() => setPagoDetalle(null)}
+                aria-label="Cerrar detalle del pago"
                 className="text-slate-400 hover:text-slate-600"
               >
                 <X className="h-5 w-5" />

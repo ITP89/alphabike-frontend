@@ -1,3 +1,4 @@
+import { useSubmission } from '../../hooks/useSubmission'
 import { useRefreshCatalogo } from '../../hooks/useRefreshCatalogo'
 import { useEffect, useState } from 'react'
 import { FolderTree, Plus, Sparkles, Edit, Trash2, X } from 'lucide-react'
@@ -10,6 +11,7 @@ import { getApiErrorMessage } from '../../utils/apiError'
 const FORM_INICIAL = { nombre: '', descripcion: '' }
 
 function GestionCategorias() {
+  const submission = useSubmission()
   const refreshCatalogo = useRefreshCatalogo()
   const [categorias, setCategorias] = useState([])
   const [cargando, setCargando] = useState(true)
@@ -48,6 +50,7 @@ function GestionCategorias() {
     e.preventDefault()
     setMensaje(null)
 
+    if (!submission.start()) return
     try {
       const response = await api.post('/categorias', form)
       await refreshCatalogo()
@@ -56,13 +59,14 @@ function GestionCategorias() {
       setMensaje({ type: 'success', text: 'Categoría creada correctamente' })
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo crear la categoría') })
-    }
+    } finally { submission.end() }
   }
 
   async function handleActualizar(e) {
     e.preventDefault()
     setMensaje(null)
 
+    if (!submission.start()) return
     try {
       const response = await api.put(`/categorias/${editando.id}`, form)
       await refreshCatalogo()
@@ -73,10 +77,12 @@ function GestionCategorias() {
       setMensaje({ type: 'success', text: 'Categoría actualizada correctamente' })
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo actualizar la categoría') })
-    }
+    } finally { submission.end() }
   }
 
   async function handleEliminar(id) {
+    const registro = categorias.find(item => item.id === id)
+    if (!window.confirm(`¿Eliminar definitivamente el categoría «${registro?.nombre || registro?.titulo || ''}»? Esta acción no se puede deshacer.`)) return
     setMensaje(null)
 
     try {
@@ -163,7 +169,7 @@ function GestionCategorias() {
 
               <div className="flex gap-2 pt-2">
                 <button
-                  type="submit"
+                  type="submit" disabled={submission.busy}
                   className="flex-1 rounded-xl bg-amber-500 py-2.5 text-xs font-black text-slate-950 hover:bg-amber-400 transition-all shadow-md active:scale-95"
                 >
                   {editando ? 'Actualizar' : 'Guardar Categoría'}

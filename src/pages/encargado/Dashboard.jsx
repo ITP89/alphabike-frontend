@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { CalendarDays, CheckCircle2, Clock3, ReceiptText } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import api from '../../api/axios'
+import { useCitasRefresh } from '../../hooks/useCitasRefresh'
 import LayoutEncargado from '../../components/LayoutEncargado'
 import { ErrorState, LoadingState } from '../../components/ui/AsyncState'
 import { getApiErrorMessage } from '../../utils/apiError'
@@ -23,7 +24,7 @@ function MetricCard({ title, value, icon: Icon, accent = 'blue' }) {
 function EstadoBadge({ estado }) {
   const className = estado === 'PENDIENTE'
     ? 'bg-yellow-100 text-yellow-700'
-    : estado === 'EN_PROCESO'
+    : estado === 'CANCELADO' ? 'bg-gray-100 text-gray-700' : estado === 'EN_PROCESO'
       ? 'bg-blue-100 text-blue-700'
       : 'bg-emerald-100 text-emerald-700'
 
@@ -63,6 +64,8 @@ function DashboardEncargado() {
   useEffect(() => {
     cargarDatos()
   }, [cargarDatos])
+
+  useCitasRefresh(cargarDatos)
 
   const citasPendientes = citas.filter((cita) => cita.estado === 'PENDIENTE')
   const citasEnProceso = citas.filter((cita) => cita.estado === 'EN_PROCESO')
