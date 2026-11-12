@@ -16,6 +16,7 @@ function GestionProductos() {
   const [productos, setProductos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [busqueda, setBusqueda] = useState('')
+  const [verDescontinuados, setVerDescontinuados] = useState(false)
   const [editandoStock, setEditandoStock] = useState(null)
   const [nuevoStock, setNuevoStock] = useState('')
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
@@ -56,9 +57,10 @@ function GestionProductos() {
     cargarDatos()
   }, [])
 
-  const productosFiltrados = productos.filter((p) =>
-    (p.nombre || '').toLowerCase().includes(busqueda.toLowerCase()) ||
-    (p.marca || '').toLowerCase().includes(busqueda.toLowerCase())
+  const termino = busqueda.trim().toLowerCase()
+  const productosFiltrados = productos.filter((producto) =>
+    (producto.estado === 'DESCONTINUADO') === verDescontinuados &&
+    [producto.nombre, producto.marca].some((campo) => campo?.toLowerCase().includes(termino))
   )
 
   // Conversión de archivo local a Data URL Base64 para almacenar en la BD
@@ -406,6 +408,12 @@ function GestionProductos() {
           className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-xs font-semibold text-slate-900 placeholder-slate-400 shadow-sm focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
         />
       </div>
+
+      <label className="mb-4 flex items-center gap-2 text-sm font-medium text-slate-700">
+        <input type="checkbox" checked={verDescontinuados}
+          onChange={(event) => setVerDescontinuados(event.target.checked)} />
+        Ver productos descontinuados
+      </label>
 
       {cargando ? (
         <LoadingState text="Cargando productos..." />

@@ -4,7 +4,7 @@ import { formatMoney } from '../utils/formatters'
 
 const columns = 'xl:grid-cols-[minmax(200px,2fr)_1fr_1fr_1fr_1fr_1fr_150px]'
 
-function InventarioProductos({ productos, editandoStock, nuevoStock, onNuevoStock, onEditarStock, onGuardarStock, onEditar, onEliminar }) {
+function InventarioProductos({ productos, editandoStock, nuevoStock, onNuevoStock, onEditarStock, onGuardarStock, onEditar, onEliminar, retirando }) {
   return (
     <section tabIndex={0} aria-label="Inventario de productos" className="max-w-full rounded-2xl border border-slate-200 bg-white shadow-sm xl:overflow-x-auto">
       <p className="hidden px-5 py-2 text-xs text-slate-500 xl:block">Si no ves todas las columnas, desplázate horizontalmente para acceder a las acciones.</p>
@@ -20,6 +20,9 @@ function InventarioProductos({ productos, editandoStock, nuevoStock, onNuevoStoc
             <div className="min-w-0 break-words">
               <h2 className="font-extrabold text-slate-900">{producto.nombre}</h2>
               <p className="mt-1 text-slate-500">{producto.marca || 'Sin marca'}</p>
+              {producto.estado === 'DESCONTINUADO' && (
+                <span className="mt-1 inline-block rounded bg-slate-100 px-2 py-1 font-semibold text-slate-700">Descontinuado</span>
+              )}
             </div>
           </div>
           <div className="min-w-0 break-words"><span className="mb-1 block text-slate-500 xl:sr-only">Categoría</span>{producto.categoriaNombre || 'Sin categoría'}</div>
@@ -28,7 +31,9 @@ function InventarioProductos({ productos, editandoStock, nuevoStock, onNuevoStoc
           <div className="min-w-0 break-words font-bold text-red-700"><span className="mb-1 block font-normal text-slate-500 xl:sr-only">Mínimo</span>{formatMoney(producto.precioMinimoVenta ?? producto.precio)}</div>
           <div className="col-span-2 min-w-0 xl:col-span-1">
             <span className="mb-1 block text-slate-500 xl:sr-only">Stock</span>
-            {editandoStock === producto.id ? (
+            {producto.estado === 'DESCONTINUADO' ? (
+              <span>{producto.stock} uds</span>
+            ) : editandoStock === producto.id ? (
               <div className="flex flex-wrap items-center gap-2">
                 <input type="number" min="0" max="2147483647" step="1" aria-label={`Stock de ${producto.nombre}`} value={nuevoStock} onChange={event => onNuevoStock(event.target.value)} className="w-24 rounded-lg border border-slate-300 px-2 py-2" />
                 <button type="button" onClick={() => onGuardarStock(producto.id)} className="rounded-lg bg-slate-950 px-3 py-2 font-bold text-white">OK</button>
@@ -38,8 +43,10 @@ function InventarioProductos({ productos, editandoStock, nuevoStock, onNuevoStoc
             )}
           </div>
           <div className="col-span-2 flex flex-wrap gap-2 xl:col-span-1">
+            {producto.estado === 'DESCONTINUADO' ? <span className="text-slate-500">Fuera del catálogo</span> : <>
             <button type="button" onClick={() => onEditar(producto)} title="Editar producto e imagen" className="inline-flex items-center gap-1 rounded-xl border border-red-200 px-3 py-2 font-bold text-red-700 hover:bg-red-50"><Edit className="h-4 w-4" aria-hidden="true" />Editar</button>
-            {onEliminar && <button type="button" onClick={() => onEliminar(producto.id)} title="Descontinuar producto" aria-label={`Descontinuar ${producto.nombre}`} className="rounded-xl border border-red-200 px-3 py-2 text-red-600 hover:bg-red-50"><Trash2 className="h-4 w-4" aria-hidden="true" /></button>}
+            {onEliminar && <button type="button" disabled={retirando} onClick={() => onEliminar(producto.id)} title="Descontinuar producto" aria-label={`Descontinuar ${producto.nombre}`} className="rounded-xl border border-red-200 px-3 py-2 text-red-600 hover:bg-red-50"><Trash2 className="h-4 w-4" aria-hidden="true" /></button>}
+            </>}
           </div>
         </article>
       ))}

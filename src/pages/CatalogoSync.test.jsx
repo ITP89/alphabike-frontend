@@ -55,8 +55,13 @@ it('retira de tienda el producto descontinuado por administrador', async () => {
  const go = setup()
  await screen.findByText('10 disponibles')
  go(<AdminProductos />)
- fireEvent.click(await screen.findByTitle('Descontinuar producto'))
- await screen.findByText('Producto descontinuado correctamente')
+ const confirmar = vi.spyOn(window, 'confirm').mockReturnValue(true)
+ try {
+  fireEvent.click(await screen.findByTitle('Descontinuar producto'))
+  await screen.findByText(/Producto retirado del catálogo/)
+ } finally {
+  confirmar.mockRestore()
+ }
  go(<Tienda />)
  await waitFor(() => expect(screen.queryByText('Bicicleta de prueba')).not.toBeInTheDocument())
 })

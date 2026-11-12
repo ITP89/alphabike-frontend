@@ -31,6 +31,7 @@ function DetalleCita() {
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState('')
   const [procesando, setProcesando] = useState(false)
+  const [errorAccion, setErrorAccion] = useState('')
 
   const cargarDatos = useCallback(async () => {
     setCargando(true)
@@ -63,14 +64,30 @@ function DetalleCita() {
   async function responderCotizacion(estado) {
     setProcesando(true)
     setMensaje('')
-    setError('')
+    setErrorAccion('')
 
     try {
       const response = await api.patch(`/cotizaciones/${cotizacion.id}/estado?estado=${estado}`)
       setCotizacion(response.data.data)
       setMensaje(estado === 'ACEPTADA' ? 'Cotizacion aceptada correctamente' : 'Cotizacion rechazada')
     } catch (err) {
-      setError(getApiErrorMessage(err, 'No se pudo procesar tu respuesta'))
+      setErrorAccion(getApiErrorMessage(err, 'No se pudo procesar tu respuesta'))
+    } finally {
+      setProcesando(false)
+    }
+  }
+
+  async function cancelarCita() {
+    if (procesando || !window.confirm('¿Cancelar esta cita pendiente?')) return
+    setProcesando(true)
+    setMensaje('')
+    setErrorAccion('')
+    try {
+      await api.delete(`/citas/${id}`)
+      setCita((actual) => ({ ...actual, estado: 'CANCELADO' }))
+      setMensaje('Cita cancelada correctamente.')
+    } catch (err) {
+      setErrorAccion(getApiErrorMessage(err, 'No se pudo cancelar la cita'))
     } finally {
       setProcesando(false)
     }
@@ -112,7 +129,7 @@ function DetalleCita() {
         </Link>
 
         {mensaje && <Alert type="success" className="mb-4">{mensaje}</Alert>}
-        {error && <Alert type="error" className="mb-4">{error}</Alert>}
+        {errorAccion && <Alert type="error" className="mb-4">{errorAccion}</Alert>}
 
         <div className="mb-6">
           <h1 className="text-2xl font-semibold text-gray-950">{cita.servicioNombre}</h1>
@@ -187,6 +204,12 @@ function DetalleCita() {
                   )}
                 </p>
               </div>
+              {cita.estado === 'PENDIENTE' && (
+                <button type="button" disabled={procesando} onClick={cancelarCita}
+                  className="mt-4 w-full rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-700 disabled:opacity-50">
+                  Cancelar cita
+                </button>
+              )}
             </div>
           </aside>
         </div>

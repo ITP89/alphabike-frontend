@@ -16,6 +16,8 @@ function AdminProductos() {
   const [productos, setProductos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [busqueda, setBusqueda] = useState('')
+  const retiro = useSubmission()
+  const [verDescontinuados, setVerDescontinuados] = useState(false)
   const [editandoStock, setEditandoStock] = useState(null)
   const [nuevoStock, setNuevoStock] = useState('')
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
@@ -56,9 +58,10 @@ function AdminProductos() {
     cargarDatos()
   }, [])
 
-  const productosFiltrados = productos.filter((p) =>
-    (p.nombre || '').toLowerCase().includes(busqueda.toLowerCase()) ||
-    (p.marca || '').toLowerCase().includes(busqueda.toLowerCase())
+  const termino = busqueda.trim().toLowerCase()
+  const productosFiltrados = productos.filter((producto) =>
+    (producto.estado === 'DESCONTINUADO') === verDescontinuados &&
+    [producto.nombre, producto.marca].some((campo) => campo?.toLowerCase().includes(termino))
   )
 
   // Conversión de archivo local a Data URL Base64 para almacenar en la BD
@@ -167,13 +170,25 @@ function AdminProductos() {
   }
 
   async function handleEliminar(id) {
+    const producto = productos.find((item) => item.id === id)
+    if (!producto || producto.estado === 'DESCONTINUADO' || retiro.busy) return
+    if (!window.confirm(`¿Retirar «${producto.nombre}» del catálogo y de las ventas?`)) return
+    if (!retiro.start()) return
+    setMensaje(null)
     try {
       await api.delete(`/productos/${id}`)
-      await refreshCatalogo()
       setProductos((prev) => prev.map((p) => p.id === id ? { ...p, estado: 'DESCONTINUADO' } : p))
-      setMensaje({ type: 'success', text: 'Producto descontinuado correctamente' })
+      if (editandoStock === id) setEditandoStock(null)
+      if (modoEdicion === id) {
+        setModoEdicion(null)
+        setMostrarFormulario(false)
+      }
+      setMensaje({ type: 'success', text: 'Producto retirado del catálogo. Puedes consultarlo en productos descontinuados.' })
+      await refreshCatalogo()
     } catch (err) {
       setMensaje({ type: 'error', text: getApiErrorMessage(err, 'No se pudo descontinuar el producto') })
+    } finally {
+      retiro.end()
     }
   }
 
@@ -395,6 +410,12 @@ function AdminProductos() {
         />
       </div>
 
+      <label className="mb-4 flex items-center gap-2 text-sm font-medium text-slate-700">
+        <input type="checkbox" checked={verDescontinuados}
+          onChange={(event) => setVerDescontinuados(event.target.checked)} />
+        Ver productos descontinuados
+      </label>
+
       {cargando ? (
         <LoadingState text="Cargando productos..." />
       ) : error ? (
@@ -412,6 +433,7 @@ function AdminProductos() {
           onGuardarStock={handleActualizarStock}
           onEditar={handleEditarProducto}
           onEliminar={handleEliminar}
+          retirando={retiro.busy}
         />
       )}
     </LayoutAdmin>
