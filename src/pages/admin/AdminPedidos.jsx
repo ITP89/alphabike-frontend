@@ -243,7 +243,7 @@ function AdminPedidos() {
                 <div>
                   <span className="font-black text-slate-950 block">#{pedido.id.slice(0, 8)}</span>
                   <span className="text-[10px] text-slate-400 font-semibold">
-                    {pedido.fechaCreacion ? new Date(pedido.fechaCreacion).toLocaleDateString('es-PE') : 'Reciente'}
+                    {pedido.fecha ? new Date(pedido.fecha).toLocaleDateString('es-PE') : 'Reciente'}
                   </span>
                 </div>
 

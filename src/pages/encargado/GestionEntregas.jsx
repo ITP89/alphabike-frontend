@@ -5,7 +5,7 @@ import LayoutEncargado from '../../components/LayoutEncargado'
 import Alert from '../../components/ui/Alert'
 import { EmptyState, ErrorState, LoadingState } from '../../components/ui/AsyncState'
 import { getApiErrorMessage } from '../../utils/apiError'
-import { classNames } from '../../utils/formatters'
+import { classNames, formatMoney } from '../../utils/formatters'
 
 const LABELS_ENTREGA = {
   RECOJO_TIENDA: 'Recojo en tienda',
@@ -155,7 +155,28 @@ function GestionEntregas() {
                 <span className={classNames('inline-flex w-fit rounded-md px-2 py-1 text-xs font-medium', estado.color)}>
                   {estado.texto}
                 </span>
-                <div>{accionesPorTipo(pedido)}</div>
+                <div className="min-w-0">{accionesPorTipo(pedido)}</div>
+                <details className="min-w-0 rounded-lg border border-slate-200 p-3 lg:col-span-5">
+                  <summary className="cursor-pointer font-semibold text-blue-700">Ver detalle del pedido</summary>
+                  <div className="mt-3 grid gap-4 sm:grid-cols-2">
+                    <div className="min-w-0 space-y-2 break-words">
+                      <p><strong>Cliente:</strong> {pedido.clienteNombre}</p>
+                      {pedido.clienteEmail && <p><strong>Correo:</strong> {pedido.clienteEmail}</p>}
+                      <p><strong>Destino:</strong> {pedido.tipoEntrega === 'RECOJO_TIENDA' ? 'Recojo en tienda' : (pedido.direccionEntrega || 'Dirección no registrada; consultar antes de despachar.')}</p>
+                      {pedido.numeroSeguimiento && <p><strong>Seguimiento:</strong> {pedido.numeroSeguimiento}</p>}
+                    </div>
+                    <div className="min-w-0">
+                      <h2 className="mb-2 font-semibold">Productos para preparar</h2>
+                      <ul className="space-y-2">
+                        {(pedido.detalles || []).map(detalle => <li key={detalle.id || detalle.productoId} className="break-words">
+                          {detalle.cantidad} × {detalle.productoNombre} — {formatMoney(detalle.subtotal)}
+                        </li>)}
+                      </ul>
+                      {!pedido.detalles?.length && <p>No hay detalle disponible. Consultar antes de despachar.</p>}
+                      <p className="mt-3 font-semibold">Total: {formatMoney(pedido.total)}</p>
+                    </div>
+                  </div>
+                </details>
               </div>
             )
           })}

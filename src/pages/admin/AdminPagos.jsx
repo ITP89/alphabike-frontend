@@ -416,7 +416,7 @@ function AdminPagos() {
 
                 <div>
                   <span className="font-black text-slate-950 text-sm tracking-tight">{formatMoney(pago.monto)}</span>
-                  <span className="block text-[10px] text-emerald-600 font-bold">Estado: Pagado</span>
+                  <span className="block text-[10px] text-emerald-600 font-bold">Estado: {pago.estado === 'PAGADO' ? 'Pagado' : 'Pendiente'}</span>
                 </div>
 
                 <div>
@@ -426,9 +426,9 @@ function AdminPagos() {
                     <IconoMetodo className="h-3 w-3" />
                     {LABELS_METODO[metodoReal] || metodoReal}
                   </span>
-                  {pago.detallesPago?.ultimos4 && (
+                  {pago.tarjetaUltimos4 && (
                     <span className="block text-[10px] font-semibold text-slate-400 mt-0.5">
-                      {pago.detallesPago.marca} •••• {pago.detallesPago.ultimos4}
+                      {pago.tarjetaMarca} •••• {pago.tarjetaUltimos4}
                     </span>
                   )}
                 </div>
@@ -573,10 +573,10 @@ function AdminPagos() {
               </button>
             </div>
 
-            <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 font-mono text-xs space-y-2 text-slate-800">
-              <div className="flex justify-between border-b border-slate-200 pb-1.5 text-[11px] font-bold">
+            <div className="break-words rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 font-mono text-xs space-y-2 text-slate-800">
+              <div className="flex flex-col gap-1 border-b border-slate-200 pb-1.5 text-xs font-bold">
                 <span>ALPHABIKE TALLER & STORE</span>
-                <span>RUC: 20608945123</span>
+                <span>Constancia interna · No es comprobante tributario</span>
               </div>
 
               <div className="grid grid-cols-2 gap-1 text-[11px]">
@@ -589,11 +589,13 @@ function AdminPagos() {
               <div className="grid grid-cols-2 gap-1 text-[11px]">
                 <span className="text-slate-500">Código Autorización:</span>
                 <span className="font-bold text-right text-emerald-700">
-                  {pagoDetalle.autorizacion || `AUT-${pagoDetalle.id.slice(0, 6).toUpperCase()}`}
+                  {pagoDetalle.autorizacion || 'No registrada'}
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-1 text-[11px]">
+                <span className="text-slate-500">Cliente:</span>
+                <span className="break-words text-right">{pagoDetalle.clienteNombre || 'No disponible'}</span>
                 <span className="text-slate-500">Referencia Origen:</span>
                 <span className="font-bold text-right text-slate-900">
                   {pagoDetalle.referenciaTipo} #{pagoDetalle.referenciaId.slice(0, 8)}
@@ -607,20 +609,20 @@ function AdminPagos() {
                 </span>
               </div>
 
-              {pagoDetalle.detallesPago?.marca && (
+              {pagoDetalle.tarjetaMarca && (
                 <div className="grid grid-cols-2 gap-1 text-[11px] border-t border-slate-200 pt-1">
                   <span className="text-slate-500">Tarjeta Emisora:</span>
                   <span className="font-bold text-right text-blue-700">
-                    {pagoDetalle.detallesPago.marca} •••• {pagoDetalle.detallesPago.ultimos4}
+                    {pagoDetalle.tarjetaMarca} •••• {pagoDetalle.tarjetaUltimos4}
                   </span>
                 </div>
               )}
 
-              {pagoDetalle.detallesPago?.codigoOperacion && (
+              {(pagoDetalle.transaccionId || pagoDetalle.codigoAutorizacion) && (
                 <div className="grid grid-cols-2 gap-1 text-[11px]">
                   <span className="text-slate-500">Cód. Banco/Billetera:</span>
                   <span className="font-bold text-right text-purple-700">
-                    {pagoDetalle.detallesPago.codigoOperacion}
+                    {pagoDetalle.transaccionId || pagoDetalle.codigoAutorizacion}
                   </span>
                 </div>
               )}
@@ -633,14 +635,6 @@ function AdminPagos() {
               </div>
 
               <div className="border-t border-slate-200 pt-2 space-y-1 text-[11px]">
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Subtotal Neto:</span>
-                  <span>{formatMoney(Number(pagoDetalle.monto) / 1.18)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">I.G.V. (18%):</span>
-                  <span>{formatMoney(Number(pagoDetalle.monto) - Number(pagoDetalle.monto) / 1.18)}</span>
-                </div>
                 <div className="flex justify-between text-xs font-black text-slate-950 border-t border-slate-300 pt-1">
                   <span>TOTAL COBRADO:</span>
                   <span className="text-emerald-700">{formatMoney(pagoDetalle.monto)}</span>

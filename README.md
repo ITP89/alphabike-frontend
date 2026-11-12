@@ -186,3 +186,12 @@ Pagos e historial usan campos etiquetados en movil. El historial distingue Total
 - El simulador identifica los datos comerciales de demostración y advierte que no deben usarse tarjetas ni transferencias reales. Checkout Pro conserva su configuración propia en backend.
 
 Pruebas nuevas: entrega por tipo, precio/correo del pedido, fecha de Lima y reportes parcialmente fallidos. Ejecutar npm test -- --run, npm run lint y npm run build. El backend debe actualizarse junto con esta versión del frontend, especialmente por stockEsperado y referencias-pendientes.
+
+
+### Consistencia de cobros y pedidos
+
+- El estado del servicio y su pago se consultan por separado. Una cita completada conserva el cobro pendiente de su cotización; las canceladas y las referencias ya pagadas no se ofrecen para cobrar.
+- El encargado puede consultar productos, cantidades, destino y guía del pedido antes de avanzar su entrega.
+- El cliente puede recuperar el pago simulado de un pedido pendiente existente o solicitar su cancelación. El servidor vuelve a validar propiedad, estado y reserva; una operación asociada a Mercado Pago exige resolver primero su estado remoto.
+- Los pagos de consulta incluyen el nombre del cliente y los datos persistidos de operación/tarjeta. Las constancias internas no inventan autorizaciones ni datos fiscales.
+- El resumen administrativo distingue Mercado Pago y otros métodos para reconciliar el desglose con los ingresos confirmados. Los pedidos muestran la fecha del contrato HTTP.

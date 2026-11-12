@@ -1,3 +1,4 @@
+import RecuperarPedido from '../components/RecuperarPedido'
 import { useState } from 'react'
 import api from '../api/axios'
 import { getApiErrorMessage } from '../utils/apiError'
@@ -131,6 +132,7 @@ function DetallePedido() {
                 Sin detalle disponible.
               </p>
             )}
+            <RecuperarPedido pedido={pedido} config={paymentConfig} onActualizar={refetch} />
           </section>
 
           <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">

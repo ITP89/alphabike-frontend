@@ -104,13 +104,15 @@ function DashboardAdmin() {
   }, [cargarDatos])
 
   const { ingresos, desgloseMetodos } = useMemo(() => {
-    if (!datos?.pagos) return { ingresos: 0, desgloseMetodos: { tarjeta: 0, yape: 0, transfer: 0, efectivo: 0 } }
+    if (!datos?.pagos) return { ingresos: 0, desgloseMetodos: { tarjeta: 0, yape: 0, transfer: 0, efectivo: 0, mercadoPago: 0, otros: 0 } }
 
     let total = 0
     let tarjeta = 0
     let yape = 0
     let transfer = 0
     let efectivo = 0
+    let mercadoPago = 0
+    let otros = 0
 
     datos.pagos.forEach((pago) => {
       if (pago.estado === 'PAGADO') {
@@ -121,10 +123,12 @@ function DashboardAdmin() {
         else if (metodo === 'YAPE' || metodo === 'PLIN') yape += m
         else if (metodo === 'TRANSFERENCIA') transfer += m
         else if (metodo === 'EFECTIVO') efectivo += m
+        else if (metodo === 'MERCADO_PAGO') mercadoPago += m
+        else otros += m
       }
     })
 
-    return { ingresos: total, desgloseMetodos: { tarjeta, yape, transfer, efectivo } }
+    return { ingresos: total, desgloseMetodos: { tarjeta, yape, transfer, efectivo, mercadoPago, otros } }
   }, [datos])
 
   return (
@@ -193,7 +197,7 @@ function DashboardAdmin() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
               <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-3.5">
                 <div className="flex items-center gap-2 text-blue-700 font-bold text-xs mb-1">
                   <CreditCard className="h-4 w-4" />
@@ -229,6 +233,15 @@ function DashboardAdmin() {
                 <p className="text-xl font-black text-slate-900">{formatMoney(desgloseMetodos.efectivo)}</p>
                 <span className="text-[10px] text-amber-600 font-semibold">Caja taller central</span>
               </div>
+              <div className="rounded-xl border border-sky-100 bg-sky-50/50 p-3.5">
+                <p className="mb-1 text-xs font-bold text-sky-800">Mercado Pago</p>
+                <p className="break-words text-xl font-black text-slate-900">{formatMoney(desgloseMetodos.mercadoPago)}</p>
+                <span className="text-xs text-sky-700">Pagos confirmados por el proveedor</span>
+              </div>
+              {desgloseMetodos.otros > 0 && <div className="rounded-xl border border-slate-200 p-3.5">
+                <p className="text-xs font-bold">Otros métodos</p>
+                <p className="break-words text-xl font-black">{formatMoney(desgloseMetodos.otros)}</p>
+              </div>}
             </div>
           </div>
 

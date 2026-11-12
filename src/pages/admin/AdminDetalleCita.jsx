@@ -16,6 +16,7 @@ function AdminDetalleCita() {
   const { id } = useParams()
   const [cita, setCita] = useState(null)
   const [cotizacion, setCotizacion] = useState(null)
+  const [pagoRegistrado, setPagoRegistrado] = useState(false)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState(null)
@@ -37,12 +38,15 @@ function AdminDetalleCita() {
 
       try {
         const cotRes = await api.get(`/cotizaciones/cita/${id}`)
+        const pagosRes = await api.get(`/pagos/referencia/${cotRes.data.data.id}`)
+        setPagoRegistrado((pagosRes.data.data || []).some(pago => pago.estado === 'PAGADO'))
         setCotizacion(cotRes.data.data)
         setDescCotizacion(cotRes.data.data.descripcion || '')
         setMontoCotizacion(cotRes.data.data.monto || '')
       } catch (err) {
         if (err.response?.status !== 404) throw err
         setCotizacion(null)
+        setPagoRegistrado(false)
       }
     } catch (err) {
       setError(getApiErrorMessage(err, 'No se pudo cargar la cita'))
@@ -107,6 +111,7 @@ function AdminDetalleCita() {
         monto: cotizacion.monto,
         metodoPago,
       })
+      setPagoRegistrado(true)
       setCotizacion((prev) => ({ ...prev, estado: 'ACEPTADA' }))
       setCita((prev) => ({ ...prev, estado: 'COMPLETADO' }))
       setMensaje({ type: 'success', text: 'Pago registrado correctamente' })
@@ -215,7 +220,7 @@ function AdminDetalleCita() {
             <CreditCard className="h-4 w-4 text-blue-600" aria-hidden="true" />
             Registrar pago
           </h2>
-          {cotizacion && !citaCerrada(cita) && cotizacion.estado !== 'RECHAZADA' ? (
+          {cotizacion && cita.estado !== 'CANCELADO' && !pagoRegistrado && cotizacion.estado !== 'RECHAZADA' ? (
             <>
               <p className="mb-3 text-sm text-gray-600">Monto: {formatMoney(cotizacion.monto)}</p>
               <select
@@ -234,11 +239,11 @@ function AdminDetalleCita() {
                 disabled={registrandoPago}
                 className="w-full rounded-md bg-emerald-600 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {registrandoPago ? 'Registrando...' : 'Registrar pago y finalizar servicio'}
+                {registrandoPago ? 'Registrando...' : (cita.estado === 'COMPLETADO' ? 'Registrar pago pendiente' : 'Registrar pago y finalizar servicio')}
               </button>
             </>
           ) : (
-            <p className="text-sm text-gray-500">{citaCerrada(cita) ? 'Esta cita está cerrada. No hay cobros disponibles desde esta pantalla.' : cotizacion?.estado === 'RECHAZADA' ? 'La cotización fue rechazada por el cliente.' : 'Genera una cotización primero.'}</p>
+            <p className="text-sm text-gray-500">{pagoRegistrado ? 'Pago registrado. No hay cobros pendientes.' : cita.estado === 'CANCELADO' ? 'Esta cita está cancelada. No hay cobros disponibles.' : cotizacion?.estado === 'RECHAZADA' ? 'La cotización fue rechazada por el cliente.' : 'Genera una cotización primero.'}</p>
           )}
         </section>
       </div>
